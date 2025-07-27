@@ -5,7 +5,7 @@
     min-height: 100vh;
     padding: 0px  16px;   /*좌우 여백*/
     box-sizing: border-box;
-    width: 100vw;       /*회면 꽉차게*/
+    width: 100%;       /*회면 꽉차게*/
 }
 
 .stepContainer {
@@ -72,6 +72,7 @@
     color: #888;
     margin-bottom: 4px;
     align-self: flex-start;
+    text-align: center;  /* 텍스트 중앙 정렬 */
 }
 
 /* 진행 바 */

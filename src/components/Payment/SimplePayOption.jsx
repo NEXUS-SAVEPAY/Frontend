@@ -13,7 +13,9 @@ function SimplePayOption({ type, label, icon, selectedIcon, options = [], select
                     className={`${styles.optionButton} ${isSelected ? styles.selected : ''}`}
                     onClick={() => onSelect(type)}
                 >
-                    <img src={displayIcon} alt={label} className={styles.icon} />
+                    <div className={styles.iconWrapper}>
+                        <img src={displayIcon} alt={label} className={styles.icon} />
+                    </div>
 
                     {/* 하위 옵션이 있을 경우 동그라미로 선택 상태 표시 */}
                     {isSelected && options.length > 0 && (

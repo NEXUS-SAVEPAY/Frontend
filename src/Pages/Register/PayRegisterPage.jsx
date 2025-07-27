@@ -82,7 +82,7 @@ function PayRegisterPage() {
                 </div>
 
                 <div className={styles.stepContainer}>
-                    <span className={styles.stepText}>2단계</span>
+                    <p className={styles.stepText}>2단계</p>
                     <div className={styles.progressBar}>
                         <div className={styles.progress} />
                     </div>

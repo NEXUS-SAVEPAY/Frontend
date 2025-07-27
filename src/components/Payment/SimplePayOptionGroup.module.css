@@ -41,9 +41,10 @@
 /* 아이콘 이미지 */
 .icon {
     width: 150px;
-    height: 16px;
     margin: 0 auto;
     flex-shrink: 0;
+    height: 20px;                /* 높이를 더 키움 */
+    object-fit: contain;        /* 비율 유지하면서 꽉 차게 */
 }
 
 /* 하위 옵션 그룹 */
@@ -69,4 +70,12 @@
 .radio {
     font-size: 14px;
     line-height: 1;
+}
+
+.iconWrapper {
+    height: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 6px;
 }
