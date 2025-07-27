@@ -1,0 +1,106 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* 화면 중앙 정렬 */
+    align-items: center;
+    background-color: #5C4CF2;
+    min-height: 100vh;
+    padding: 40px 16px;
+    box-sizing: border-box;
+    max-width: 390px;
+    margin: 0 auto;
+}
+
+.character {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    margin-bottom: 16px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFD900;
+    margin-bottom: 12px;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.description {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+    white-space: pre-line;
+    color: white;
+    margin-bottom: 32px;
+}
+
+.speechBubble {
+    background-color: #3E33A9;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 32px;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600;
+    font-size: 11.42px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 24px;
+}
+
+.speechBubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #3E33A9;
+}
+
+.loginDriver {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    text-align: center;
+    color: #EAEDF0;
+    margin: 0 0 32px;
+    position: relative;
+}
+
+.loginDriver::before,
+.loginDriver::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 120px;
+    height: 1px;
+    background-color: #EAEDF0;
+}
+
+.loginDriver::before {
+    left: -130px;
+}
+
+.loginDriver::after {
+    right: -130px;
+}
+
+.buttonWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;  /* 버튼 간격 */
+    max-width: 360px;
+    padding: 0 16px;
+    box-sizing: border-box;
+}

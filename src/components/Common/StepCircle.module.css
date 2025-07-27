@@ -1,0 +1,22 @@
+.circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #eaedf0;
+    color: #7a5ef8;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.active {
+    background-color: #6c4eff;
+    color: white;
+}
+
+.done {
+    background-color: #a98bff;
+    color: white;
+}
