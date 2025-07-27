@@ -1,0 +1,74 @@
+.container {
+    padding: 24px 16px;
+    max-width: 390px;
+    margin: 0 auto;
+}
+
+.title {
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.description {
+    font-size: 16px;
+    font-weight: 500;
+    color: #222;
+    margin: 16px 0 20px 0;  /* 상하 간격 정리 */
+    text-align: left;
+}
+
+.inputRow {
+    display: flex;
+    align-items: center;    /* StepCircle과 컴포넌트를 수직 정렬 */
+    gap: 12px;              /* StepCircle ↔ 컴포넌트 간격 */
+    margin-bottom: 24px;    /* 줄 간 여백 */
+}
+
+.circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #EAEDF0;
+    color: #7a5ef8;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px;
+    flex-shrink: 0;         /* 줄어들지 않도록 고정 */
+}
+
+.registerButton {
+    width: 100%;
+    padding: 14px 0;
+    background-color: #6a3bf9;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;       /* 카드 미리보기와 간격 */
+}
+
+.registerButton:hover {
+    background-color: #5c2ee3;
+}
+
+.completeButton {
+    width: 100%;
+    padding: 14px 0;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 16px;
+}

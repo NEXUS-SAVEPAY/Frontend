@@ -1,0 +1,23 @@
+.tabbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    z-index: 10;
+}
+
+.tabbar button {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.tabbar button:hover {
+    color: #4F46E5;
+}

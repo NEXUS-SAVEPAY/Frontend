@@ -1,0 +1,82 @@
+.dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    border-radius: 999px;
+    background-color: #7a5ef8;
+    font-weight: bold;
+    font-size: 14px;
+    overflow: visible;
+    justify-content: center;
+}
+
+.selected {
+    padding: 16px 20px;
+    border-radius: 999px;
+    background-color: #f5f5f5;
+    color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: none;
+    position:relative;
+}
+
+.arrow {
+    position: absolute;  /* ✅ 오른쪽 고정 */
+    right: 20px;          /* ✅ 우측 여백 */
+    top: 50%;             /* 수직 중앙 정렬 */
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: #000000;
+    font-family: Arial, sans-serif;
+}
+
+.options {
+    margin-top: 8px;
+    padding: 0;
+    list-style: none;
+    border-radius: 12px;
+    background-color: white;
+    overflow: hidden;
+    position: absolute; /* ✅ 추가 */
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 10; /* ✅ 추가 */
+}
+
+
+.optionItem {
+    /* 🔧 아래 줄이 필요합니다 */
+    position: relative;
+
+    padding: 14px 20px;
+    background-color: #7a5ef8;
+    color: white;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.optionarrow {
+    position: absolute;  /* ✅ 오른쪽 고정 */
+    right: 20px;          /* ✅ 우측 여백 */
+    top: 50%;             /* 수직 중앙 정렬 */
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+.optionItem:last-child {
+    margin-bottom: 0;
+}
+
+.optionItem:hover {
+    background-color: #684ee0;
+}

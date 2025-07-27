@@ -1,0 +1,43 @@
+.benefit-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.summary {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.card-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail-btn {
+    background-color: #4F46E5;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.more-btn {
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
