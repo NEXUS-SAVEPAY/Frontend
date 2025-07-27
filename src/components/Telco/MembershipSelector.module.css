@@ -1,0 +1,91 @@
+/* components/Telco/MembershipSelector.module.css */
+.container {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    background-color: #654EFF;
+    border-radius: 20px;
+    color: white;
+    margin-bottom: 12px;
+    text-align: left; /* 텍스트 왼쪽 정렬 */
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center; /* 가운데 정렬 */
+}
+
+.telcoItem {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.question {
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.button {
+    flex: 1;
+    padding: 10px 0px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background: transparent;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.active {
+    background-color: white;
+    color: #654EFF;
+}
+
+.gradeQuestion {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.gradeGroup {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.gradeButton {
+    flex: 1; /*버튼 너비 동일*/
+    padding: 8px 20px;
+    border: 1px solid white;
+    border-radius: 8px;
+    background: transparent;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gradeButton.active {
+    background-color: white;
+    color: #654EFF;
+}
+
+.guide {
+    font-size: 12px;
+    color: #eee;
+    line-height: 1.4;
+    margin-top: 8px;
+}

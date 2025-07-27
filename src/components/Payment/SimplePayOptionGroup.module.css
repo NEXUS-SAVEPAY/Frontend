@@ -1,0 +1,72 @@
+/* 결제 수단 묶음 */
+.group {
+    margin-bottom: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 버튼 그룹 박스 */
+.box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+/* 옵션 버튼 */
+.optionButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 12px;
+    background-color: #eee;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    color: #444;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;             /* 부모 기준으로 꽉 차게 */
+}
+
+/* 선택된 버튼 스타일 */
+.selected {
+    background-color: #654EFF;
+    color: white;
+}
+
+/* 아이콘 이미지 */
+.icon {
+    width: 150px;
+    height: 16px;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+/* 하위 옵션 그룹 */
+.labelSubGroup {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: white;
+}
+
+/* 하위 옵션 한 줄 */
+.subOption {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* 동그라미 */
+.radio {
+    font-size: 14px;
+    line-height: 1;
+}
