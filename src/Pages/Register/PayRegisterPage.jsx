@@ -103,9 +103,11 @@ function PayRegisterPage() {
             </div>
 
             {/* 완료 버튼 */}
-            {selected && (
-                <button className={styles.completeButton} onClick={handleComplete}>완료</button>
-            )}
+            <div className={styles.fixedUnder}>
+                {selected && (
+                    <button className={styles.completeButton} onClick={handleComplete}>완료</button>
+                )}
+            </div>
         </div>
     );
 }

@@ -21,6 +21,7 @@
 /* 고정된 상단만큼 아래 콘텐츠 밀어내기 */
 .content {
     padding-top: 120px; /* fixedTop의 높이만큼 여백 */
+    padding-bottom: 90px; /* 완료 버튼 높이 + 여유 여백 */
     width: 100%;
 }
 
