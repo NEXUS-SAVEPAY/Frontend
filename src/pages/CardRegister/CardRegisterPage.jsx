@@ -1,6 +1,6 @@
-// pages/CardRegister/CardRegisterPage.jsx
 import React from 'react';
 import { useRecoilState } from 'recoil';
+
 import {
     cardCompanyAtom,
     cardNameAtom,
@@ -16,8 +16,9 @@ import CardNameInput from '../../components/Card/CardNameInput';
 import CardPreviewBox from '../../components/Card/CardPreviewBox';
 import CardDeleteModal from '../../components/Modal/DeleteCardModal';
 import CardSearchResultList from '../../components/Card/CardSearchResultList';
-import styles from './CardRegisterPage.module.css';
+import StepCircle from '../../components/Common/StepCircle';
 
+import styles from './CardRegisterPage.module.css';
 import mockCardData from '../../data/mockCardData';
 
 function CardRegisterPage() {
@@ -27,6 +28,8 @@ function CardRegisterPage() {
     const [registeredCards, setRegisteredCards] = useRecoilState(registeredCardsAtom);
     const [showDeleteModal, setShowDeleteModal] = useRecoilState(showDeleteModalAtom);
     const [pendingDeleteCard, setPendingDeleteCard] = useRecoilState(pendingDeleteCardAtom);
+
+    const currentStep = !cardCompany ? 1 : cardCompany && registeredCards.length === 0 ? 2 : 3;
 
     const handleSearch = () => {
         if (cardCompany && cardName) {
@@ -43,7 +46,7 @@ function CardRegisterPage() {
                     id: Date.now(),
                     name: cardName,
                     company: cardCompany,
-                    image: '/assets/images/sample-card.png'
+                    image: '/assets/images/sample-card.png',
                 });
             }
         }
@@ -69,42 +72,68 @@ function CardRegisterPage() {
     };
 
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>카드 등록</h1>
-            <ProgressStepIndicator currentStep={1} totalSteps={3} /> {/* 항상 1단계 고정 */}
-            <p className={styles.description}>자주 사용하는 카드를 등록해주세요.</p>
+        <div className={styles.pageWrapper}>
+            <div className={styles.contentWrapper}>
+                <h1 className={styles.title}>카드 등록</h1>
+                <ProgressStepIndicator currentStep={1} totalSteps={3} />
+                <p className={styles.description}>자주 사용하는 카드를 등록해주세요.</p>
 
-            <div className={styles.inputRow}>
-                <CardCompanyDropdown onSelect={setCardCompany} />
-            </div>
-
-            {cardCompany && (
-                <div className={styles.inputRow}>
-                    <CardNameInput value={cardName} onChange={setCardName} onSearch={handleSearch} />
+                <div className={styles.inputGroupWithStep}>
+                    <StepCircle number={1} />
+                    <CardCompanyDropdown onSelect={setCardCompany} />
                 </div>
-            )}
 
-            {searchResult && (
-                <>
-                    <CardPreviewBox card={searchResult} />
-                    <button className={styles.registerButton} onClick={handleRegister}>
-                        카드 등록 하기
-                    </button>
-                </>
-            )}
+                {currentStep >= 2 && (
+                    <>
+                        <div className={styles.inputGroupWithStep}>
+                            <StepCircle number={2} />
+                            <CardNameInput
+                                value={cardName}
+                                onChange={setCardName}
+                                onSearch={handleSearch}
+                            />
+                        </div>
 
-            <CardSearchResultList cards={registeredCards} onDelete={handleDeleteClick} />
+                        <div className={styles.inputGroup}>
+                            <button
+                                className={styles.registerButton}
+                                onClick={handleSearch}
+                            >
+                                카드 검색 하기
+                            </button>
+                        </div>
 
-            {registeredCards.length > 0 && (
-                <button className={styles.completeButton}>완료 하기</button>
-            )}
+                        {searchResult && (
+                            <>
+                                <CardPreviewBox card={searchResult} />
+                                <button
+                                    className={styles.registerButton}
+                                    onClick={handleRegister}
+                                >
+                                    카드 등록 하기
+                                </button>
+                            </>
+                        )}
+                    </>
+                )}
 
-            {showDeleteModal && (
-                <CardDeleteModal
-                    onConfirm={confirmDelete}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
+                {registeredCards.length > 0 && (
+                    <>
+                        <div className={styles.inputGroupWithStep}>
+                            <StepCircle number={3} />
+                            <button className={styles.completeButton}>완료 하기</button>
+                        </div>
+                        <CardSearchResultList cards={registeredCards} onDelete={handleDeleteClick} />
+                    </>
+                )}
+
+                {showDeleteModal && (
+                    <CardDeleteModal
+                        onConfirm={confirmDelete}
+                        onCancel={() => setShowDeleteModal(false)}
+                    />
+                )}
+            </div>
         </div>
     );
 }

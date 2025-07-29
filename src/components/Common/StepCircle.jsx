@@ -1,16 +1,12 @@
+// components/Common/StepCircle.jsx
+
 import React from 'react';
 import styles from './StepCircle.module.css';
-import classNames from 'classnames';
 
-function StepCircle({ number, isActive, isDone }) {
+function StepCircle({ number }) {
     return (
-        <div
-            className={classNames(styles.circle, {
-                [styles.active]: isActive,
-                [styles.done]: isDone,
-            })}
-        >
-            {number}
+        <div className={styles.circle}>
+            <span className={styles.number}>{number}</span>
         </div>
     );
 }

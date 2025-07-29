@@ -1,12 +1,13 @@
-// components/Card/CardCompanyDropdown.jsx
 import React, { useState } from 'react';
 import styles from './CardCompanyDropdown.module.css';
 
-const CARD_COMPANIES = ['신한 카드', '삼성 카드', '롯데 카드', '현대 카드', '국민 카드'];
+const companies = ['신한 카드', '삼성 카드', '롯데 카드', '현대 카드', '국민 카드'];
 
 function CardCompanyDropdown({ onSelect }) {
+    const [selected, setSelected] = useState('');
     const [isOpen, setIsOpen] = useState(false);
-    const [selected, setSelected] = useState('카드사 선택');
+
+    const toggleDropdown = () => setIsOpen(!isOpen);
 
     const handleSelect = (company) => {
         setSelected(company);
@@ -15,24 +16,28 @@ function CardCompanyDropdown({ onSelect }) {
     };
 
     return (
-        <div className={styles.dropdown}>
-            <div className={styles.selected} onClick={() => setIsOpen(!isOpen)}>
-                {selected}
-                <span className={styles.arrow}>▾</span>
+        <div className={styles.wrapper}>
+            <div
+                className={`${styles.dropdownTrigger} ${selected && !isOpen ? styles.selected : ''}`}
+                onClick={toggleDropdown}
+            >
+                <span>{selected || '카드사 선택'}</span>
+                <span>{isOpen ? '▲' : '▼'}</span>
             </div>
+
             {isOpen && (
-                <ul className={styles.options}>
-                    {CARD_COMPANIES.map((company) => (
-                        <li
-                            key={company}
-                            className={styles.optionItem}
+                <div className={styles.dropdownList}>
+                    {companies.map((company, index) => (
+                        <div
+                            key={index}
+                            className={styles.dropdownItem}
                             onClick={() => handleSelect(company)}
                         >
-                            {company}
-                            <span className={styles.optionarrow}>▴</span>
-                        </li>
+                            <span>{company}</span>
+                            <span>▲</span>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

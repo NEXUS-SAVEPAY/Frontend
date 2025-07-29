@@ -1,5 +1,4 @@
 import React from 'react';
-import StepCircle from './StepCircle';
 import styles from './StepIndicator.module.css';
 import { useRecoilValue } from 'recoil';
 import { currentStepAtom } from '../../recoil/atoms/CardRegisterAtom';

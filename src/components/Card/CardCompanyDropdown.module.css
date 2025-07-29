@@ -1,82 +1,76 @@
-.dropdown {
-    position: relative;
+.wrapper {
     width: 100%;
-    max-width: 340px;
     margin: 0 auto;
+    position: relative;
+}
+
+/* 닫힌 상태 */
+.dropdownTrigger {
+    background-color: #f0f2f5;
     border-radius: 999px;
-    background-color: #7a5ef8;
+    padding: 16px 24px;
+    font-size: 15px;
     font-weight: bold;
-    font-size: 14px;
-    overflow: visible;
-    justify-content: center;
+    color: black;
+    position: relative;
+    cursor: pointer;
 }
 
 .selected {
-    padding: 16px 20px;
-    border-radius: 999px;
-    background-color: #f5f5f5;
-    color: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: none;
-    position:relative;
-}
-
-.arrow {
-    position: absolute;  /* ✅ 오른쪽 고정 */
-    right: 20px;          /* ✅ 우측 여백 */
-    top: 50%;             /* 수직 중앙 정렬 */
-    transform: translateY(-50%);
-    font-size: 30px;
-    color: #000000;
-    font-family: Arial, sans-serif;
-}
-
-.options {
-    margin-top: 8px;
-    padding: 0;
-    list-style: none;
-    border-radius: 12px;
-    background-color: white;
-    overflow: hidden;
-    position: absolute; /* ✅ 추가 */
-    top: 100%;
-    left: 0;
-    width: 100%;
-    z-index: 10; /* ✅ 추가 */
-}
-
-
-.optionItem {
-    /* 🔧 아래 줄이 필요합니다 */
-    position: relative;
-
-    padding: 14px 20px;
-    background-color: #7a5ef8;
+    background-color: #7A5DF7;
     color: white;
-    border-radius: 999px;
-    margin-bottom: 8px;
+}
+
+/* 글자 가운데, 화살표 오른쪽 */
+.dropdownTrigger span:first-child {
+    display: block;
     text-align: center;
+    width: 100%;
+}
+
+.dropdownTrigger span:last-child {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 펼쳐진 리스트 */
+.dropdownList {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropdownItem {
+    background-color: #7A5DF7;
+    border-radius: 999px;
+    padding: 16px 24px;
+    color: white;
     font-weight: bold;
+    font-size: 15px;
+    position: relative;
     cursor: pointer;
 }
 
+/* 드롭다운 항목도 동일하게 처리 */
+.dropdownItem span:first-child {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
 
-.optionarrow {
-    position: absolute;  /* ✅ 오른쪽 고정 */
-    right: 20px;          /* ✅ 우측 여백 */
-    top: 50%;             /* 수직 중앙 정렬 */
+.dropdownItem span:last-child {
+    position: absolute;
+    right: 24px;
+    top: 50%;
     transform: translateY(-50%);
-    font-size: 24px;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
 }
-.optionItem:last-child {
-    margin-bottom: 0;
+.dropdownWrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
 }
 
-.optionItem:hover {
-    background-color: #684ee0;
-}

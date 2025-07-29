@@ -5,10 +5,9 @@
     align-items: center;
     background-color: #5C4CF2;
     min-height: 100vh;
-    padding: 40px 16px;
     box-sizing: border-box;
-    max-width: 390px;
-    margin: 0 auto;
+
+    width: 100%;
 }
 
 .character {
@@ -98,9 +97,20 @@
 .buttonWrapper {
     display: flex;
     flex-direction: column;
+    align-items: center; /* ✅ 가운데 정렬 */
     width: 100%;
-    gap: 16px;  /* 버튼 간격 */
-    max-width: 360px;
+    gap: 16px;
     padding: 0 16px;
     box-sizing: border-box;
 }
+
+.buttonWrapper button {
+    width: 100%;        
+    padding: 14px 0;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
+

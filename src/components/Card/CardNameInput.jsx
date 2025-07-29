@@ -16,11 +16,6 @@ const CardNameInput = ({ value, onChange, onSearch }) => {
                 />
             </div>
 
-            <div className={styles.buttonWrapper}>
-                <button className={styles.searchButton} onClick={onSearch}>
-                    카드 검색 하기
-                </button>
-            </div>
         </div>
     );
 };
