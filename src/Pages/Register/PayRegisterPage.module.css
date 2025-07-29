@@ -31,7 +31,7 @@
     color: #222;
     position: absolute;
     left: 0;
-    font-weight: 1000;
+    font-weight: 900;
 }
 
 .title {
@@ -64,7 +64,6 @@
 
 
 
-
 /* 단계 설명 텍스트 */
 .stepText {
     margin-top: 15px;
@@ -85,13 +84,19 @@
 }
 
 /* 진행 바 내부 */
-.progress {
-    width: 50%;
+.secondProgress {
+    width: 66%;
     height: 100%;
     background-color: #654EFF;
     border-radius: 3px;
 }
 
+.thirdProgress {
+    width: 100%;
+    height: 100%;
+    background-color: #654EFF;
+    border-radius: 3px;
+}
 
 .completeButton {
     width: calc(100% - 32px);  /* 좌우 padding 16px씩 고려 */

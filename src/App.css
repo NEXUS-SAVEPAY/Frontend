@@ -1,10 +1,10 @@
 #root {
   width: 100%;
   height: 100%;
-  max-width: none;          /* ✅ 최대 너비 제한 제거 */
+  max-width: none;          /* 최대 너비 제한 제거 */
   margin: 0;
-  padding: 0;               /* ✅ 여백 제거 */
-  text-align: initial;      /* ✅ 텍스트 정렬 초기화 */
+  padding: 0;               /* 여백 제거 */
+  text-align: initial;      /* 텍스트 정렬 초기화 */
   box-sizing: border-box;
 }
 

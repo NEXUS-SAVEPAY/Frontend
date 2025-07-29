@@ -47,7 +47,7 @@ function TelcoRegisterPage() {
                 <div className={styles.stepContainer}>
                     <p className={styles.stepText}>3단계</p>
                     <div className={styles.progressBar}>
-                        <div className={styles.progress} />
+                        <div className={styles.thirdProgress} />
                     </div>
                 </div>
 

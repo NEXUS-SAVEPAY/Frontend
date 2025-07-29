@@ -12,7 +12,7 @@
     left: 0;
     width: 100%;
     background-color: #ffffff;
-    padding: 16px;
+    padding: 0px 16px;
     padding-top: 20px; /* 상태바 여백 */
     box-sizing: border-box;
     z-index: 1000;
@@ -20,7 +20,7 @@
 
 /* 고정된 상단만큼 아래 콘텐츠 밀어내기 */
 .content {
-    padding-top: 120px; /* fixedTop의 높이만큼 여백 */
+    padding-top: 86px; /* fixedTop의 높이만큼 여백 */
     padding-bottom: 90px; /* 완료 버튼 높이 + 여유 여백 */
     width: 100%;
 }
@@ -33,7 +33,7 @@
 }
 
 .logo {
-    width: 180px;
+    width: 130px;
     height: auto;
 }
 
@@ -49,8 +49,8 @@
 }
 
 .title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .viewAllButton {
@@ -155,11 +155,12 @@
 
 .scrollTopButton {
     position: fixed;
-    right: 16px;
-    bottom: 80px;
+    right: 9px;
+    bottom: 63px;
     background-color: #654eff;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: 700;
     border: none;
     border-radius: 50%;
     padding: 10px 14px;
