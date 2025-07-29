@@ -11,6 +11,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0 !important;
 }
 
 a {
@@ -23,8 +24,9 @@ a:hover {
 }
 
 body {
+  margin: 0 !important;
   margin: 0;
-  display: flex;
+  display: block; /* ✅ flex 대신 block */
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -50,8 +52,16 @@ button:hover {
   border-color: #646cff;
 }
 button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+button:focus-visible,
+button:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 @media (prefers-color-scheme: light) {

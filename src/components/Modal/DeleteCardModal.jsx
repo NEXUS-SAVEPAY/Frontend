@@ -14,7 +14,7 @@ const CardDeleteModal = () => {
         setShowDeleteModal(false);
         setPendingDeleteCard(null);
     };
-
+/*
     return (
         <div className={styles.modal}>
             <div className={styles.modalContent}>
@@ -24,6 +24,42 @@ const CardDeleteModal = () => {
             </div>
         </div>
     );
+*/
+
+    return (
+        <div className={styles.backdrop}>
+            <div className={styles.modal}>
+                <div className={styles.closeIconWrapper}>
+                    <div
+                        className={styles.closeIcon}
+                        onClick={() => setShowDeleteModal(false)}
+                    >
+                        ×
+                    </div>
+                </div>
+
+                <p className={styles.text}>등록하신 카드를 삭제하시겠습니까?</p>
+                <p className={styles.subtext}>삭제 시 처음부터 다시 검색해서 등록해야합니다.</p>
+
+                <div className={styles.buttonGroup}>
+                    <button
+                        className={`${styles.button} ${styles.confirmButton}`}
+                        onClick={confirmDelete}
+                    >
+                        네
+                    </button>
+                    <button
+                        className={`${styles.button} ${styles.cancelButton}`}
+                        onClick={() => setShowDeleteModal(false)}
+                    >
+                        아니요
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
+
 };
 
 export default CardDeleteModal;

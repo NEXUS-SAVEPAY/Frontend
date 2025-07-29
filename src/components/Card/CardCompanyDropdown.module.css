@@ -17,7 +17,7 @@
 }
 
 .selected {
-    background-color: #7A5DF7;
+    background-color: #654eff;
     color: white;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .dropdownItem {
-    background-color: #7A5DF7;
+    background-color: #654eff;
     border-radius: 999px;
     padding: 16px 24px;
     color: white;

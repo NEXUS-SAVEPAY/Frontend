@@ -7,7 +7,7 @@
 
 .cardBox {
     display: flex;
-    background-color: #6C4EFF;
+    background-color: #654eff;
     border-radius: 16px;
     padding: 12px;
     align-items: center;
@@ -40,7 +40,7 @@
 }
 
 .companyBadge {
-    background-color: #3F2EFF;
+    background-color: #654eff;
     font-size: 12px;
     padding: 4px 8px;
     border-radius: 999px;

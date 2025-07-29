@@ -4,6 +4,7 @@ import characterImage from '../../assets/images/character.svg';
 import SocialLoginButton from '../../components/Auth/SocialLoginButton';
 
 const OnboardingPage = () => {
+
     const handleKakaoLogin = () => {
         console.log('카카오 로그인');
     };

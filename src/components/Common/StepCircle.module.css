@@ -1,7 +1,7 @@
 /* components/Common/StepCircle.module.css */
 
 .circle {
-    position: sticky;  /* 또는 fixed도 가능 */
+    position: static;  /* 또는 fixed도 가능 */
     top: 140px; /* 카드 등록 문구 기준 위치로 조절 */
     width: 24px;
     height: 24px;
@@ -12,7 +12,7 @@
     justify-content: center;
     font-size: 14px;
     font-weight: bold;
-    color: #6A3BF9;
+    color: #654eff;
     flex-shrink: 0;
 }
 
@@ -20,5 +20,5 @@
 .number {
     font-size: 14px;
     font-weight: bold;
-    color: #6a3bf9; /* 보라색 */
+    color: #654eff; /* 보라색 */
 }

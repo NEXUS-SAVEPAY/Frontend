@@ -78,14 +78,19 @@ function CardRegisterPage() {
                 <ProgressStepIndicator currentStep={1} totalSteps={3} />
                 <p className={styles.description}>자주 사용하는 카드를 등록해주세요.</p>
 
-                <div className={styles.inputGroupWithStep}>
-                    <StepCircle number={1} />
+                <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
+                    <div className={styles.stepWrapper}>
+                        <StepCircle number={1} />
+                    </div>
+                    <div className={styles.inputWithButtonWrapper}>
                     <CardCompanyDropdown onSelect={setCardCompany} />
+                    </div>
                 </div>
 
                 {currentStep >= 2 && (
                     <>
-                        <div className={styles.inputGroupWithStep}>
+                    {/*
+                        <div className={`${styles.inputGroupWithStep} ${styles.alignCenter}`}>
                             <StepCircle number={2} />
                             <CardNameInput
                                 value={cardName}
@@ -96,7 +101,7 @@ function CardRegisterPage() {
 
                         <div className={styles.inputGroup}>
                             <button
-                                className={styles.registerButton}
+                                className={styles.searchButton}
                                 onClick={handleSearch}
                             >
                                 카드 검색 하기
@@ -104,7 +109,7 @@ function CardRegisterPage() {
                         </div>
 
                         {searchResult && (
-                            <>
+                            <div className={styles.previewWrapper}>
                                 <CardPreviewBox card={searchResult} />
                                 <button
                                     className={styles.registerButton}
@@ -112,20 +117,69 @@ function CardRegisterPage() {
                                 >
                                     카드 등록 하기
                                 </button>
-                            </>
+                            </div>
                         )}
+                    */}
+
+                        {/* Step 2: 카드 이름 입력 + 검색 버튼 같이 묶기 */}
+                        <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
+                            <div className={styles.stepWrapper}>
+                                <StepCircle number={2} />
+                            </div>
+                            <div className={styles.inputWithButtonWrapper}>
+                                <CardNameInput
+                                    value={cardName}
+                                    onChange={setCardName}
+                                    onSearch={handleSearch}
+                                />
+                                <button
+                                    className={styles.searchButton}
+                                    onClick={handleSearch}
+                                >
+                                    카드 검색 하기
+                                </button>
+                            </div>
+                        </div>
+
+
+                        {searchResult && (
+                            <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
+                                <div className={styles.stepWrapper}></div> {/* 빈칸으로 step 공간 확보 */}
+                                <div className={styles.previewWrapper}>
+                                    <CardPreviewBox card={searchResult} />
+                                    <button
+                                        className={styles.registerButton}
+                                        onClick={handleRegister}
+                                    >
+                                        카드 등록 하기
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+
                     </>
                 )}
 
                 {registeredCards.length > 0 && (
                     <>
-                        <div className={styles.inputGroupWithStep}>
-                            <StepCircle number={3} />
-                            <button className={styles.completeButton}>완료 하기</button>
+                        <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
+                            <div className={styles.resultWrapper}>
+                                <CardSearchResultList cards={registeredCards} onDelete={handleDeleteClick} />
+                            </div>
                         </div>
-                        <CardSearchResultList cards={registeredCards} onDelete={handleDeleteClick} />
+
+                        <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
+                            <div className={styles.stepWrapper}>
+                                <StepCircle number={3} />
+                            </div>
+                            <div className={styles.buttonWrapper}>
+                                <button className={styles.completeButton}>완료 하기</button>
+                            </div>
+                        </div>
                     </>
                 )}
+
 
                 {showDeleteModal && (
                     <CardDeleteModal
