@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { useNavigate } from 'react-router-dom';
+import { HiChevronLeft } from 'react-icons/hi';
 
 import {
     cardCompanyAtom,
@@ -28,17 +30,22 @@ function CardRegisterPage() {
     const [registeredCards, setRegisteredCards] = useRecoilState(registeredCardsAtom);
     const [showDeleteModal, setShowDeleteModal] = useRecoilState(showDeleteModalAtom);
     const [pendingDeleteCard, setPendingDeleteCard] = useRecoilState(pendingDeleteCardAtom);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const currentStep = !cardCompany ? 1 : cardCompany && registeredCards.length === 0 ? 2 : 3;
+    const navigate = useNavigate();
+    const handleBack = () => navigate(-1);
+
+    const currentStep = !cardCompany
+        ? 1
+        : cardCompany && registeredCards.length === 0
+        ? 2
+        : 3;
 
     const handleSearch = () => {
         if (cardCompany && cardName) {
             const foundCard = mockCardData.find(
-                (card) =>
-                    card.company === cardCompany &&
-                    card.name.includes(cardName)
+                (card) => card.company === cardCompany && card.name.includes(cardName)
             );
-
             if (foundCard) {
                 setSearchResult(foundCard);
             } else {
@@ -71,60 +78,59 @@ function CardRegisterPage() {
         setPendingDeleteCard(null);
     };
 
+    const handleCompanySelect = (company) => {
+        // 카드사를 새로 선택하면 상태 초기화
+        setCardCompany(company);
+        setCardName('');
+        setSearchResult(null);
+        setRegisteredCards([]);
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.contentWrapper}>
-                <h1 className={styles.title}>카드 등록</h1>
+                <div className={styles.header}>
+                    <button className={styles.backButton} onClick={handleBack}>
+                        <HiChevronLeft size={24} />
+                    </button>
+                    <h1 className={styles.title}>카드 등록</h1>
+                </div>
+
                 <ProgressStepIndicator currentStep={1} totalSteps={3} />
                 <p className={styles.description}>자주 사용하는 카드를 등록해주세요.</p>
 
+                {/* Step 1 */}
                 <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
                     <div className={styles.stepWrapper}>
-                        <StepCircle number={1} />
+                        <div className={styles.circleAndLine}>
+                            <StepCircle
+                                number={1}
+                                hasLineBelow={currentStep >= 2}
+                                lineHeight={isDropdownOpen ? '370px' : '50px'}
+                            />
+                        </div>
                     </div>
                     <div className={styles.inputWithButtonWrapper}>
-                    <CardCompanyDropdown onSelect={setCardCompany} />
+                        <CardCompanyDropdown 
+                        selected={cardCompany}
+                        onSelect={handleCompanySelect} 
+                        onToggleOpen={(isOpen) => setIsDropdownOpen(isOpen)}
+                        />
                     </div>
                 </div>
 
+                {/* Step 2 */}
                 {currentStep >= 2 && (
                     <>
-                    {/*
-                        <div className={`${styles.inputGroupWithStep} ${styles.alignCenter}`}>
-                            <StepCircle number={2} />
-                            <CardNameInput
-                                value={cardName}
-                                onChange={setCardName}
-                                onSearch={handleSearch}
-                            />
-                        </div>
-
-                        <div className={styles.inputGroup}>
-                            <button
-                                className={styles.searchButton}
-                                onClick={handleSearch}
-                            >
-                                카드 검색 하기
-                            </button>
-                        </div>
-
-                        {searchResult && (
-                            <div className={styles.previewWrapper}>
-                                <CardPreviewBox card={searchResult} />
-                                <button
-                                    className={styles.registerButton}
-                                    onClick={handleRegister}
-                                >
-                                    카드 등록 하기
-                                </button>
-                            </div>
-                        )}
-                    */}
-
-                        {/* Step 2: 카드 이름 입력 + 검색 버튼 같이 묶기 */}
                         <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
                             <div className={styles.stepWrapper}>
-                                <StepCircle number={2} />
+                                <div className={styles.circleAndLine}>
+                                    <StepCircle
+                                        number={2}
+                                        hasLineBelow={currentStep >= 3}
+                                        lineHeight="300px"
+                                    />
+                                </div>
                             </div>
                             <div className={styles.inputWithButtonWrapper}>
                                 <CardNameInput
@@ -132,46 +138,43 @@ function CardRegisterPage() {
                                     onChange={setCardName}
                                     onSearch={handleSearch}
                                 />
-                                <button
-                                    className={styles.searchButton}
-                                    onClick={handleSearch}
-                                >
+                                <button className={styles.searchButton} onClick={handleSearch}>
                                     카드 검색 하기
                                 </button>
                             </div>
                         </div>
 
-
                         {searchResult && (
                             <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
-                                <div className={styles.stepWrapper}></div> {/* 빈칸으로 step 공간 확보 */}
+                                <div className={styles.stepWrapper}></div>
                                 <div className={styles.previewWrapper}>
                                     <CardPreviewBox card={searchResult} />
-                                    <button
-                                        className={styles.registerButton}
-                                        onClick={handleRegister}
-                                    >
+                                    <button className={styles.registerButton} onClick={handleRegister}>
                                         카드 등록 하기
                                     </button>
                                 </div>
                             </div>
                         )}
-
-
                     </>
                 )}
 
+                {/* Step 3 */}
                 {registeredCards.length > 0 && (
                     <>
                         <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                             <div className={styles.resultWrapper}>
-                                <CardSearchResultList cards={registeredCards} onDelete={handleDeleteClick} />
+                                <CardSearchResultList
+                                    cards={registeredCards}
+                                    onDelete={handleDeleteClick}
+                                />
                             </div>
                         </div>
 
                         <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                             <div className={styles.stepWrapper}>
-                                <StepCircle number={3} />
+                                <div className={styles.circleAndLine}>
+                                    <StepCircle number={3} hasLineBelow={false} />
+                                </div>
                             </div>
                             <div className={styles.buttonWrapper}>
                                 <button className={styles.completeButton}>완료 하기</button>
@@ -179,7 +182,6 @@ function CardRegisterPage() {
                         </div>
                     </>
                 )}
-
 
                 {showDeleteModal && (
                     <CardDeleteModal

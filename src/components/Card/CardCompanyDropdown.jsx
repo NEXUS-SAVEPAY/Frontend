@@ -1,27 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './CardCompanyDropdown.module.css';
 
 const companies = ['신한 카드', '삼성 카드', '롯데 카드', '현대 카드', '국민 카드'];
 
-function CardCompanyDropdown({ onSelect }) {
-    const [selected, setSelected] = useState('');
+function CardCompanyDropdown({ onSelect, onToggleOpen, selected }) {
+    const [selectedInternal, setSelectedInternal] = useState(selected || '');
     const [isOpen, setIsOpen] = useState(false);
 
-    const toggleDropdown = () => setIsOpen(!isOpen);
+    // 외부 selected prop이 바뀔 때 내부 state도 반영
+    useEffect(() => {
+        setSelectedInternal(selected || '');
+    }, [selected]);
+
+    const toggleDropdown = () => {
+        const newOpen = !isOpen;
+        setIsOpen(newOpen);
+        onToggleOpen?.(newOpen); // 부모에게 드롭다운 열림/닫힘 전달
+    };
 
     const handleSelect = (company) => {
-        setSelected(company);
+        setSelectedInternal(company);
         onSelect(company);
         setIsOpen(false);
+        onToggleOpen?.(false); // 닫히도록 부모에게도 알림
     };
 
     return (
         <div className={styles.wrapper}>
             <div
-                className={`${styles.dropdownTrigger} ${selected && !isOpen ? styles.selected : ''}`}
+                className={`${styles.dropdownTrigger} ${selectedInternal && !isOpen ? styles.selected : ''}`}
                 onClick={toggleDropdown}
             >
-                <span>{selected || '카드사 선택'}</span>
+                <span>{selectedInternal || '카드사 선택'}</span>
                 <span>{isOpen ? '▲' : '▼'}</span>
             </div>
 

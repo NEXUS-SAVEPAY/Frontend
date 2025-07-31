@@ -1,11 +1,14 @@
-/* components/Common/StepCircle.module.css */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
 
 .circle {
-    position: static;  /* 또는 fixed도 가능 */
-    top: 140px; /* 카드 등록 문구 기준 위치로 조절 */
     width: 24px;
     height: 24px;
-    background-color: #f5f5f5;
+    background-color: #EAEDF0;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -13,12 +16,14 @@
     font-size: 14px;
     font-weight: bold;
     color: #654eff;
-    flex-shrink: 0;
+    z-index: 1;
 }
 
-
-.number {
-    font-size: 14px;
-    font-weight: bold;
-    color: #654eff; /* 보라색 */
+/* 🔽 줄을 absolute로 위치시킴 */
+.verticalLine {
+    position: absolute;
+    top: 100%;
+    width: 2px;
+    background-color:#EAEDF0;
+    margin-top: 4px;
 }
