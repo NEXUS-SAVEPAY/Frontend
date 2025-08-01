@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.stepContainer {
+    display: flex;
+    align-items: center;
+}
+.circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+}
+.active {
+    background-color: #654eff;
+    color: white;
+}
+.line {
+    width: 40px;
+    height: 2px;
+    background-color: lightgray;
+    margin: 0 8px;
+}

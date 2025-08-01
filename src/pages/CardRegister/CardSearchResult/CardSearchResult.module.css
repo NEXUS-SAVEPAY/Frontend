@@ -1,0 +1,54 @@
+.resultList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.cardBox {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%; /* resultList 영역 안에서 꽉 차게 */
+}
+
+.thumbnail {
+    width: 48px;
+    height: 30px;
+    object-fit: contain;
+    margin-right: 12px;
+}
+
+.info {
+    flex-grow: 1;
+}
+
+.name {
+    font-family: Pretendard;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: #333333;
+}
+
+.company {
+    font-family: Pretendard;
+    font-size: 12px;
+    color: #999999;
+    margin-top: 4px;
+}
+
+.registerButton {
+    background-color: #654eFF;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: Pretendard;
+    font-weight: 600;
+    cursor: pointer;
+}

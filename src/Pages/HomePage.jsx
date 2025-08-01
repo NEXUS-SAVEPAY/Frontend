@@ -5,7 +5,7 @@ import BenefitCard from '../components/Benefit/BenefitCard';
 import TabBar from '../components/Common/TabBar';
 import styles from './HomePage.module.css';
 
-import logoImage from '../assets/images/logo.svg';
+import logoImage from '../assets/images/logo-purple.svg';
 import oliveyoung from '../assets/images/oliveyoung.svg';
 import starbucks from '../assets/images/starbucks.svg';
 import mcdonalds from '../assets/images/mcdonalds.svg';

@@ -1,0 +1,66 @@
+.resultContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.cardBox {
+    display: flex;
+    background-color: #654eff;
+    border-radius: 16px;
+    padding: 12px;
+    align-items: center;
+    position: relative;
+}
+
+.cardLeft {
+    background-color: white;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    width: 60px;
+    height: 84px;
+}
+
+.cardImage {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.cardRight {
+    flex: 1;
+    position: relative;
+    color: white;
+}
+
+.companyBadge {
+    background-color: #654eff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+.cardName {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.closeButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}

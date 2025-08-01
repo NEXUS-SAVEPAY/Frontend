@@ -1,7 +1,11 @@
+// src/Pages/BenefitDetailPage.jsx
 
-// src/pages/BenefitDetailPage.jsx
 const BenefitDetailPage = () => {
-    return <div>Benefit Detail Page (준비 중)</div>;
+    return (
+        <div>
+            혜택 상세 페이지입니다.
+        </div>
+    );
 };
 
 export default BenefitDetailPage;

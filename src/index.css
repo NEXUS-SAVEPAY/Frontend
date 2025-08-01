@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  margin: 0 !important;
 }
 
 a {
@@ -23,8 +25,9 @@ a:hover {
 }
 
 body {
+  margin: 0 !important;
   margin: 0;
-  display: flex;
+  display: block; /* ✅ flex 대신 block */
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -74,3 +77,4 @@ button:active {
     background-color: #f9f9f9;
   }
 }
+

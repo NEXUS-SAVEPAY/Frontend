@@ -23,7 +23,7 @@ function TelcoRegisterPage() {
             grade: membershipInfo?.grade || '',
         });
     
-        navigate('/'); // 다음 단계로
+        navigate('/home'); // 다음 단계로
     };
 
     const showCompleteButton =
