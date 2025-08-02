@@ -1,0 +1,177 @@
+.pageWrapper {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto;
+    padding: 20px 20px 40px 20px;
+    font-family: 'Pretendard', sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* 헤더 */
+.header {
+    position: relative; /* 추가 */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 중앙 정렬 */
+    height: 48px;
+    margin-bottom: 20px;
+}
+
+.backButton {
+    position: absolute; /* ← 왼쪽에 고정 */
+    left: 0;
+    background: none;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #000000;
+    padding: 0 16px; /* 터치 영역 넓히기 */
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-left:-10px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 이미지 */
+.storeImage {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+/* 요약 */
+.summaryBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.brandTag {
+    background-color: #EAEDF0;
+    color: #5c4cf2;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+}
+
+.benefitTitle {
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    margin-left:3px;
+}
+
+/* 설명 + 버튼 한 줄 */
+.subTextRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    margin-bottom:-10px;    
+}
+
+.subText {
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.5;
+    white-space: pre-line;
+    flex: 1;
+}
+
+.inlineButton {
+    background-color: #5c4cf2;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-top:30px;
+}
+
+/* 혜택 내역 */
+.section {
+    margin-top: 20px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: 12px;
+}
+
+.benefitGrid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.benefitBox {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 16px;
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    background-color: #ffffff; /* 내부 흰색 */
+}
+
+.instructionContainer {
+    background-color: #ffffff;   /* 내부 흰색 */
+    border: 1px solid #e6e6e6;   /* 회색 테두리 */
+    border-radius: 12px;
+    padding: 16px;
+}
+
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5c4cf2;
+}
+
+.value {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+.instructionList {
+    padding-left: 20px;
+    font-size: 14px;
+    color: #333333;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* 하단 버튼 */
+.bottomButton {
+    display: block;
+    width: 100%;
+    background-color: #5c4cf2;
+    color: #ffffff;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    margin-top: 40px;
+    cursor: pointer;
+    text-decoration: none;
+}

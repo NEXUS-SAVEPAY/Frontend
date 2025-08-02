@@ -1,0 +1,15 @@
+{
+    "id": "oliveyoung",
+    "brand": "올리브영",
+    "title": "10% 캐시백",
+    "description": "카드사앱에서 쿠폰을 받고 등록된 카드로 매장 결제 시 혜택 제공",
+    "image": "/assets/oliveyoung_store.png",
+    "cashback": "10%",
+    "point": "결제 금액의 5% 적립",
+    "steps": [
+        "카드사 앱에서 쿠폰 받기",
+        "쿠폰 확인 후 매장에서 결제",
+        "전화번호 입력으로 포인트 적립"
+    ],
+    "externalUrl": "https://event.cardcompany.com/oliveyoung-benefit"
+}
