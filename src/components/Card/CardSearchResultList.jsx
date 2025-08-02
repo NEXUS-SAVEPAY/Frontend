@@ -16,9 +16,9 @@ const CardSearchResultList = ({ cards, onDelete }) => {
                         />
                     </div>
                     <div className={styles.cardRight}>
+                        <button className={styles.closeButton} onClick={() => onDelete(card)}>×</button>
                         <span className={styles.companyBadge}>{card.company}</span>
                         <div className={styles.cardName}>{card.name}</div>
-                        <button className={styles.closeButton} onClick={() => onDelete(card)}>×</button>
                     </div>
                 </div>
             ))}

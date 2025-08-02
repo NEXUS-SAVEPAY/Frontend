@@ -79,7 +79,6 @@ function CardRegisterPage() {
     };
 
     const handleCompanySelect = (company) => {
-        // 카드사를 새로 선택하면 상태 초기화
         setCardCompany(company);
         setCardName('');
         setSearchResult(null);
@@ -116,9 +115,9 @@ function CardRegisterPage() {
                     </div>
                     <div className={styles.inputWithButtonWrapper}>
                         <CardCompanyDropdown 
-                        selected={cardCompany}
-                        onSelect={handleCompanySelect} 
-                        onToggleOpen={(isOpen) => setIsDropdownOpen(isOpen)}
+                            selected={cardCompany}
+                            onSelect={handleCompanySelect} 
+                            onToggleOpen={(isOpen) => setIsDropdownOpen(isOpen)}
                         />
                     </div>
                 </div>
@@ -152,7 +151,16 @@ function CardRegisterPage() {
                             <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
                                 <div className={styles.stepWrapper}></div>
                                 <div className={styles.previewWrapper}>
+                                    {/* 🔼 카드 이미지 위로 텍스트 이동 */}
+                                    <p className={styles.retrySearchText} onClick={() => {
+                                        setSearchResult(null);
+                                        setCardName('');
+                                    }}>
+                                        검색된 카드가 아니신가요? <span className={styles.retryUnderline}>다시 검색</span>
+                                    </p>
+
                                     <CardPreviewBox card={searchResult} />
+
                                     <button className={styles.registerButton} onClick={handleRegister}>
                                         카드 등록 하기
                                     </button>
