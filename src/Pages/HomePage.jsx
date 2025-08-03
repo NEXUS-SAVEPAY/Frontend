@@ -5,6 +5,7 @@ import BenefitCard from '../components/Benefit/BenefitCard';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import TabBar from '../components/Common/TabBar';
 import styles from './HomePage.module.css';
+import recommendedBenefits from '../data/mockRecommendBenefits';
 
 
 import logoImage from '../assets/images/logo-purple.svg';
@@ -44,23 +45,19 @@ function HomePage() {
                             전체 보기  〉
                         </button>
                     </div>
+                    
                     <div className={styles.benefitList}>
-                        <BenefitCard
-                            brand="올리브영"
-                            description="10% 캐시백"
-                            imageSrc="/assets/images/oliveyoung.svg"
-                        />
-                        <BenefitCard
-                            brand="스타벅스"
-                            description="무료 사이즈 업"
-                            imageSrc="/assets/images/starbucks.svg"
-                        />
-                        <BenefitCard
-                            brand="맥도날드"
-                            description="전메뉴 40% 할인"
-                            imageSrc="/assets/images/mcdonalds.svg"
-                        />
+                        {recommendedBenefits.map((benefit) => (
+                            <BenefitCard
+                                key={benefit.id}
+                                id={benefit.id}
+                                brand={benefit.brand}
+                                description={benefit.description}
+                                imageSrc={benefit.imageSrc}
+                            />
+                        ))}
                     </div>
+
                 </section>
 
                 {/* 관심 브랜드 혜택 */}
@@ -92,13 +89,18 @@ function HomePage() {
                             <span className={styles.brandLabel}>메가박스</span>
                         </div>
                     </div>
-
-                    <BenefitListItem
-                        brand="올리브영"
-                        description="10% 캐시백"
-                        detail="등록하신 카드로 매장에서 결제해주세요"
-                        imageSrc="/assets/images/oliveyoung.png"
-                    />
+                    
+                    <div className={styles.listColumn}>
+                        {recommendedBenefits.map((benefit) => (
+                            <BenefitListItem
+                                key={benefit.id}
+                                id={benefit.id}
+                                brand={benefit.brand}
+                                description={benefit.description}
+                                imageSrc={benefit.imageSrc}
+                            />
+                        ))}
+                    </div>
 
                 </section>
             </div>

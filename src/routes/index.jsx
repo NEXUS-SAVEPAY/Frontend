@@ -11,6 +11,7 @@ import ExternalBenefitPage from '../pages/ExternalBenefitPage';
 import MyPage from '../pages/MyPage';
 import NotificationPage from '../pages/NotificationPage';
 import RecommendedBenefitPage from '../Pages/RecommendedBenefitPage';
+import FavoriteBenefitPage from '../Pages/FavoriteBenefitPage';
 
 function AppRoutes() {
     return (
@@ -22,6 +23,7 @@ function AppRoutes() {
                 <Route path="/register/telco" element={<TelcoRegisterPage />} />
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/benefit/recommended" element={<RecommendedBenefitPage />} />
+                <Route path="/benefit/favorites" element={<FavoriteBenefitPage />} />
                 <Route path="/benefit/:id" element={<BenefitDetailPage />} /> 
                 <Route path="/external-benefits" element={<ExternalBenefitPage />} />
                 <Route path="/mypage" element={<MyPage />} />
