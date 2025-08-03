@@ -1,11 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
+import { useRecoilValue } from 'recoil';
+import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
 import SearchBar from '../components/Common/SearchBar';
 import BenefitCard from '../components/Benefit/BenefitCard';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import TabBar from '../components/Common/TabBar';
 import styles from './HomePage.module.css';
 import recommendedBenefits from '../data/mockRecommendBenefits';
+import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
+import brandIcons from '../data/brandIcons';
 
 
 import logoImage from '../assets/images/logo-purple.svg';
@@ -21,6 +25,36 @@ function HomePage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const likedBrands = useRecoilValue(likedBrandsAtom);
+
+
+    const flatFavoriteBenefits = favoriteBrandBenefits.flatMap((brandGroup) =>
+        brandGroup.benefits.map((benefit) => ({
+            ...benefit,
+            brand: brandGroup.brand
+        }))
+    );
+
+    const filteredFlatBenefits = flatFavoriteBenefits.filter(
+        (benefit) => likedBrands[benefit.brand]
+    );
+
+    
+    const likedBrandList = Object.entries(likedBrands)
+    .filter(([_, isLiked]) => isLiked)
+    .map(([brand]) => brand);
+    
+    /*const likedBrandList = ['올리브영', '스타벅스', '맥도날드', '메가박스'];*/
+
+    const likedBrandGroups = favoriteBrandBenefits.filter((item) =>
+        likedBrandList.includes(item.brand)
+    );
+
+    console.log('🔥 likedBrands:', likedBrands);
+    console.log('🔥 likedBrandList:', likedBrandList);
+    console.log('🔥 brandIcons:', brandIcons);
+
+    console.log('🔥 localStorage:', localStorage.getItem('recoil-persist'));
     return (
         <div className={styles.container}>
             <div className={styles.fixedTop}>
@@ -71,27 +105,23 @@ function HomePage() {
                             전체 보기  〉
                         </button>
                     </div>
+
                     <div className={styles.brandList}>
-                        <div className={styles.brandItem}>
-                            <img src={oliveyoung} alt="올리브영" className={styles.brandIcon} />
-                            <span className={styles.brandLabel}>올리브영</span>
-                        </div>
-                        <div className={styles.brandItem}>
-                            <img src={starbucks} alt="스타벅스" className={styles.brandIcon} />
-                            <span className={styles.brandLabel}>스타벅스</span>
-                        </div>
-                        <div className={styles.brandItem}>
-                            <img src={mcdonalds} alt="맥도날드" className={styles.brandIcon} />
-                            <span className={styles.brandLabel}>맥도날드</span>
-                        </div>
-                        <div className={styles.brandItem}>
-                            <img src={megabox} alt="메가박스" className={styles.brandIcon} />
-                            <span className={styles.brandLabel}>메가박스</span>
-                        </div>
+                        {likedBrandList.map((brand) => {
+                        const icon = brandIcons[brand.trim()]; 
+                        console.log(`brand: '${brand}' → icon:`, icon);
+                        return(
+                            <div key={brand} className={styles.brandItem}>
+                                <img src={brandIcons[brand]} alt={brand} className={styles.brandIcon} />
+                                <span className={styles.brandLabel}>{brand}</span>
+                            </div>
+                        );
+                        })}
                     </div>
+
                     
                     <div className={styles.listColumn}>
-                        {recommendedBenefits.map((benefit) => (
+                        {filteredFlatBenefits.map((benefit) => (
                             <BenefitListItem
                                 key={benefit.id}
                                 id={benefit.id}
@@ -111,6 +141,7 @@ function HomePage() {
             <TabBar />
         </div>
     );
+
 }
 
 export default HomePage;

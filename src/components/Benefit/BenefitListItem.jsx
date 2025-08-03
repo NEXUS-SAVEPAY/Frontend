@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BenefitListItem.module.css';
+import brandIcons from '../../data/brandIcons';
 
 function BenefitListItem({ id, brand, description, detail, imageSrc, onClick }) {
         const navigate = useNavigate();
@@ -18,7 +19,7 @@ function BenefitListItem({ id, brand, description, detail, imageSrc, onClick }) 
                 <p className={styles.brandSubText}>{detail}</p>
                 <button className={styles.detailButton} onClick={handleDetailClick}>자세히 보기 〉</button>
             </div>
-            <img src={imageSrc} alt={brand} className={styles.brandImage} />
+            <img src={brandIcons[brand]} alt={brand} className={styles.brandImage} />
         </div>
     );
 }
