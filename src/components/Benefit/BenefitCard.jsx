@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BenefitCard.module.css';
+import brandIcons from '../../data/brandIcons';
 
 function BenefitCard({id, brand, description, imageSrc }) {
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ function BenefitCard({id, brand, description, imageSrc }) {
 
     return (
         <div className={styles.card}>
-            <img src={imageSrc} alt={brand} className={styles.image} />
+            <img src={brandIcons[brand]} alt={brand} className={styles.image} />
             <div className={styles.info}>
                 <h4 className={styles.brand}>{brand}</h4>
                 <h3 className={styles.description}>{description}</h3>
