@@ -78,17 +78,38 @@
 
 .brandList {
     display: flex;
-    gap: 12px;
+    gap: 2px; /* 아이템 사이 간격 넉넉하게 */
     margin-bottom: 12px;
 }
 
-.brandIcon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    border: 2px solid #654eff;
-    padding: 4px;
+/* 하나의 브랜드 아이템 전체 */
+.brandItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 68px; /* 상자 넓게 */
 }
+
+/* 이미지 박스 */
+.brandIcon {
+    width: 60px;        /* 더 크게 */
+    height: 60px;
+    border-radius: 12px;
+    border: none;       /* 보라색 선 제거 */
+    padding: 4px;
+    background-color: #fff; /* 선택되었을 때 대비 */
+    box-sizing: border-box;
+}
+
+/* 브랜드명 텍스트 */
+.brandLabel {
+    font-size: 13px;
+    color: #000;
+    margin-top: 6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 
 .selectedBrandBenefit {
     display: flex;
@@ -168,3 +189,9 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.listColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 아이템마다 여백 생김 */
+    padding-bottom: 32px;
+}

@@ -74,6 +74,16 @@
     text-align: center;  /* 텍스트 중앙 정렬 */
 }
 
+.thirdstepText {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 4px;
+    align-self: flex-start;
+    text-align: right;  /* 텍스트 왼쪽 정렬 */
+    margin-right: 45px;
+}
+
 /* 진행 바 */
 .progressBar {
     width: 100%;

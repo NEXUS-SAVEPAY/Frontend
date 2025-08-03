@@ -2,8 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import SearchBar from '../components/Common/SearchBar';
 import BenefitCard from '../components/Benefit/BenefitCard';
+import BenefitListItem from '../components/Benefit/BenefitListItem';
 import TabBar from '../components/Common/TabBar';
 import styles from './HomePage.module.css';
+import recommendedBenefits from '../data/mockRecommendBenefits';
+
 
 import logoImage from '../assets/images/logo-purple.svg';
 import oliveyoung from '../assets/images/oliveyoung.svg';
@@ -42,23 +45,19 @@ function HomePage() {
                             전체 보기  〉
                         </button>
                     </div>
+                    
                     <div className={styles.benefitList}>
-                        <BenefitCard
-                            brand="올리브영"
-                            description="10% 캐시백"
-                            imageSrc="/assets/images/oliveyoung.png"
-                        />
-                        <BenefitCard
-                            brand="스타벅스"
-                            description="무료 사이즈 업"
-                            imageSrc="/assets/images/starbucks.png"
-                        />
-                        <BenefitCard
-                            brand="맥도날드"
-                            description="전메뉴 40% 할인"
-                            imageSrc="/assets/images/mcdonalds.png"
-                        />
+                        {recommendedBenefits.map((benefit) => (
+                            <BenefitCard
+                                key={benefit.id}
+                                id={benefit.id}
+                                brand={benefit.brand}
+                                description={benefit.description}
+                                imageSrc={benefit.imageSrc}
+                            />
+                        ))}
                     </div>
+
                 </section>
 
                 {/* 관심 브랜드 혜택 */}
@@ -73,21 +72,36 @@ function HomePage() {
                         </button>
                     </div>
                     <div className={styles.brandList}>
-                        <img src={oliveyoung} alt="올리브영" className={styles.brandIcon} />
-                        <img src={starbucks} alt="스타벅스" className={styles.brandIcon} />
-                        <img src={mcdonalds} alt="맥도날드" className={styles.brandIcon} />
-                        <img src={megabox} alt="메가박스" className={styles.brandIcon} />
+                        <div className={styles.brandItem}>
+                            <img src={oliveyoung} alt="올리브영" className={styles.brandIcon} />
+                            <span className={styles.brandLabel}>올리브영</span>
+                        </div>
+                        <div className={styles.brandItem}>
+                            <img src={starbucks} alt="스타벅스" className={styles.brandIcon} />
+                            <span className={styles.brandLabel}>스타벅스</span>
+                        </div>
+                        <div className={styles.brandItem}>
+                            <img src={mcdonalds} alt="맥도날드" className={styles.brandIcon} />
+                            <span className={styles.brandLabel}>맥도날드</span>
+                        </div>
+                        <div className={styles.brandItem}>
+                            <img src={megabox} alt="메가박스" className={styles.brandIcon} />
+                            <span className={styles.brandLabel}>메가박스</span>
+                        </div>
+                    </div>
+                    
+                    <div className={styles.listColumn}>
+                        {recommendedBenefits.map((benefit) => (
+                            <BenefitListItem
+                                key={benefit.id}
+                                id={benefit.id}
+                                brand={benefit.brand}
+                                description={benefit.description}
+                                imageSrc={benefit.imageSrc}
+                            />
+                        ))}
                     </div>
 
-                    <div className={styles.selectedBrandBenefit}>
-                        <div className={styles.benefitTextBlock}>
-                            <h4 className={styles.brandTitle}>올리브영</h4>
-                            <h3 className={styles.brandDescription}>10% 캐시백</h3>
-                            <p className={styles.brandSubText}>등록하신 카드로 매장에서 결제해주세요</p>
-                            <button className={styles.detailButton}>자세히 보기 〉</button>
-                        </div>
-                        <img src="/assets/images/oliveyoung.png" alt="올리브영" className={styles.brandImage} />
-                    </div>
                 </section>
             </div>
 

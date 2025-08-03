@@ -14,7 +14,7 @@ function BenefitDetailPage() {
     return (
         <div className={styles.pageWrapper}>
             {/* 상단 헤더 */}
-             <div className={styles.header}>
+            <div className={styles.header}>
                 <button className={styles.backButton} onClick={() => navigate(-1)}>
                     <HiChevronLeft size={24} />
                 </button>
