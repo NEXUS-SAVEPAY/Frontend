@@ -17,6 +17,11 @@
 }
 
 .input:focus {
-    border-color: #6a46ff;
+    border-color: #654eff;
     background-color: #ffffff;
+}
+
+.input::placeholder {
+    color: #654eff;      /* 원하는 색상으로 변경 */
+    opacity: 1;       /* 흐릿하게 보이는 것 방지 (일부 브라우저) */
 }

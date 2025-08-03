@@ -1,0 +1,76 @@
+.container {
+    width: 100vw;
+    padding: 0 16px;
+    padding-bottom: 90px; /* 탭바와 여백 고려 */
+    box-sizing: border-box;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+/* 페이지 제목 */
+.pageTitle {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* 각 혜택 영역 구분 */
+.section {
+    margin-top: 24px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sectionHeader h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* '전체 보기' 버튼 */
+.viewAllButton {
+    background-color: #654eff;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* 혜택 카드 리스트 */
+.benefitList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 위로 가기 버튼 */
+.scrollTopButton {
+    position: fixed;
+    right: 9px;
+    bottom: 63px;
+    background-color: #654eff;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50%;
+    padding: 10px 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
