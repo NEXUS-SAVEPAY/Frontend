@@ -106,18 +106,40 @@ function HomePage() {
                         </button>
                     </div>
 
+                    {/*
                     <div className={styles.brandList}>
                         {likedBrandList.map((brand) => {
                         const icon = brandIcons[brand.trim()]; 
                         console.log(`brand: '${brand}' → icon:`, icon);
                         return(
-                            <div key={brand} className={styles.brandItem}>
+                            <div key={brand} className={styles.brandItem} onClick={() => navigate(`/brand/${encodeURIComponent(cleanBrand)}`)}>
                                 <img src={brandIcons[brand]} alt={brand} className={styles.brandIcon} />
                                 <span className={styles.brandLabel}>{brand}</span>
                             </div>
                         );
                         })}
                     </div>
+                    */}
+
+                    <div className={styles.brandList}>
+                        {likedBrandList.map((brand) => {
+                            return (
+                                <div
+                                    key={brand}
+                                    className={styles.brandItem}
+                                    onClick={() => navigate(`/benefits/${encodeURIComponent(brand)}`)}
+                                >
+                                    <img
+                                        src={brandIcons[brand]}
+                                        alt={brand}
+                                        className={styles.brandIcon}
+                                    />
+                                    <span className={styles.brandLabel}>{brand}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
 
                     
                     <div className={styles.listColumn}>
@@ -127,6 +149,7 @@ function HomePage() {
                                 id={benefit.id}
                                 brand={benefit.brand}
                                 description={benefit.description}
+                                detail={benefit.detail}
                                 imageSrc={benefit.imageSrc}
                             />
                         ))}

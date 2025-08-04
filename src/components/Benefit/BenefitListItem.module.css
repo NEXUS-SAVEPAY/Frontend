@@ -58,8 +58,8 @@
 }
 
 .brandImage {
-    width: 48px;  /* 중간 크기 */
-    height: 48px;
+    width: 72px;  /* 중간 크기 */
+    height: 72px;
     border-radius: 10px;
     object-fit: contain;
     flex-shrink: 0;
