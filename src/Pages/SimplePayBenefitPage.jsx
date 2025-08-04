@@ -17,7 +17,7 @@ function SimplePayBenefitPage() {
             <div className={styles.fixedHeader}>
                 <div className={styles.header}>
                     <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
-                    <h2 className={styles.title}>추천 혜택</h2>
+                    <h2 className={styles.title}>간편결제 혜택</h2>
                 </div>
             </div>
 
