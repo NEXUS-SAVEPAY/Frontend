@@ -1,46 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import BenefitCard from '../components/Benefit/BenefitCard';
 import TabBar from '../components/Common/TabBar';
 
 import styles from './RegisteredBenefitPage.module.css';
 import brandIcons from '../data/brandIcons';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
+import registeredBenefits from '../data/registeredBenefits';
+
 
 // 목데이터
-const cardBenefits = [
-    {
-        id: 1,
-        brand: '올리브영',
-        description: '10% 캐시백',
-        detail: '등록하신 카드로 매장에서 결제해주세요.',
-        imageSrc: brandIcons['올리브영'],
-    },
-    {
-        id: 2,
-        brand: '스타벅스',
-        description: '5% 할인',
-        detail: '모바일 카드로 결제 시 적용됩니다.',
-        imageSrc: brandIcons['스타벅스'],
-    },
-];
-
-const simplePayBenefits = [
-    {
-        id: 3,
-        brand: '올리브영',
-        description: '10% 캐시백',
-        detail: '등록하신 카드로 매장에서 결제해주세요.',
-        imageSrc: brandIcons['올리브영'],
-    },
-    {
-        id: 4,
-        brand: '메가박스',
-        description: '영화 1천원 할인',
-        detail: '간편결제로 예매 시 적용됩니다.',
-        imageSrc: brandIcons['메가박스'],
-    },
-];
+// 구분해서 슬라이스
+const cardBenefits = registeredBenefits.filter(b => b.type === 'card');
+const simplePayBenefits = registeredBenefits.filter(b => b.type === 'simplepay');
+const telcoBenefits = registeredBenefits.filter(b => b.type === 'telco');
 
 function RegisteredBenefitPage() {
     const navigate = useNavigate();
@@ -57,13 +29,13 @@ function RegisteredBenefitPage() {
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h3>카드 혜택 TOP2</h3>
-                    <button className={styles.viewAllButton} onClick={() => navigate('/benefits/cards')}>
+                    <button className={styles.viewAllButton} onClick={() => navigate('/benefit/cards')}>
                         전체 보기 〉
                     </button>
                 </div>
 
                 <div className={styles.benefitList}>
-                    {cardBenefits.map((benefit) => (
+                    {cardBenefits.slice(0, 2).map((benefit) => (
                         <BenefitListItem
                             key={benefit.id}
                             brand={benefit.brand}
@@ -79,13 +51,13 @@ function RegisteredBenefitPage() {
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h3>간편결제 혜택 TOP2</h3>
-                    <button className={styles.viewAllButton} onClick={() => navigate('/benefits/simplepay')}>
+                    <button className={styles.viewAllButton} onClick={() => navigate('/benefit/simplepay')}>
                         전체 보기 〉
                     </button>
                 </div>
 
                 <div className={styles.benefitList}>
-                    {simplePayBenefits.map((benefit) => (
+                    {simplePayBenefits.slice(0, 2).map((benefit) => (
                         <BenefitListItem
                             key={benefit.id}
                             brand={benefit.brand}
@@ -101,13 +73,13 @@ function RegisteredBenefitPage() {
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h3>통신사 혜택 TOP2</h3>
-                    <button className={styles.viewAllButton} onClick={() => navigate('/benefits/telco')}>
+                    <button className={styles.viewAllButton} onClick={() => navigate('/benefit/telco')}>
                         전체 보기 〉
                     </button>
                 </div>
 
                 <div className={styles.benefitList}>
-                    {simplePayBenefits.map((benefit) => (
+                    {telcoBenefits.slice(0, 2).map((benefit) => (
                         <BenefitListItem
                             key={benefit.id}
                             brand={benefit.brand}
