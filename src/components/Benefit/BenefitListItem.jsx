@@ -8,8 +8,10 @@ function BenefitListItem({ id, brand, description, detail, imageSrc, onClick }) 
         const navigate = useNavigate();
     
         const handleDetailClick = () => {
-            navigate(`/benefit/${id}`);
+            navigate(`/benefit/${brand}/${id}`);
         };
+
+        console.log('BenefitListItem - brand:', brand);
 
     return (
         <div className={styles.selectedBrandBenefit}>
@@ -19,7 +21,7 @@ function BenefitListItem({ id, brand, description, detail, imageSrc, onClick }) 
                 <p className={styles.brandSubText}>{detail}</p>
                 <button className={styles.detailButton} onClick={handleDetailClick}>자세히 보기 〉</button>
             </div>
-            <img src={brandIcons[brand]} alt={brand} className={styles.brandImage} />
+            <img src={imageSrc || brandIcons[brand]} alt={brand} className={styles.brandImage} />
         </div>
     );
 }

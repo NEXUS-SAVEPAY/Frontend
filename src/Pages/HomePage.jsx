@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useRecoilValue } from 'recoil';
 import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
@@ -50,6 +50,22 @@ function HomePage() {
         likedBrandList.includes(item.brand)
     );
 
+    const [showNoResult, setShowNoResult] = useState(false);
+    const handleSearch = (keyword) => {
+        const brandName = keyword.trim();
+        if (!brandName) return;
+    
+        // 유효한 브랜드인지 검사 (옵션)
+        const brandExists = favoriteBrandBenefits.some((item) => item.brand === brandName);
+        
+        if (brandExists) {
+            navigate(`/benefit/${encodeURIComponent(brandName)}`);
+        } else {
+            setShowNoResult(true);
+            setTimeout(() => setShowNoResult(false), 2000); // 2초 후 사라짐
+        }
+    };    
+
     console.log('🔥 likedBrands:', likedBrands);
     console.log('🔥 likedBrandList:', likedBrandList);
     console.log('🔥 brandIcons:', brandIcons);
@@ -57,6 +73,11 @@ function HomePage() {
     console.log('🔥 localStorage:', localStorage.getItem('recoil-persist'));
     return (
         <div className={styles.container}>
+
+            {showNoResult && (
+                <div className={styles.toastMessage}>검색 결과가 없습니다</div>
+            )}
+
             <div className={styles.fixedTop}>
                 {/*  로고 영역 추가 */}
                 <div className={styles.logoWrapper}>
@@ -64,7 +85,10 @@ function HomePage() {
                 </div>
 
                 {/* 검색창 */}
-                <SearchBar placeholder="혜택을 원하는 브랜드를 검색해주세요" />
+                <SearchBar 
+                    placeholder="혜택을 원하는 브랜드를 검색해주세요" 
+                    onSearch={handleSearch}
+                />
             </div>
 
             <div className={styles.content}>
@@ -109,32 +133,41 @@ function HomePage() {
                     {/*
                     <div className={styles.brandList}>
                         {likedBrandList.map((brand) => {
-                        const icon = brandIcons[brand.trim()]; 
-                        console.log(`brand: '${brand}' → icon:`, icon);
-                        return(
-                            <div key={brand} className={styles.brandItem} onClick={() => navigate(`/brand/${encodeURIComponent(cleanBrand)}`)}>
-                                <img src={brandIcons[brand]} alt={brand} className={styles.brandIcon} />
-                                <span className={styles.brandLabel}>{brand}</span>
-                            </div>
-                        );
+                            return (
+                                <div
+                                    key={brand}
+                                    className={styles.brandItem}
+                                    onClick={() => navigate(`/benefit/${encodeURIComponent(brand)}`)}
+                                >
+                                    <img
+                                        src={brand.imageSrc}
+                                        alt={brand}
+                                        className={styles.brandIcon}
+                                    />
+                                    <span className={styles.brandLabel}>{brand}</span>
+                                </div>
+                            );
                         })}
                     </div>
                     */}
 
                     <div className={styles.brandList}>
-                        {likedBrandList.map((brand) => {
+                        {likedBrandList.map((brandName) => {
+                            const brandData = favoriteBrandBenefits.find((item) => item.brand === brandName);
+                            const imageSrc = brandData?.benefits[0]?.imageSrc; // 첫 번째 혜택의 이미지 사용
+
                             return (
                                 <div
-                                    key={brand}
+                                    key={brandName}
                                     className={styles.brandItem}
-                                    onClick={() => navigate(`/benefits/${encodeURIComponent(brand)}`)}
+                                    onClick={() => navigate(`/benefit/${encodeURIComponent(brandName)}`)}
                                 >
                                     <img
-                                        src={brandIcons[brand]}
-                                        alt={brand}
+                                        src={imageSrc}
+                                        alt={brandName}
                                         className={styles.brandIcon}
                                     />
-                                    <span className={styles.brandLabel}>{brand}</span>
+                                    <span className={styles.brandLabel}>{brandName}</span>
                                 </div>
                             );
                         })}

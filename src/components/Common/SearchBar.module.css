@@ -2,6 +2,7 @@
     width: 100%;
     padding: 12px 0;
     box-sizing: border-box;
+    position: relative;
 }
 
 .input {
@@ -24,4 +25,38 @@
 .input::placeholder {
     color: #654eff;      /* 원하는 색상으로 변경 */
     opacity: 1;       /* 흐릿하게 보이는 것 방지 (일부 브라우저) */
+    font-size: 13px; /* 원하는 크기로 조절 */
+}
+
+
+.input {
+    width: 100%;
+    padding: 10px 40px 10px 12px; /* 오른쪽에 아이콘 공간 확보 */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* 오른쪽 끝에 아이콘 버튼 */
+.searchButton {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 아이콘 크기 */
+.searchIcon {
+    width: 20px;
+    height: 20px;
 }

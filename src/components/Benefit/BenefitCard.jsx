@@ -7,7 +7,7 @@ function BenefitCard({id, brand, description, imageSrc }) {
     const navigate = useNavigate();
 
     const handleDetailClick = () => {
-        navigate(`/benefit/${id}`);
+        navigate(`/benefit/${brand}/${id}`);
     };
 
     return (

@@ -16,6 +16,7 @@ import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
 import CardBenefitPage from '../Pages/CardBenefitPage';
 import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
 import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
+import BrandBenefitPage from '../Pages/BrandBenefitPage';
 
 function AppRoutes() {
     return (
@@ -32,7 +33,8 @@ function AppRoutes() {
                 <Route path="/benefit/cards" element={<CardBenefitPage />} />
                 <Route path="/benefit/simplepay" element={<SimplePayBenefitPage />} />
                 <Route path="/benefit/telco" element={<TelcoBenefitPage />} />
-                <Route path="/benefit/:id" element={<BenefitDetailPage />} /> 
+                <Route path="/benefit/:brand" element={<BrandBenefitPage />} />
+                <Route path="/benefit/:brand/:id" element={<BenefitDetailPage />} /> 
                 <Route path="/external-benefits" element={<ExternalBenefitPage />} />
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/notifications" element={<NotificationPage />} />
