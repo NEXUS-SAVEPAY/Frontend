@@ -1,95 +1,135 @@
 .section {
-    margin-top: 20px;
-    padding: 0 20px;
-}
-
-.title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    margin-left:-5px
-}
-
-/* 알림 박스 전체 영역 */
-.boxWrapper {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding: 0 16px;
+    margin-bottom: 38px;
 }
 
-/* 각각의 박스 스타일 */
-.subBox {
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: 0 0 0 1.5px #d9d9d9;
+.title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.box {
+    background-color: #fffefe;
+    border: 1px solid #e0e0e0;
+    border-radius: 9px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rowBetween {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* 박스 내부: 텍스트 + 스위치 */
-.toggleHeader {
-    font-size: 16px;
-    font-weight: 600;
-    color: #111111;
-}
-
-/* 혜택 수단 (카드/간편결제/통신사) */
-.methodBox {
-    margin-top: 12px;
-    display: flex;
-    gap: 28px;
-    justify-content: space-between;
-}
-
-.method {
-    font-size: 14px;
+.label {
+    font-size: 15px;
     font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #111111;
 }
 
-.square {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background-color: #e7ebf0;
-}
-
-.checked {
-    background-color: #7456f0;
-}
-
-/* 토글 스위치 */
 .toggleSwitch {
     width: 48px;
     height: 28px;
-    background-color: #d9d9d9;
-    border-radius: 999px;
+    background-color: #ccc;
+    border-radius: 14px;
     position: relative;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    flex-shrink: 0;
 }
 
 .toggleSwitch.active {
-    background-color: #7456f0;
+    background-color: #654EFF;
 }
 
 .knob {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    width: 22px;
+    height: 22px;
     background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
     transition: left 0.3s ease;
 }
 
 .toggleSwitch.active .knob {
-    left: 22px;
+    left: 23px;
+}
+
+.methodButtons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.methodButton {
+    flex: 1;
+    padding: 10px 0;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: #666;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.methodButton.selected {
+    background-color: #e8e5ff;
+    color: #654EFF;
+    font-weight: 600;
+}
+
+.methodCheckboxGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* 기본 checkbox 숨기기 */
+.checkboxLabel input[type='checkbox'] {
+    display: none;
+}
+
+/* 커스텀 체크박스 */
+.customCheckbox {
+    width: 20px;
+    height: 20px;
+    background-color: #e6e9ec;
+    border-radius: 6px;
+    position: relative;
+}
+
+/* 체크 상태일 때 */
+.checkboxLabel input[type='checkbox']:checked + .customCheckbox {
+    background-color: #654EFF;
+}
+
+/* 체크 표시 (선택적으로 추가 가능) */
+.checkboxLabel input[type='checkbox']:checked + .customCheckbox::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
