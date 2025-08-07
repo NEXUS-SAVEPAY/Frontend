@@ -1,0 +1,40 @@
+
+.splashWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #654eff;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+.character {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    margin-bottom: 16px;
+    transition: transform 0.5s ease-in-out, opacity 2.0s ease-in-out;
+}
+
+/* 위로 이동하면서 서서히 흐려짐 */
+.move-up {
+    transform: translateY(-120px);
+    opacity: 0; /* 완전 사라지지 않게 흐리게 */
+}
+
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFD900;
+    margin-bottom: 12px;
+    font-family: 'Pretendard', sans-serif;
+}

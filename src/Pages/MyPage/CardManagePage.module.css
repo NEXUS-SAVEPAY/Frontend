@@ -1,0 +1,45 @@
+.pageWrapper {
+    max-width: 390px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Pretendard', sans-serif;
+    background-color: #fff;
+}
+
+.pageTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.searchButton,
+.registerButton,
+.saveButton {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.searchButton {
+    background-color: #5C4CF2;
+    color: white;
+}
+
+.registerButton {
+    background-color: #03C75A;
+    color: white;
+}
+
+.saveButton {
+    background-color: black;
+    color: white;
+}

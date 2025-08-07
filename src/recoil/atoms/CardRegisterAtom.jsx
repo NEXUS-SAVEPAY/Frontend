@@ -12,7 +12,7 @@ export const cardNameAtom = atom({
 
 export const searchResultAtom = atom({
     key: 'searchResultAtom',
-    default: null,
+    default: [],
 });
 
 export const registeredCardsAtom = atom({

@@ -67,3 +67,14 @@
     align-items: center;
     justify-content: center;
 }
+.searchButton {
+    margin-top: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background-color: #5C4CF2;
+    color: white;
+    cursor: pointer;
+}

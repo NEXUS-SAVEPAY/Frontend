@@ -1,7 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CardCompanyDropdown.module.css';
 
-const companies = ['신한 카드', '삼성 카드', '롯데 카드', '현대 카드', '국민 카드'];
+const companies = [
+    '카카오뱅크',
+    '신한 카드',
+    'NH농협 카드',
+    '현대 카드',
+    '삼성 카드',
+    '우리 카드',
+    '케이뱅크',
+    '우체국',
+    '새마을금고',
+    '하나 카드',
+    '롯데 카드',
+    'IBK기업 카드',
+    'BC바로 카드',
+    '토스뱅크',
+    '씨티 카드',
+    'SC 카드',
+    '국민 카드',
+    'KDB산업 카드',
+    '신협',
+    'iM뱅크',
+    '부산은행',
+    '경남은행',
+    '광주은행',
+    '제주은행',
+    '수협',
+    '전북은행',
+];
+
 
 function CardCompanyDropdown({ onSelect, onToggleOpen, selected }) {
     const [selectedInternal, setSelectedInternal] = useState(selected || '');

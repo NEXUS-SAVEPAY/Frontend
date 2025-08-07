@@ -1,0 +1,95 @@
+.section {
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    margin-left:-5px
+}
+
+/* 알림 박스 전체 영역 */
+.boxWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 각각의 박스 스타일 */
+.subBox {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 0 0 1.5px #d9d9d9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 박스 내부: 텍스트 + 스위치 */
+.toggleHeader {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111111;
+}
+
+/* 혜택 수단 (카드/간편결제/통신사) */
+.methodBox {
+    margin-top: 12px;
+    display: flex;
+    gap: 28px;
+    justify-content: space-between;
+}
+
+.method {
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #111111;
+}
+
+.square {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: #e7ebf0;
+}
+
+.checked {
+    background-color: #7456f0;
+}
+
+/* 토글 스위치 */
+.toggleSwitch {
+    width: 48px;
+    height: 28px;
+    background-color: #d9d9d9;
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.toggleSwitch.active {
+    background-color: #7456f0;
+}
+
+.knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: white;
+    transition: left 0.3s ease;
+}
+
+.toggleSwitch.active .knob {
+    left: 22px;
+}

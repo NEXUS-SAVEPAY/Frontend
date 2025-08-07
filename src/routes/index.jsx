@@ -8,7 +8,8 @@ import PayRegisterPage from '../pages/Register/PayRegisterPage';
 import TelcoRegisterPage from '../pages/Register/TelcoRegisterPage';
 import BenefitDetailPage from '../Pages/BenefitDetailPage';
 import ExternalBenefitPage from '../pages/ExternalBenefitPage';
-import MyPage from '../pages/MyPage';
+import MyPage from '../pages/MyPage/MyPage.jsx';
+import ManagePaymentPage from '../pages/MyPage/ManagePaymentPage';
 import NotificationPage from '../pages/NotificationPage';
 import RecommendedBenefitPage from '../Pages/RecommendedBenefitPage';
 import FavoriteBenefitPage from '../Pages/FavoriteBenefitPage';
@@ -16,13 +17,16 @@ import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
 import CardBenefitPage from '../Pages/CardBenefitPage';
 import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
 import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
+import CardManagePage from '../pages/MyPage/CardManagePage.jsx';
+import FirstPage from '../pages/Onboarding/FirstPage.jsx';
 
 function AppRoutes() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<OnboardingPage />} />
-                <Route path="/register/card" element={<CardRegisterPage />} />
+                <Route path="/" element={<FirstPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/register/card" element={<CardRegisterPage isManageMode={false} />} />
                 <Route path="/register/simple-pay" element={<PayRegisterPage />} />
                 <Route path="/register/telco" element={<TelcoRegisterPage />} />
                 <Route path="/home" element={<HomePage />} />
@@ -35,7 +39,9 @@ function AppRoutes() {
                 <Route path="/benefit/:id" element={<BenefitDetailPage />} /> 
                 <Route path="/external-benefits" element={<ExternalBenefitPage />} />
                 <Route path="/mypage" element={<MyPage />} />
+                <Route path="/manage-payment" element={<ManagePaymentPage />} />
                 <Route path="/notifications" element={<NotificationPage />} />
+                <Route path="/manage-card" element={<CardRegisterPage isManageMode={true} />} />
             </Routes>
         </BrowserRouter>
     );

@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { selectedBenefitAtom } from '../recoil/atoms/selectedBenefitAtom';
 import { HiChevronLeft } from 'react-icons/hi';
+import ExternalLinkModal from '../components/Modal/ExternalLinkModal';
 import styles from './BenefitDetailPage.module.css';
+import owlImage from '../assets/images/character.svg';
+
 
 function BenefitDetailPage() {
     const benefit = useRecoilValue(selectedBenefitAtom);
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
 
     if (!benefit) return <div className={styles.pageWrapper}>혜택 정보를 불러올 수 없습니다.</div>;
+
+    const handleConfirm = () => {
+        setShowModal(false);
+        window.open(benefit.externalUrl, '_blank', 'noopener,noreferrer');
+    };
 
     return (
         <div className={styles.pageWrapper}>
@@ -20,6 +29,7 @@ function BenefitDetailPage() {
                 </button>
                 <div className={styles.title}>혜택 상세 보기</div>
             </div>
+
             {/* 이미지 */}
             <img src={benefit.image} alt="혜택 이미지" className={styles.storeImage} />
 
@@ -30,7 +40,10 @@ function BenefitDetailPage() {
 
                 <div className={styles.subTextRow}>
                     <p className={styles.subText}>{benefit.description}</p>
-                    <button className={styles.inlineButton}>혜택 받기 &gt;</button>
+                    <button className={styles.inlineButton}>
+                        <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
+                        혜택 받기 &gt;
+                    </button>
                 </div>
             </div>
 
@@ -65,15 +78,17 @@ function BenefitDetailPage() {
                 </div>
             </div>
 
-            {/* 하단 버튼 */}
-            <a
-                href={benefit.externalUrl ?? '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.bottomButton}
-            >
+            {/* 하단 버튼 - 모달 열기 */}
+            <button onClick={() => setShowModal(true)} className={styles.bottomButton}>
                 혜택 받으러 이동하기
-            </a>
+            </button>
+
+            {/* 외부 링크 모달 */}
+            <ExternalLinkModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onConfirm={handleConfirm}
+            />
         </div>
     );
 }

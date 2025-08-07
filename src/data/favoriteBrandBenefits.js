@@ -1,5 +1,5 @@
 // src/mocks/favoriteBrandBenefits.js
-
+//관심 브랜드 가로로 뜨는 내용
 const favoriteBrandBenefits = [
     {
         brand: '올리브영',
