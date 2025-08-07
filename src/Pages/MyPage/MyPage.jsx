@@ -98,7 +98,7 @@ function MyPage() {
     };
 
     const handleAddBrand = () => {
-        navigate('/brand/add');
+        navigate('/favorite-brand');
     };
 
     return (

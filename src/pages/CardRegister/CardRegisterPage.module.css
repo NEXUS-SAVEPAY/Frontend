@@ -232,7 +232,7 @@
     text-decoration: underline;
 }
 
-.completeButton {
+.saveButton {
     width: calc(100% - 32px);  /* 좌우 padding 16px씩 고려 */
     padding: 12px 0;
     border-radius: 24px;

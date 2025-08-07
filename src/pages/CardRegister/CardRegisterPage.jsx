@@ -202,7 +202,7 @@ function CardRegisterPage({ isManageMode = false }) {
                                 )}
                                 <div className={styles.buttonWrapper}>
                                     <button
-                                        className={styles.completeButton}
+                                        className={isManageMode ? styles.saveButton : styles.completeButton}
                                         onClick={isManageMode ? handleSave : handleComplete}
                                     >
                                         {isManageMode ? '저장' : '완료 하기'}
