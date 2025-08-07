@@ -8,6 +8,7 @@ function PaymentMethodSection({ groupedMethods = [], onCardClick, arrowIcon }) {
                 <div key={group.type} className={styles.categoryBlock}>
                     <div className={styles.typeBadge}>{group.type}</div>
 
+                    <div className={styles.cardList}>
                     {group.items.map(item => (
                         <div
                             key={item.id}
@@ -37,6 +38,7 @@ function PaymentMethodSection({ groupedMethods = [], onCardClick, arrowIcon }) {
                             </div>
                         </div>
                     ))}
+                    </div>
                 </div>
             ))}
         </div>

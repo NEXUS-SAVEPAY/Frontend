@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { userTelcoInfoAtom } from '../../recoil/atoms/userInfoAtom';
+import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
 import TelcoOption from '../../components/Telco/TelcoOption';
 import MembershipSelector from '../../components/Telco/MembershipSelector';
 import styles from './PayRegisterPage.module.css';

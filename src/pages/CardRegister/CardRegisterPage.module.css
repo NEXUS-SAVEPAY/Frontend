@@ -86,6 +86,7 @@
 }
 */
 
+/*
 .completeButton {
     width: 100%;
     padding: 14px 0;
@@ -101,6 +102,7 @@
     align-items: center;
     justify-content: center;
 }
+*/
 
 .alignTop {
     align-items: flex-start;
@@ -228,4 +230,23 @@
 /* 밑줄 강조 부분 (선택적으로 스타일 따로 적용 가능) */
 .retryUnderline {
     text-decoration: underline;
+}
+
+.completeButton {
+    width: calc(100% - 32px);  /* 좌우 padding 16px씩 고려 */
+    padding: 12px 0;
+    border-radius: 24px;
+    background-color: #654EFF;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+
+    /* 하단 고정 */
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 1000;
 }

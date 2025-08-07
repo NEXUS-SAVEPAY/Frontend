@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { selectedCardAtom } from '../../recoil/atoms/selectedCardAtom';
+import { userPaymentsAtom } from '../../recoil/atoms/userPaymentsAtom';
+import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
+
 import styles from './ManagePaymentPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
 
 import rightArrowImg from '../../assets/images/rightArrowImg.png';
-import cardImg from '../../assets/images/card.png';
 import kakaopayImg from '../../assets/images/kakaopay.png';
 import sktImg from '../../assets/images/skt.png';
 
@@ -14,11 +17,9 @@ function ManagePaymentPage() {
     const navigate = useNavigate();
     const setSelectedCard = useSetRecoilState(selectedCardAtom);
 
-    const [methods, setMethods] = useState({
-        카드: [{ id: 1, name: 'taptap O', image: cardImg, tag: '삼성카드' }],
-        간편결제: [{ id: 2, name: '카카오페이', image: kakaopayImg, tag: '멤버십 없음' }],
-        통신사: [{ id: 3, name: 'SK텔레콤', image: sktImg, tag: 'VIP' }],
-    });
+    const registeredCards = useRecoilValue(registeredCardsAtom);
+    const userPayment = useRecoilValue(userPaymentsAtom);
+    const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
 
     const handleCardClick = (card, type) => {
         if (type === '카드') {
@@ -26,11 +27,62 @@ function ManagePaymentPage() {
             navigate('/manage-card');
         }
     };
+    const getPaymentImage = (type) => {
+        switch (type) {
+            case 'kakao': return kakaopayImg;
+            case 'naver': return null;
+            case 'toss': return null;
+            case 'payco': return null;
+            default: return null;
+        }
+    };
 
-    const groupedMethods = Object.entries(methods).map(([type, items]) => ({
-        type,
-        items,
-    }));
+    const getTelcoImage = (telco) => {
+        switch (telco) {
+            case 'SKT': return sktImg;
+            case 'KT': return null;
+            case 'LG U+': return null;
+            case '알뜰폰': return null;
+            default: return null;
+        }
+    };
+
+    const groupedMethods = [
+        {
+            type: '카드',
+            items: registeredCards.map((card) => ({
+                id: card.id,
+                name: card.name,
+                image: card.image,
+                tag: card.company,
+            })),
+        },
+        {
+            type: '간편결제',
+            items: userPayment && userPayment !== 'none' ? [{
+                id: 'simplepay',
+                name: {
+                    kakao: '카카오페이',
+                    naver: '네이버페이',
+                    toss: '토스페이',
+                    payco: '페이코',
+                }[userPayment] || '간편결제',
+                image: getPaymentImage(userPayment),
+                tag: '등록됨',
+            }] : [],
+        },
+        {
+            type: '통신사',
+            items: userTelcoInfo?.telco ? [{
+                id: 'telco',
+                name: userTelcoInfo.telco,
+                image: getTelcoImage(userTelcoInfo.telco),
+                tag: userTelcoInfo.hasMembership
+                    ? (userTelcoInfo.grade || '')
+                    : '멤버십 없음',
+            }] : [],
+        },
+    ];
 
     return (
         <div className={styles.pageWrapper}>
@@ -47,4 +99,5 @@ function ManagePaymentPage() {
         </div>
     );
 }
+
 export default ManagePaymentPage;

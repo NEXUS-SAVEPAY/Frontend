@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { HiChevronLeft } from 'react-icons/hi';
@@ -39,21 +39,6 @@ function CardRegisterPage({ isManageMode = false }) {
         : cardCompany && registeredCards.length === 0
         ? 2
         : 3;
-
-    // 🔥 관리 페이지일 경우 localStorage에서 등록 카드 정보 불러오기
-    useEffect(() => {
-        if (isManageMode) {
-            const saved = localStorage.getItem('savedCards');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    setRegisteredCards(parsed);
-                } catch (e) {
-                    console.error('카드 불러오기 실패:', e);
-                }
-            }
-        }
-    }, [isManageMode]);
 
     const handleBack = () => navigate(-1);
 
@@ -102,19 +87,16 @@ function CardRegisterPage({ isManageMode = false }) {
     };
 
     const handleComplete = () => {
-        // CR 모드에서 완료 → localStorage에 저장
-        localStorage.setItem('savedCards', JSON.stringify(registeredCards));
         navigate('/register/simple-pay');
     };
 
     const handleSave = () => {
-        alert('저장 완료!');
+        navigate('/manage-payment');
     };
 
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.contentWrapper}>
-                {/* 상단 헤더 */}
                 <div className={styles.header}>
                     <button className={styles.backButton} onClick={handleBack}>
                         <HiChevronLeft size={24} />
@@ -122,7 +104,6 @@ function CardRegisterPage({ isManageMode = false }) {
                     <h1 className={styles.title}>{isManageMode ? '등록된 카드' : '카드 등록'}</h1>
                 </div>
 
-                {/* 상단 안내 및 진행 표시 */}
                 {!isManageMode && (
                     <>
                         <ProgressStepIndicator currentStep={1} totalSteps={3} />
@@ -130,7 +111,6 @@ function CardRegisterPage({ isManageMode = false }) {
                     </>
                 )}
 
-                {/* Step 1: 카드사 선택 */}
                 <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
                     <div className={styles.stepWrapper}>
                         <div className={styles.circleAndLine}>
@@ -150,7 +130,6 @@ function CardRegisterPage({ isManageMode = false }) {
                     </div>
                 </div>
 
-                {/* Step 2: 카드명 입력 및 검색 */}
                 {currentStep >= 2 && (
                     <>
                         <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
@@ -158,7 +137,7 @@ function CardRegisterPage({ isManageMode = false }) {
                                 <div className={styles.circleAndLine}>
                                     <StepCircle
                                         number={2}
-                                        hasLineBelow={currentStep >= 3}
+                                        hasLineBelow={!isManageMode && currentStep >= 3}
                                         lineHeight="300px"
                                     />
                                 </div>
@@ -175,7 +154,6 @@ function CardRegisterPage({ isManageMode = false }) {
                             </div>
                         </div>
 
-                        {/* 카드 미리보기 */}
                         {searchResult && (
                             <div className={`${styles.inputGroupWithStep} ${styles.alignTop}`}>
                                 <div className={styles.stepWrapper}></div>
@@ -202,7 +180,6 @@ function CardRegisterPage({ isManageMode = false }) {
                     </>
                 )}
 
-                {/* Step 3: 등록된 카드 리스트 + 완료 or 저장 버튼 */}
                 {registeredCards.length > 0 && (
                     <>
                         <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
@@ -214,20 +191,21 @@ function CardRegisterPage({ isManageMode = false }) {
                             </div>
                         </div>
 
-                        {/* 저장 or 완료 버튼은 카드 등록 버튼이 보이지 않을 때만 표시 */}
-                        {!searchResult && (
+                        {(!searchResult && (registeredCards.length > 0 || isManageMode)) && (
                             <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
-                                <div className={styles.stepWrapper}>
-                                    <div className={styles.circleAndLine}>
-                                        <StepCircle number={3} hasLineBelow={false} />
+                                {!isManageMode && (
+                                    <div className={styles.stepWrapper}>
+                                        <div className={styles.circleAndLine}>
+                                            <StepCircle number={3} hasLineBelow={false} />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                                 <div className={styles.buttonWrapper}>
                                     <button
                                         className={styles.completeButton}
                                         onClick={isManageMode ? handleSave : handleComplete}
                                     >
-                                        {isManageMode ? '저장 하기' : '완료 하기'}
+                                        {isManageMode ? '저장' : '완료 하기'}
                                     </button>
                                 </div>
                             </div>
@@ -235,7 +213,6 @@ function CardRegisterPage({ isManageMode = false }) {
                     </>
                 )}
 
-                {/* 카드 삭제 모달 */}
                 {showDeleteModal && (
                     <CardDeleteModal
                         onConfirm={confirmDelete}
