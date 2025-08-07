@@ -139,6 +139,11 @@
     box-sizing: border-box;
 }
 
+/* 단계 없는 헤더용 */
+.headerCompact {
+    height: 3px; /* 타이틀과 back 버튼만 있는 높이 */
+}
+
 /*필요 없을듯-뒤에 배경 하얀색으로 만들고 싶어서 추가*/
 .fixedUnder {
     background-color: white;
@@ -155,6 +160,10 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+
+.manageScrollArea {
+    margin-top: 72px;
 }
 
 .buttonGroup {

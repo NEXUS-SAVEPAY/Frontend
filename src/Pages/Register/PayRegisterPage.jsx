@@ -86,7 +86,7 @@ function PayRegisterPage({ isManageMode = false }) {
     return (
         <div className={styles.container}>
             {/* 헤더 */}
-            <div className={styles.fixedHeader}>
+            <div className={`${styles.fixedHeader} ${isManageMode ? styles.headerCompact : ''}`}>
                 <div className={styles.header}>
                     <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
                     <h2 className={styles.title}>
@@ -110,7 +110,7 @@ function PayRegisterPage({ isManageMode = false }) {
             </div>
 
             {/* 간편결제 선택 */}
-            <div className={styles.scrollArea}>
+            <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea : ''}`}>
                 {OPTIONS.map((option) => (
                     <SimplePayOption
                         key={option.type}

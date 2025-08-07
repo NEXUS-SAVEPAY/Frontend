@@ -97,7 +97,7 @@ function ManagePaymentPage() {
     return (
         <div className={styles.pageWrapper}>
             <header className={styles.header}>
-                <button className={styles.backButton} onClick={() => navigate(-1)}>〈</button>
+                <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
                 <h2 className={styles.title}>등록된 결제 수단</h2>
             </header>
 

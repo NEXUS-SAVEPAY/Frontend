@@ -70,7 +70,7 @@ function TelcoRegisterPage({ isManageMode = false }) {
                 )}
             </div>
 
-            <div className={styles.scrollArea}>
+            <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea : ''}`}>
                 <div className={styles.buttonGroup}>
                     {telcos.map((telco) => (
                         <div key={telco} className={styles.telcoItem}>

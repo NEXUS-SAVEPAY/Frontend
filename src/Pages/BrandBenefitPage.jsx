@@ -41,7 +41,7 @@ const BrandBenefitPage = () => {
         <div className={styles.container}>
             <div className={styles.fixedHeader}>
                 <div className={styles.header}>
-                    <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
+                    <span className={styles.backButton} onClick={() => navigate('/home')}>〈</span>
                     <div className={styles.brandTitleWrapper}>
                         <h2 className={styles.pageTitle}>{decodedBrand} </h2>
                         <button className={styles.starButton} onClick={toggleLike}>
