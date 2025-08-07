@@ -1,29 +1,45 @@
-// pages/Register/TelcoRegisterPage.js
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
 import TelcoOption from '../../components/Telco/TelcoOption';
 import MembershipSelector from '../../components/Telco/MembershipSelector';
 import styles from './PayRegisterPage.module.css';
 
-function TelcoRegisterPage() {
+function TelcoRegisterPage({ isManageMode = false }) {
+    const navigate = useNavigate();
+    const setUserTelcoInfo = useSetRecoilState(userTelcoInfoAtom);
+    const savedTelcoInfo = useRecoilValue(userTelcoInfoAtom); // 관리모드에서 불러올 값
+
     const [selectedTelco, setSelectedTelco] = useState('');
     const [membershipInfo, setMembershipInfo] = useState(null);
-    const navigate = useNavigate();
 
     const telcos = ['SKT', 'LG U+', 'KT', '알뜰폰'];
 
-    const setUserTelcoInfo = useSetRecoilState(userTelcoInfoAtom);
+    // 관리모드일 경우 기존 값 미리 셋팅
+    useEffect(() => {
+        if (isManageMode && savedTelcoInfo) {
+            setSelectedTelco(savedTelcoInfo.telco || '');
+            setMembershipInfo({
+                hasMembership: savedTelcoInfo.hasMembership,
+                grade: savedTelcoInfo.grade || '',
+            });
+        }
+    }, [isManageMode, savedTelcoInfo]);
 
-    const handleNext = () => {
+    const handleComplete = () => {
         setUserTelcoInfo({
             telco: selectedTelco,
             hasMembership: membershipInfo?.hasMembership,
             grade: membershipInfo?.grade || '',
         });
-    
-        navigate('/home'); // 다음 단계로
+
+        // 등록 모드 → 홈으로, 관리 모드 → manage-payment로
+        if (isManageMode) {
+            navigate('/manage-payment');
+        } else {
+            navigate('/home');
+        }
     };
 
     const showCompleteButton =
@@ -33,29 +49,28 @@ function TelcoRegisterPage() {
     return (
         <div className={styles.container}>
             <div className={styles.fixedHeader}>
-                {/* 기존 헤더 유지 */}
                 <div className={styles.header}>
-                    <span
-                        className={styles.backButton}
-                        onClick={() => navigate(-1)}
-                    >
-                        〈
-                    </span>
-                    <h2 className={styles.title}>통신사 등록</h2>
+                    <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
+                    <h2 className={styles.title}>
+                        {isManageMode ? '등록된 통신사' : '통신사 등록'}
+                    </h2>
                 </div>
 
-                <div className={styles.stepContainer}>
-                    <p className={styles.thirdstepText}>3단계</p>
-                    <div className={styles.progressBar}>
-                        <div className={styles.thirdProgress} />
+                {!isManageMode && (
+                    <div className={styles.stepContainer}>
+                        <p className={styles.thirdstepText}>3단계</p>
+                        <div className={styles.progressBar}>
+                            <div className={styles.thirdProgress} />
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <p className={styles.subTitle}>사용중인 통신사를 등록해주세요.</p>
+                {!isManageMode && (
+                    <p className={styles.subTitle}>사용중인 통신사를 등록해주세요.</p>
+                )}
             </div>
 
             <div className={styles.scrollArea}>
-                {/* 통신사 선택 or 선택된 곳만 MembershipSelector로 교체 */}
                 <div className={styles.buttonGroup}>
                     {telcos.map((telco) => (
                         <div key={telco} className={styles.telcoItem}>
@@ -63,6 +78,9 @@ function TelcoRegisterPage() {
                                 <MembershipSelector
                                     telco={telco}
                                     onComplete={(info) => setMembershipInfo(info)}
+                                    initialMembershipInfo={
+                                        isManageMode ? membershipInfo : null
+                                    }
                                 />
                             ) : (
                                 <TelcoOption
@@ -80,8 +98,11 @@ function TelcoRegisterPage() {
             </div>
 
             {showCompleteButton && (
-                <button className={styles.completeButton} onClick={handleNext}>
-                    완료
+                <button
+                    className={styles.completeButton}
+                    onClick={handleComplete}
+                >
+                    {isManageMode ? '저장' : '완료'}
                 </button>
             )}
         </div>

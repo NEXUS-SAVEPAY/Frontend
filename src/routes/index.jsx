@@ -17,7 +17,6 @@ import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
 import CardBenefitPage from '../Pages/CardBenefitPage';
 import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
 import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
-import CardManagePage from '../pages/MyPage/CardManagePage.jsx';
 import FirstPage from '../pages/Onboarding/FirstPage.jsx';
 import BrandBenefitPage from '../Pages/BrandBenefitPage';
 import FavoriteBrandPage from '../Pages/FavoriteBrandPage';
@@ -29,8 +28,8 @@ function AppRoutes() {
                 <Route path="/" element={<FirstPage />} />
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/register/card" element={<CardRegisterPage isManageMode={false} />} />
-                <Route path="/register/simple-pay" element={<PayRegisterPage />} />
-                <Route path="/register/telco" element={<TelcoRegisterPage />} />
+                <Route path="/register/simple-pay" element={<PayRegisterPage isManageMode={false}/>} />
+                <Route path="/register/telco" element={<TelcoRegisterPage isManageMode={false}/>} />
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/benefit/recommended" element={<RecommendedBenefitPage />} />
                 <Route path="/benefit/registered" element={<RegisteredBenefitPage />} />
@@ -46,6 +45,8 @@ function AppRoutes() {
                 <Route path="/manage-payment" element={<ManagePaymentPage />} />
                 <Route path="/notifications" element={<NotificationPage />} />
                 <Route path="/manage-card" element={<CardRegisterPage isManageMode={true} />} />
+                <Route path="manage-simplepay" element={<PayRegisterPage isManageMode={true} />}/>
+                <Route path="manage-telco" element={<TelcoRegisterPage isManageMode={true} />} />
             </Routes>
         </BrowserRouter>
     );

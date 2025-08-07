@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
+
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { selectedCardAtom } from '../../recoil/atoms/selectedCardAtom';
 import { userPaymentsAtom } from '../../recoil/atoms/userPaymentsAtom';
@@ -27,6 +28,15 @@ function ManagePaymentPage() {
             navigate('/manage-card');
         }
     };
+
+    const handleSimplePayClick = () => {
+        navigate('/manage-simplepay');
+    };
+
+    const handleTelcoClick = () => {
+        navigate('/manage-telco');
+    };
+
     const getPaymentImage = (type) => {
         switch (type) {
             case 'kakao': return kakaopayImg;
@@ -94,6 +104,8 @@ function ManagePaymentPage() {
             <PaymentMethodSection
                 groupedMethods={groupedMethods}
                 onCardClick={handleCardClick}
+                onSimplePayClick={handleSimplePayClick}
+                onTelcoClick={handleTelcoClick}
                 arrowIcon={rightArrowImg}
             />
         </div>
