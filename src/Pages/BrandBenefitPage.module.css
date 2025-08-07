@@ -1,0 +1,114 @@
+.container {
+    width: 100vw;
+    padding: 0 16px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.fixedHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 32px;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: #222;
+    position: absolute;
+    left: 0;
+    font-weight: 900;
+}
+
+.brandTitleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* 브랜드 이름과 별 사이 여백 */
+    margin: 0 auto; /* 중앙 정렬하고 싶을 경우 */
+}
+
+.pageTitle {
+    margin: 0 auto;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.starButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #654EFF;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.content {
+    padding-top: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    margin-top: 3px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sectionHeader h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.benefitList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scrollTopButton {
+    position: fixed;
+    right: 9px;
+    bottom: 30px;
+    background-color: #654eff;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50%;
+    padding: 10px 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.notFound {
+    padding: 32px;
+    text-align: center;
+    color: #888;
+}

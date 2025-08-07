@@ -1,0 +1,37 @@
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #eee;
+    margin-bottom: 8px;
+}
+
+.brandInfo {
+    display: flex;
+    align-items: center;
+}
+
+.brandImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+}
+
+.brandName {
+    margin-left: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #654EFF;
+}
+
+.starButton {
+    background: none;
+    border: none;
+    font-size: 23px;
+    cursor: pointer;
+    color: #654EFF;
+    margin-right: -15px;
+}
