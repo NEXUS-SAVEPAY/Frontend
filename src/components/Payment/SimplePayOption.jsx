@@ -1,8 +1,10 @@
 import styles from './SimplePayOptionGroup.module.css';
 
-function SimplePayOption({ type, label, icon, selectedIcon, options = [], selected, onSelect }) {
-    const isSelected = selected === type || options.some((opt) => selected === opt.value);
-    const selectedSubLabel = options.find((opt) => selected === opt.value)?.label || options[0]?.label;
+function SimplePayOption({ type, icon, selectedIcon, options = [], selected, onSelect }) {
+    // selected: string[]
+    const isSelected =
+        Array.isArray(selected) &&
+        (selected.includes(type) || options.some((opt) => selected.includes(opt.value)));
 
     const displayIcon = isSelected && selectedIcon ? selectedIcon : icon;
 
@@ -10,14 +12,16 @@ function SimplePayOption({ type, label, icon, selectedIcon, options = [], select
         <div className={styles.group}>
             <div className={styles.box}>
                 <button
+                    type="button"
                     className={`${styles.optionButton} ${isSelected ? styles.selected : ''}`}
-                    onClick={() => onSelect(type)}
+                    onClick={() => onSelect(type)}  // 기본 타입 토글
                 >
+                    {/* 아이콘만 */}
                     <div className={styles.iconWrapper}>
-                        <img src={displayIcon} alt={label} className={styles.icon} />
+                        <img src={displayIcon} alt={type} className={styles.icon} />
                     </div>
 
-                    {/* 하위 옵션이 있을 경우 동그라미로 선택 상태 표시 */}
+                    {/* 서브옵션: 선택 상태일 때 '버튼 내부'에 표시 */}
                     {isSelected && options.length > 0 && (
                         <div className={styles.labelSubGroup}>
                             {options.map((opt) => (
@@ -25,13 +29,13 @@ function SimplePayOption({ type, label, icon, selectedIcon, options = [], select
                                     key={opt.value}
                                     className={styles.subOption}
                                     onClick={(e) => {
-                                        e.stopPropagation(); // 부모 버튼 클릭 방지
-                                        onSelect(opt.value);
+                                        e.stopPropagation(); // 상위 버튼 클릭 방지
+                                        onSelect(opt.value); // 'type_sub' 형태 토글
                                     }}
                                 >
                                     <span>{opt.label}</span>
                                     <span className={styles.radio}>
-                                        {selected === opt.value ? '⦿' : '◯'}
+                                        {Array.isArray(selected) && selected.includes(opt.value) ? '⦿' : '◯'}
                                     </span>
                                 </div>
                             ))}

@@ -57,20 +57,46 @@ const OPTIONS = [
 
 function PayRegisterPage({ isManageMode = false }) {
     const navigate = useNavigate();
-    const savedPayment = useRecoilValue(userPaymentsAtom); // 현재 저장된 간편결제
+    const savedPayment = useRecoilValue(userPaymentsAtom); // 저장된 간편결제(과거 string일 수도, 배열일 수도)
     const setUserPayment = useSetRecoilState(userPaymentsAtom);
 
-    const [selected, setSelected] = useState('');
+    const [selected, setSelected] = useState([]); // 여러 개 선택
 
-    // 관리 모드일 때 기존 값 미리 설정
+    // 관리 모드일 때 기존 값 세팅 (string 호환)
     useEffect(() => {
-        if (isManageMode) {
+        if (!isManageMode) return;
+        if (Array.isArray(savedPayment)) {
             setSelected(savedPayment);
+        } else if (typeof savedPayment === 'string' && savedPayment) {
+            setSelected([savedPayment]);
+        } else {
+            setSelected([]);
         }
     }, [isManageMode, savedPayment]);
 
+    // 클릭 토글: 기본타입(ex. 'kakao') 또는 서브옵션(ex. 'naver_membership')
     const handleSelect = (value) => {
-        setSelected(value);
+        setSelected((prev) => {
+            // 서브옵션: "type_sub" 형태라고 가정 → 같은 type의 기존 서브옵션 제거 후 추가
+            if (value.includes('_')) {
+                const parent = value.split('_')[0];
+                const withoutParentSubs = prev.filter(v => !(v.startsWith(parent + '_')));
+                // 부모 타입이 없으면 부모 타입도 포함(하이라이트 유지용)
+                const ensureParent = withoutParentSubs.includes(parent)
+                    ? withoutParentSubs
+                    : [...withoutParentSubs, parent];
+                // 이미 선택된 같은 서브옵션이면 해제, 아니면 교체/추가
+                return ensureParent.includes(value)
+                    ? ensureParent.filter(v => v !== value)
+                    : [...ensureParent, value];
+            }
+
+            // 기본 타입 토글: 선택되어 있으면 해당 타입과 그 타입의 서브옵션 전부 제거
+            if (prev.includes(value)) {
+                return prev.filter(v => v !== value && !v.startsWith(value + '_'));
+            }
+            return [...prev, value];
+        });
     };
 
     const handleComplete = () => {
@@ -115,15 +141,15 @@ function PayRegisterPage({ isManageMode = false }) {
                     <SimplePayOption
                         key={option.type}
                         {...option}
-                        selected={selected}
-                        onSelect={handleSelect}
+                        selected={selected}        // 배열 전달
+                        onSelect={handleSelect}     // 토글 핸들러
                     />
                 ))}
             </div>
 
             {/* 완료 or 저장 버튼 */}
             <div className={styles.fixedUnder}>
-                {selected && (
+                {selected.length > 0 && (  /* 배열 길이 기준으로 표시 */
                     <button
                         className={styles.completeButton}
                         onClick={isManageMode ? handleSave : handleComplete}

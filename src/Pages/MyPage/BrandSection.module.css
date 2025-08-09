@@ -1,5 +1,5 @@
 .section {
-    padding: 0 20px;
+    padding: 0 12px;
     margin-top: 32px;
 }
 
@@ -7,36 +7,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 6px; /* 살짝만 띄움 */
 }
 
 .title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
-    margin-left:-10px;
+    margin-left: -10px; /* 기존 값 유지 */
 }
 
 .addButton {
     background-color: #654EFF;
-    color: white;
+    color: #fff;
     border: none;
-    padding: 6px 12px;
+    padding: 10px 12px;
     border-radius: 999px;
     font-size: 14px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-right:-20px;
+    margin-right: -20px; /* 기존 값 유지 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+
 
 /* 화살표 스타일 */
 .arrowShape {
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-top: 2px solid white;
-    border-right: 2px solid white;
+    border-top: 2px solid #fff;
+    border-right: 2px solid #fff;
     transform: rotate(45deg);
     margin-left: 4px;
 }
@@ -47,34 +50,62 @@
     padding-left: 4px;
 }
 
+/* === 관심브랜드 카드: 홈과 동일한 룩 + 좌우 스크롤만 추가 === */
 .brandList {
     display: flex;
-    gap: 12px;
+    gap: 2px;             /* 홈과 동일 */
+    margin-bottom: 12px;  /* 홈과 동일 */
+    margin-left: -12px;
+
+    /* 스크롤 추가 */
     overflow-x: auto;
-    padding: 4px 0;
-    margin-left:-5px;
+    overflow-y: hidden;
+    padding-bottom: 6px;            /* 스크롤바 여유 */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
 }
 
+/* (선택) 스크롤바 최소화 */
+.brandList::-webkit-scrollbar { height: 6px; }
+.brandList::-webkit-scrollbar-thumb { background: #e6e9ec; border-radius: 3px; }
+.brandList::-webkit-scrollbar-track { background: transparent; }
+
+/* 하나의 브랜드 아이템 */
 .brandItem {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 12px;
-    white-space: nowrap;
-    
+    width: 64px;   /* 홈과 동일 폭 */
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    scroll-snap-align: start;
 }
 
+/* 이미지: 회색/흰 박스 느낌 제거 (배경/패딩/그림자 모두 제거) */
 .brandImage {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    margin-bottom: 4px;
+    width: 52px;           /* 홈과 동일 */
+    height: 52px;
+    display: block;        /* inline 이미지 여백 제거 */
+    border-radius: 12px;
+    object-fit: contain;   /* 로고 비율 유지 */
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+
+    /* 가장자리 미세 회색 빛(안티앨리어싱) 억제 */
+    overflow: hidden;
+    clip-path: inset(0.5px round 12px);
+    image-rendering: -webkit-optimize-contrast;
+    transform: translateZ(0);
 }
 
+/* 라벨: 홈과 동일 */
 .brandName {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    color: #000;
+    margin-top: 6px;
+    text-align: center;
+    white-space: nowrap;
 }
