@@ -1,5 +1,5 @@
 .section {
-    padding: 0 20px;
+    padding: 0 12px;
     margin-top: 32px;
 }
 
@@ -7,36 +7,40 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 6px; /* 살짝만 띄움 */
 }
 
 .title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
-    margin-left:-10px;
+    margin-left: -10px; /* 기존 값 유지 */
 }
 
 .addButton {
     background-color: #654EFF;
-    color: white;
+    color: #fff;
     border: none;
-    padding: 6px 12px;
+    padding: 10px 12px;
     border-radius: 999px;
     font-size: 14px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-right:-20px;
+    margin-right: -20px; /* 기존 값 유지 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.addButton:hover { transform: translateY(-1px); }
+.addButton:active { transform: translateY(0); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
 /* 화살표 스타일 */
 .arrowShape {
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-top: 2px solid white;
-    border-right: 2px solid white;
+    border-top: 2px solid #fff;
+    border-right: 2px solid #fff;
     transform: rotate(45deg);
     margin-left: 4px;
 }
@@ -47,34 +51,76 @@
     padding-left: 4px;
 }
 
+/* === 가로 스크롤 리스트 === */
 .brandList {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     overflow-x: auto;
-    padding: 4px 0;
-    margin-left:-5px;
+    overflow-y: hidden;
+    padding: 4px 0 8px 0;
+    margin-left: -12px; /* 기존 값 유지 */
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
 }
 
+/* 스크롤바 최소화 */
+.brandList::-webkit-scrollbar {
+    height: 6px;
+}
+.brandList::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 3px;
+}
+.brandList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 아이템 */
 .brandItem {
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: 12px;
     white-space: nowrap;
-    
+    scroll-snap-align: start;
+    padding: 4px 2px; /* 터치 여유 */
 }
 
+/* 아이콘 */
 .brandImage {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    margin-bottom: 4px;
+    width: 52px;
+    height: 52px;
+    display: block;                 /* inline 이미지의 여백 제거 */
+    border-radius: 12px;
+    object-fit: contain;            /* 로고 비율 유지 */
+    background: transparent !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+
+    /* 가장자리 회색빛(안티앨리어싱) 억제용: 라운드 영역만 깔끔하게 잘라냄 */
+    overflow: hidden;
+    clip-path: inset(0.5px round 12px);
+
+    /* webkit 최적화 (iOS/크롬에서 미세한 테두리 완화) */
+    image-rendering: -webkit-optimize-contrast;
+    transform: translateZ(0);
+}
+.brandItem:hover .brandImage {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
 }
 
+/* 라벨 */
 .brandName {
     font-size: 12px;
     font-weight: 500;
+    color: #222;
+}
+
+/* 키보드 포커스 접근성 (버튼/링크로 감싸는 경우에 유용) */
+.brandItem:focus-visible,
+.addButton:focus-visible {
+    outline: 2px solid #654EFF;
+    outline-offset: 2px;
+    border-radius: 12px;
 }

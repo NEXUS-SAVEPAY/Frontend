@@ -6,6 +6,6 @@ const { persistAtom } = recoilPersist();
 
 export const userPaymentsAtom = atom({
     key: 'userPaymentsAtom',
-    default: '',
+    default: [],
     effects_UNSTABLE: [persistAtom],
 });

@@ -6,7 +6,7 @@ const CardNameInput = ({ value, onChange, onSearch }) => {
     return (
         <div className={styles.container}>
             <div className={styles.inputWrapper}>
-                <Search size={18} className={styles.icon} />
+                
                 <input
                     type="text"
                     value={value}
@@ -14,6 +14,7 @@ const CardNameInput = ({ value, onChange, onSearch }) => {
                     placeholder="카드 이름 검색"
                     className={styles.input}
                 />
+                <Search size={18} className={styles.icon} />
             </div>
 
         </div>

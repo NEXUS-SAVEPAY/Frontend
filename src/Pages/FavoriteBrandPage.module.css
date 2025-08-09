@@ -20,13 +20,15 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    height: 32px;
+    height: 22px;
+    margin-top: 4px; 
+    margin-bottom: 12px; 
 }
 
 .backButton {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 22px;
     margin-right: 8px;
     cursor: pointer;
     color: #222;
@@ -37,12 +39,12 @@
 
 .title {
     margin: 0 auto;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .subTitle {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 600;
     color: #222;
     margin: 20px 0 12px 4px;
@@ -83,7 +85,7 @@
 }
 
 .searchSection {
-    margin-top: 120px; /* fixedHeader 높이만큼 밀어줌 */
+    margin-top: 140px; /* fixedHeader 높이만큼 밀어줌 */
 }
 
 .emptyResult {
