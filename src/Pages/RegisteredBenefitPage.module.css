@@ -9,8 +9,8 @@
 
 /* 페이지 제목 */
 .pageTitle {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
     margin-top: 24px;
     margin-bottom: 12px;
     text-align: center;
@@ -29,9 +29,10 @@
 }
 
 .sectionHeader h3 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     margin: 0;
+    margin-left: 8px;
 }
 
 /* '전체 보기' 버튼 */
@@ -72,5 +73,27 @@
     padding: 10px 14px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
 }
 
+.owlButtonWrapper {
+    position: fixed;       /* 위로가기 버튼 위치 고정 */
+    right: 8px;            /* 기존 scrollTopButton 위치값 */
+    bottom: 63px;
+    width: 50px;           /* 버튼+부엉이 영역 */
+    height: 80px;          /* 버튼 높이 + 부엉이 영역 */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* 버튼은 아래쪽 정렬 */
+}
+
+/* 부엉이 위치 */
+.owlIcon {
+    position: absolute;
+    top: -3px;            /* 버튼 위로 올림 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;           /* 부엉이 크기 */
+    height: auto;
+    z-index: 2;
+}

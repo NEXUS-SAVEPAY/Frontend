@@ -47,8 +47,8 @@
 
 .pageTitle {
     margin: 0 auto;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .starButton {
@@ -81,9 +81,10 @@
 }
 
 .sectionHeader h3 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     margin: 0;
+    margin-left: 8px;
 }
 
 .benefitList {

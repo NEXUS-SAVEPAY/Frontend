@@ -1,0 +1,31 @@
+.owlButtonWrapper {
+    position: fixed;
+    right: 9px;
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3; /* 전체 묶음 z-index 높임 */
+}
+
+/* 부엉이 버튼 위에 */
+.owlIcon {
+    width: 40px;
+    height: auto;
+    margin-bottom: -10px;
+    position: relative;
+    z-index: 4; /* 버튼보다 높게 */
+}
+
+.scrollTopButton {
+    background-color: #654eff;
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50%;
+    padding: 10px 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1; /* 부엉이보다 낮게 */
+}

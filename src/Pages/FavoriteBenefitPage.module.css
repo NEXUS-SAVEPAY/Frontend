@@ -38,8 +38,8 @@
 
 .title {
     margin: 0 auto;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .content {
@@ -66,8 +66,8 @@
 }
 
 .brandTitle {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: #000;
 }
 

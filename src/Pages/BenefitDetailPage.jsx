@@ -23,13 +23,14 @@ function BenefitDetailPage() {
     return (
         <div className={styles.pageWrapper}>
             {/* 상단 헤더 */}
-            <div className={styles.header}>
-                <button className={styles.backButton} onClick={() => navigate(-1)}>
-                    <HiChevronLeft size={24} />
-                </button>
-                <div className={styles.title}>혜택 상세 보기</div>
+            <div className={styles.fixedHeader}>
+                <div className={styles.header}>
+                    <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
+                    <h2 className={styles.title}>혜택 상세 보기</h2>
+                </div>
             </div>
 
+            <div className={styles.content}>
             {/* 이미지 */}
             <img src={benefit.image} alt="혜택 이미지" className={styles.storeImage} />
 
@@ -40,10 +41,12 @@ function BenefitDetailPage() {
 
                 <div className={styles.subTextRow}>
                     <p className={styles.subText}>{benefit.description}</p>
-                    <button className={styles.inlineButton}>
+                    <div className={styles.owlButtonWrapper}>
                         <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
-                        혜택 받기 &gt;
-                    </button>
+                        <button className={styles.inlineButton}>
+                            혜택 받기 &gt;
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -89,6 +92,7 @@ function BenefitDetailPage() {
                 onClose={() => setShowModal(false)}
                 onConfirm={handleConfirm}
             />
+        </div>
         </div>
     );
 }

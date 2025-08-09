@@ -10,7 +10,7 @@ import styles from './HomePage.module.css';
 import recommendedBenefits from '../data/mockRecommendBenefits';
 import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
 import brandIcons from '../data/brandIcons';
-
+import owlImage from '../assets/images/character.svg';
 
 import logoImage from '../assets/images/logo-purple.svg';
 import oliveyoung from '../assets/images/oliveyoung.svg';
@@ -192,8 +192,10 @@ function HomePage() {
             </div>
 
             {/* 위로가기 버튼 (문자 ↑ 사용) */}
-            <button className={styles.scrollTopButton} onClick={handleScrollTop}>↑</button>
-
+            <div className={styles.owlButtonWrapper}>
+                <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
+                <button className={styles.scrollTopButton} onClick={handleScrollTop}>↑</button>
+            </div>
             <TabBar />
         </div>
     );

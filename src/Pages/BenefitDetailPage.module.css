@@ -13,36 +13,50 @@
 
 }
 
+.fixedHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 1000;
+    padding: 16px;
+    padding-top: 20px;  
+    box-sizing: border-box;
+}
+
 /* 헤더 */
 .header {
-    position: relative; /* 추가 */
+
+
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center; /* 중앙 정렬 */
-    height: 48px;
-    margin-bottom: 20px;
+    justify-content: center;
+    height: 32px;
 }
 
 .backButton {
-    position: absolute; /* ← 왼쪽에 고정 */
-    left: -15px;
     background: none;
     border: none;
     font-size: 20px;
-    font-weight: bold;
+    margin-right: 8px;
     cursor: pointer;
-    color: #000000;
-    padding: 0 16px; /* 터치 영역 넓히기 */
-    display: flex;
-    align-items: center;
-    height: 100%;
-    margin-left:0;
+    color: #222;
+    position: absolute;
+    left: 0;
+    font-weight: 900;
 }
 
 .title {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
+}
+
+.content {
+    padding-top: 64px;     /* fixedHeader 실제 높이에 맞춰 60~72px 사이로 조정 */
+
 }
 
 /* 이미지 */
@@ -180,6 +194,7 @@
     cursor: pointer;
     text-decoration: none;
 }
+/*
 .inlineButton {
     background-color: #5c4cf2;
     color: #ffffff;
@@ -196,8 +211,38 @@
     align-items: center;
     gap: 6px;
 }
+    */
+
+.owlButtonWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
 
 .owlIcon {
-    width: 20px;
-    height: 20px;
+    position: absolute;
+    top: -18px;      /* 버튼 위로 올리는 정도 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 48px;     /* 크기 조절 */
+    height: auto;
+    z-index: 2;      /* 버튼보다 위 */
 }
+
+.inlineButton {
+    background-color: #5c4cf2;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;         /* 부엉이보다 위에 올리려면 조절 */
+}
+

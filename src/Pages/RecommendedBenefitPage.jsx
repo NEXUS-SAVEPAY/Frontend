@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './RecommendedBenefitPage.module.css';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import recommendedBenefits from '../data/mockRecommendBenefits';
+import OwlScrollTop from '../components/Common/OwlScrollTop';
 
 
 function RecommendedBenefitPage() {
@@ -32,6 +33,7 @@ function RecommendedBenefitPage() {
                     ))}
                 </div>
             </div>
+            <OwlScrollTop />
         </div>
     );
 }

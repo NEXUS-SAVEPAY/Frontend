@@ -6,6 +6,7 @@ import styles from './RegisteredBenefitPage.module.css';
 import brandIcons from '../data/brandIcons';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import registeredBenefits from '../data/registeredBenefits';
+import owlImage from '../assets/images/character.svg';
 
 
 // 목데이터
@@ -92,8 +93,10 @@ function RegisteredBenefitPage() {
             </section>
 
             {/* 위로가기 버튼 */}
-            <button className={styles.scrollTopButton} onClick={handleScrollTop}>↑</button>
-
+            <div className={styles.owlButtonWrapper}>
+                <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
+                <button className={styles.scrollTopButton} onClick={handleScrollTop}>↑</button>
+            </div>
             {/* 하단 탭바 */}
             <TabBar />
         </div>

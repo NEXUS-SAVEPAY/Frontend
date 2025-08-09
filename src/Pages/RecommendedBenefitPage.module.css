@@ -38,8 +38,8 @@
 
 .title {
     margin: 0 auto;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 /* 콘텐츠 영역을 fixedHeader만큼 아래로 밀기 */

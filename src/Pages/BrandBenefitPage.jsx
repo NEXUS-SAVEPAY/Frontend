@@ -6,6 +6,7 @@ import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
 import styles from './BrandBenefitPage.module.css';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
+import OwlScrollTop from '../components/Common/OwlScrollTop';
 
 const BrandBenefitPage = () => {
     const { brand } = useParams();
@@ -112,8 +113,7 @@ const BrandBenefitPage = () => {
                     </section>
                 )}
             </div>
-            {/* 위로 가기 버튼 */}
-            <button className={styles.scrollTopButton} onClick={handleScrollTop}>↑</button>
+            <OwlScrollTop/>
         </div>
     );
 };

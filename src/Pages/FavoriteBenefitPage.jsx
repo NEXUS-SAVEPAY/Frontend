@@ -7,6 +7,7 @@ import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
 import styles from './FavoriteBenefitPage.module.css';
+import OwlScrollTop from '../components/Common/OwlScrollTop';
 
 const FavoriteBenefitPage = () => {
     const navigate = useNavigate();
@@ -63,6 +64,7 @@ const FavoriteBenefitPage = () => {
                     ))
                 )}
             </div>
+            <OwlScrollTop/>
         </div>
     );
 };
