@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './ExternalLinkModal.module.css';
+import star from '../../assets/images/star.svg';
 
 function ExternalLinkModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
@@ -7,7 +8,7 @@ function ExternalLinkModal({ isOpen, onClose, onConfirm }) {
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-                <div className={styles.icon}>✨</div>
+                <div className={styles.icon}><img src={star} alt="별 아이콘" /></div>
                 <p className={styles.title}>해당 혜택을 받으러<br />외부사이트로 이동하시겠습니까?</p>
                 <p className={styles.subtitle}>외부사이트 접속 시 앱은 종료됩니다.</p>
                 <div className={styles.buttonGroup}>
