@@ -83,23 +83,16 @@
     scroll-snap-align: start;
 }
 
-/* 이미지: 회색/흰 박스 느낌 제거 (배경/패딩/그림자 모두 제거) */
-.brandImage {
-    width: 52px;           /* 홈과 동일 */
-    height: 52px;
-    display: block;        /* inline 이미지 여백 제거 */
-    border-radius: 12px;
-    object-fit: contain;   /* 로고 비율 유지 */
-    background: transparent !important;
-    padding: 0 !important;
-    box-shadow: none !important;
 
-    /* 가장자리 미세 회색 빛(안티앨리어싱) 억제 */
-    overflow: hidden;
-    clip-path: inset(0.5px round 12px);
-    image-rendering: -webkit-optimize-contrast;
-    transform: translateZ(0);
+
+.brandImage {
+    width: 52px;  /* 중간 크기 */
+    height: 52px;
+    border-radius: 10px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
+
 
 /* 라벨: 홈과 동일 */
 .brandName {

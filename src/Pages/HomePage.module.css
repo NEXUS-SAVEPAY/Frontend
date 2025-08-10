@@ -201,6 +201,7 @@
     flex-direction: column;
     gap: 12px; /* 아이템마다 여백 생김 */
     padding-bottom: 32px;
+    overflow-x: auto;
 }
 
 .toastMessage {

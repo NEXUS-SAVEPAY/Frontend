@@ -17,7 +17,7 @@
 /* 기존 container 대신 contentWrapper 안으로 이동 */
 .title {
     font-family: 'Pretendard';
-    font-weight: 700;
+    font-weight: 600;
     font-size: 22px;
     line-height: 100%;
     text-align: center;
@@ -197,7 +197,7 @@
 
 .backButton {
     position: absolute;
-    left: 16px;
+    left: 15px;
     transform: translateY(-50%);
     background: none;
     border: none;
@@ -205,6 +205,8 @@
     cursor: pointer;
     padding: 4px;
     margin-top:40px;
+    font-size: 20px;
+    font-weight: 900;
 }
 /* 보라색 문구 (카드 이미지 위) */
 .retrySearchText {

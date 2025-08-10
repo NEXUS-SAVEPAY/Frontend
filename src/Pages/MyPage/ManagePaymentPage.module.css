@@ -1,5 +1,5 @@
 .pageWrapper {
-    padding: 20px;
+    padding: 16px;
     font-family: 'Pretendard', sans-serif;
     background-color: #ffffff;
     min-height: 100vh;
@@ -12,19 +12,13 @@
     margin-bottom: 70px;
 }
 
-.backButton {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
 
 .title {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 21px;
+    font-weight: 600;
     color: #222;
     margin-bottom:0; /* 마진 제거 */
     margin-top:40px;

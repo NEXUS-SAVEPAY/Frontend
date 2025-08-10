@@ -127,6 +127,39 @@ const favoriteBrandBenefits = [
                 imageSrc: brandIcons['메가박스']
             }
         ]
+    },
+    {
+        brand: 'cgv',
+        benefits: [
+            {
+                id: 12,
+                type: 'card',
+                description: '영화 예매 2천원 할인',
+                detail: '온라인 예매 시 자동 적용',
+                imageSrc: brandIcons['cgv']
+            },
+            {
+                id: 13,
+                type: 'card',
+                description: '10% 캐시백',
+                detail: '등록하신 카드로 매장에서 결제해주세요.',
+                imageSrc: brandIcons['cgv']
+            },
+            {
+                id: 14,
+                type: 'simplepay',
+                description: '10% 캐시백',
+                detail: '등록하신 카드로 매장에서 결제해주세요.',
+                imageSrc: brandIcons['cgv']
+            },
+            {
+                id: 15,
+                type: 'telco',
+                description: '5% 할인',
+                detail: '모바일 카드로 결제 시 적용됩니다.',
+                imageSrc: brandIcons['cgv']
+            }
+        ]
     }
     
 ];

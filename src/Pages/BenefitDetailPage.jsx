@@ -43,7 +43,7 @@ function BenefitDetailPage() {
                     <p className={styles.subText}>{benefit.description}</p>
                     <div className={styles.owlButtonWrapper}>
                         <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
-                        <button className={styles.inlineButton}>
+                        <button onClick={() => setShowModal(true)} className={styles.inlineButton}>
                             혜택 받기 &gt;
                         </button>
                     </div>

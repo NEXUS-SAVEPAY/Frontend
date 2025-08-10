@@ -12,31 +12,38 @@
 }
 
 .modalContent {
-    width: 90%;
-    max-width: 320px;
-    background-color: white;
+    background-color: #fff;
+    padding: 16px 20px; /* 세로·가로 패딩 줄임 */
     border-radius: 20px;
-    padding: 24px;
+    width: 280px; /* 전체 모달 가로 크기 줄임 */
     text-align: center;
     font-family: 'Pretendard', sans-serif;
 }
 
 .icon {
     font-size: 28px;
-    margin-bottom: 12px;
+}
+
+.icon img {
+    width: 44px; /* 아이콘 크기 줄임 */
+    height: auto;
+    margin-top: 4px;
 }
 
 .title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 8px;
     color: #000;
+    line-height: 1.4;
+    margin: 0; /* 불필요한 기본 마진 제거 */
 }
 
 .subtitle {
-    font-size: 14px;
+    font-size: 12px;
     color: #666;
     margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .buttonGroup {

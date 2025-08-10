@@ -2,19 +2,21 @@
     padding: 0 16px;
     width: 100vw;
     box-sizing: border-box;
+    padding-bottom: 70px;
 }
 
 .fixedHeader {
-    
+    /*
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background-color: white;
     z-index: 1000;
-    
-    padding: 16px;
+    */
+    /*padding: 16px;*/
     box-sizing: border-box;
+    padding-top: 12px;
 }
 
 .header {
@@ -25,6 +27,7 @@
     height: 22px;
     margin-top: 4px; 
     margin-bottom: 12px; 
+    padding: 16px;
 }
 
 .backButton {
@@ -37,6 +40,7 @@
     position: absolute;
     left: 0;
     font-weight: 900;
+    margin-left: 8px;
 }
 
 .title {
@@ -53,11 +57,12 @@
 }
 
 .registeredBrandSection {
-    margin-top: 12px;
+    margin-top: 1px;
 }
 
 .withPadding {
-    padding-top: 100px; /* fixedHeader 높이만큼 */
+    padding-top: 1px; /* fixedHeader 높이만큼 */
+
 }
 
 .brandList {
@@ -87,7 +92,7 @@
 }
 
 .searchSection {
-    margin-top: 140px; /* fixedHeader 높이만큼 밀어줌 */
+    margin-top: 14px; /* fixedHeader 높이만큼 밀어줌 */
 }
 
 .emptyResult {

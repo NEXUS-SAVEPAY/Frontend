@@ -136,7 +136,7 @@ function PayRegisterPage({ isManageMode = false }) {
             </div>
 
             {/* 간편결제 선택 */}
-            <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea : ''}`}>
+            <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea_pay : ''}`}>
                 {OPTIONS.map((option) => (
                     <SimplePayOption
                         key={option.type}

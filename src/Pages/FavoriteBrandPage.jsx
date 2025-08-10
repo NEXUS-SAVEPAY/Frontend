@@ -71,7 +71,7 @@ function FavoriteBrandPage() {
                 </div>
             )}
 
-            {/* ✅ 등록된 관심 브랜드 */}
+            {/* 등록된 관심 브랜드 */}
             <div className={`${styles.registeredBrandSection} ${
                 searchResults.length === 0 ? styles.withPadding : ''
             }`}>

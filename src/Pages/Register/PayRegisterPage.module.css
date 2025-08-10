@@ -30,16 +30,17 @@
     cursor: pointer;
     color: #222;
     position: absolute;
-    left: 0;
+    left: 5px;
     font-weight: 900;
 }
 
 .title {
+    font-family: 'Pretendard';
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
     color: #222;
     margin: 0; /* 마진 제거 */
 }
@@ -129,13 +130,15 @@
 
 /* 고정 헤더 전체 묶음 */
 .fixedHeader {
+    /*
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background-color: white;
     z-index: 1000;
-    padding: 16px;
+    */
+    padding-top: 20px;
     box-sizing: border-box;
 }
 
@@ -153,7 +156,7 @@
 
 /* 옵션이 스크롤되는 영역 */
 .scrollArea {
-    margin-top: 160px; /* 고정된 영역 높이만큼 여백 */
+    margin-top: 25px; /* 고정된 영역 높이만큼 여백 */
     padding-bottom: 100px; /* 완료 버튼 높이 + 여유 여백 */
     overflow-y: auto;
     overflow-x: hidden; /* 가로 스크롤 방지 */
@@ -161,9 +164,12 @@
     display: flex;
     flex-direction: column;
 }
+.manageScrollArea_pay {
+    margin-top: 56px;
+}
 
-.manageScrollArea {
-    margin-top: 72px;
+.manageScrollArea_telco {
+    margin-top: 24px;
 }
 
 .buttonGroup {
