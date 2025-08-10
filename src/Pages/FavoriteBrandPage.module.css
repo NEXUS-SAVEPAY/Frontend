@@ -5,13 +5,15 @@
 }
 
 .fixedHeader {
+    
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background-color: white;
     z-index: 1000;
-    padding: 14px;
+    
+    padding: 16px;
     box-sizing: border-box;
 }
 

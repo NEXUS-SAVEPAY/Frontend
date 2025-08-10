@@ -119,7 +119,7 @@ function HomePage() {
                 </section>
 
                 {/* 관심 브랜드 혜택 */}
-                <section className={styles.section}>
+                <section className={styles.section2}>
                     <div className={styles.sectionHeader}>
                         <h1 className={styles.title}>관심 브랜드 혜택</h1>
                         <button 

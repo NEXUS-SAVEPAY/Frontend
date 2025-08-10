@@ -29,14 +29,17 @@ const FavoriteBenefitPage = () => {
 
     return (
         <div className={styles.container}>
+            {/*
             <div className={styles.fixedHeader}>
                 <div className={styles.header}>
                     <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
                     <h2 className={styles.title}>관심 브랜드 혜택</h2>
                 </div>
             </div>
+            */}
 
             <div className={styles.content}>
+            <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
                 {likedBrandGroups.length === 0 ? (
                     <p className={styles.emptyMessage}>관심 브랜드가 없습니다.</p>
                 ) : (
