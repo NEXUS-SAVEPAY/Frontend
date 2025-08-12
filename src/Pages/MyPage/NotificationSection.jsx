@@ -78,39 +78,37 @@ function NotificationSection() {
                     {renderToggle(useMethod, setUseMethod)}
                 </div>
                 <div className={styles.methodCheckboxGroup}>
-                    <label
-                        className={`${styles.checkboxLabel} ${card ? styles.checked : ''}`}
-                        onClick={() => setCard(!card)}
-                    >
-                        카드
-                        <span className={styles.customCheckbox} />
+                    <label className={styles.checkboxLabel}>
                         <input
-                            type="checkbox"
-                            checked={card}
-                            readOnly
+                        type="checkbox"
+                        checked={card}
+                        onChange={() => setCard(prev => !prev)}
                         />
+                        <span className={styles.customCheckbox} />
+                        <span>카드</span>
                     </label>
 
                     <label className={styles.checkboxLabel}>
-                        간편결제
-                        <span className={styles.customCheckbox} />
                         <input
-                            type="checkbox"
-                            checked={simplePay}
-                            onChange={() => setSimplePay(!simplePay)}
+                        type="checkbox"
+                        checked={simplePay}
+                        onChange={() => setSimplePay(prev => !prev)}
                         />
+                        <span className={styles.customCheckbox} />
+                        <span>간편결제</span>
                     </label>
 
                     <label className={styles.checkboxLabel}>
-                        통신사
-                        <span className={styles.customCheckbox} />
                         <input
-                            type="checkbox"
-                            checked={telco}
-                            onChange={() => setTelco(!telco)}
+                        type="checkbox"
+                        checked={telco}
+                        onChange={() => setTelco(prev => !prev)}
                         />
+                        <span className={styles.customCheckbox} />
+                        <span>통신사</span>
                     </label>
-                </div>
+                    </div>
+
 
             </div>
 
