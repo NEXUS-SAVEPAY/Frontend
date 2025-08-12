@@ -25,6 +25,7 @@
     /* padding-top: 86px; *//* fixedTop의 높이만큼 여백 */
     /*padding-bottom: 60px; *//* 완료 버튼 높이 + 여유 여백 */
     width: 100%;
+    padding-bottom: 40px;
 }
 
 .logoWrapper {
