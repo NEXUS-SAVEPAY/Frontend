@@ -56,8 +56,10 @@
 }
 
 .title {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 600;
+    margin-bottom:3px;
+    margin-left:5px;
 }
 
 .viewAllButton {
@@ -79,7 +81,7 @@
 
 .benefitList {
     display: flex;
-    gap: 12px;
+    gap: 5px;
     overflow-x: auto;
 }
 
@@ -260,4 +262,21 @@
     width: 40px;           /* 부엉이 크기 */
     height: auto;
     z-index: 2;
+}
+
+
+/* 추천혜택 카드 내부 세로 여백 줄이기 */
+.benefitList > * {
+    flex: 0 0 130px;
+    max-width: 220px;
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 8px; /* 카드 자체 패딩 축소 */
+}
+
+/* 카드 내부 텍스트들의 불필요한 margin 제거 */
+.benefitList > * h3,
+.benefitList > * p {
+    margin-top: 4px;    /* 위쪽 여백 */
+    margin-bottom: 2px; /* 아래쪽 여백 */
 }
