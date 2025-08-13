@@ -83,19 +83,29 @@
     overflow-x: auto;
 }
 
+
+
+/* 기존 brandList 교체 */
 .brandList {
     display: flex;
-    gap: 2px; /* 아이템 사이 간격 넉넉하게 */
+    gap: 2px;                 /* 보기 좋게 약간 넓힘 */
     margin-bottom: 12px;
+    overflow-x: auto;         /* ← 가로 스크롤 켜기 */
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+    padding: 2px 2px 6px;     /* 아래 살짝 패딩(스크롤바 간섭 방지) */
+    scroll-snap-type: x proximity;     /* 선택: 스냅 스크롤 */
 }
 
-/* 하나의 브랜드 아이템 전체 */
+/* 아이템이 줄바꿈되거나 눌리지 않도록 */
 .brandItem {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 68px; /* 상자 넓게 */
+    width: 68px;
+    flex: 0 0 auto;           /* ← 가로로 연속 배치, 축소 금지 */
+    scroll-snap-align: start; /* 선택: 스냅 위치 */
 }
+
 
 /* 이미지 박스 */
 .brandIcon {
