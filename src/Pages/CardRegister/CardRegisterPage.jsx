@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // ★ 추가
 import { HiChevronLeft } from 'react-icons/hi';
 
 import {
@@ -33,6 +33,14 @@ function CardRegisterPage({ isManageMode = false }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation(); // ★ 추가
+
+    // ★ 추가: 관리 모드에서 화살표로 들어온 특정 카드만 보여주기
+    const targetCardId = location.state?.cardId ?? null;
+    const displayedCards =
+        isManageMode && targetCardId
+            ? registeredCards.filter(c => String(c.id) === String(targetCardId))
+            : registeredCards;
 
     const currentStep = !cardCompany
         ? 1
@@ -183,18 +191,19 @@ function CardRegisterPage({ isManageMode = false }) {
                     </>
                 )}
 
-                {registeredCards.length > 0 && (
+                {/* ▼ 여기부터 2곳만 displayedCards 사용 */}
+                {displayedCards.length > 0 && (
                     <>
                         <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                             <div className={styles.resultWrapper}>
                                 <CardSearchResultList
-                                    cards={registeredCards}
+                                    cards={displayedCards} // ★ 변경
                                     onDelete={handleDeleteClick}
                                 />
                             </div>
                         </div>
 
-                        {(!searchResult && (registeredCards.length > 0 || isManageMode)) && (
+                        {(!searchResult && (displayedCards.length > 0 || isManageMode)) && ( // ★ 변경
                             <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                                 {!isManageMode && (
                                     <div className={styles.stepWrapper}>

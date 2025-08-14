@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
 
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
@@ -25,7 +25,7 @@ function ManagePaymentPage() {
     const handleCardClick = (card, type) => {
         if (type === '카드') {
             setSelectedCard(card);
-            navigate('/manage-card');
+            navigate('/manage-card', { state: { cardId: card.id } });
         }
     };
 
@@ -34,7 +34,7 @@ function ManagePaymentPage() {
     };
 
     const handleTelcoClick = () => {
-        navigate('/manage-telco');
+        navigate('/manage-telco', { state: { telco: userTelcoInfo?.telco || null } });
     };
 
     const getPaymentImage = (type) => {
