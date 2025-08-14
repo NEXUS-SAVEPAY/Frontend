@@ -104,7 +104,7 @@ function MyPage() {
                     id: `simplepay_${p}_${idx}`,
                     name: PAYMENT_NAME[parent] || parent,
                     image: getPaymentImage(parent),
-                    tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '등록됨',
+                    tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '멤버십 없음',
                 };
             }),
         },

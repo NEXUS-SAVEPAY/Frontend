@@ -25,26 +25,32 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    margin-left: 8px;
 }
 
 .brand {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
-    color: #222222;
+    color: #17171B;
     margin: 0;
+    padding: 0;
+    
 }
 
 .description {
-    font-size: 14px;
-    color: #222;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #17171B;
+    margin-top: 0;
+    margin-bottom: 5px;
 }
 
 .detailButton {
+    margin-top: auto;
+    margin-bottom: 8px; 
     align-self: flex-start;
     font-size: 13px;
-    color: #222;
+    color: #AFB3BA;
     background: none;
     border: none;
     padding: 0;

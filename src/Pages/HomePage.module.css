@@ -56,8 +56,10 @@
 }
 
 .title {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 600;
+    margin-bottom:3px;
+    margin-left:5px;
 }
 
 .viewAllButton {
@@ -79,23 +81,33 @@
 
 .benefitList {
     display: flex;
-    gap: 12px;
+    gap: 5px;
     overflow-x: auto;
 }
 
+
+
+/* 기존 brandList 교체 */
 .brandList {
     display: flex;
-    gap: 2px; /* 아이템 사이 간격 넉넉하게 */
+    gap: 2px;                 /* 보기 좋게 약간 넓힘 */
     margin-bottom: 12px;
+    overflow-x: auto;         /* ← 가로 스크롤 켜기 */
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+    padding: 2px 2px 6px;     /* 아래 살짝 패딩(스크롤바 간섭 방지) */
+    scroll-snap-type: x proximity;     /* 선택: 스냅 스크롤 */
 }
 
-/* 하나의 브랜드 아이템 전체 */
+/* 아이템이 줄바꿈되거나 눌리지 않도록 */
 .brandItem {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 68px; /* 상자 넓게 */
+    width: 68px;
+    flex: 0 0 auto;           /* ← 가로로 연속 배치, 축소 금지 */
+    scroll-snap-align: start; /* 선택: 스냅 위치 */
 }
+
 
 /* 이미지 박스 */
 .brandIcon {
@@ -260,4 +272,45 @@
     width: 40px;           /* 부엉이 크기 */
     height: auto;
     z-index: 2;
+}
+
+
+
+
+
+/* 카드(박스) */
+.benefitList > * {
+    flex: 0 0 120px;
+    max-width: 200px;
+    min-width: 0;
+    box-sizing: border-box;
+    height: 180px;            
+    display: flex;
+    flex-direction: column;   /* 위=이미지 / 아래=텍스트 */
+    overflow: hidden;
+    padding: 0;               /* 내부 여백 제거 */
+}
+
+/* ✅ 이미지: 비율 유지하면서 상자에 맞춰 ‘동일 비율’ 확대해 채우기 */
+.benefitList > * img {
+    flex: 0 0 50%;            /* 카드 높이의 절반 차지 */
+    width: 100%;
+    height: 50%;
+    object-fit: cover;        /* 비율 유지 + 여백 없이 채움(잘릴 수 있음) */
+    display: block;
+
+    border-top-left-radius: 12px;   /* 왼쪽 위 둥글게 */
+    border-top-right-radius: 12px;  /* 오른쪽 위 둥글게 */
+    border-bottom-left-radius: 0;   /* 아래쪽은 네모 */
+    border-bottom-right-radius: 0;
+}
+
+/* “자세히 보기” 아래 내부 빈공간 제거 */
+.benefitList > * > :last-child {
+    margin-bottom: 0;         /* 마지막 줄 하단 여백 제거 */
+}
+
+/* 텍스트 묶음을 카드 하단으로 붙이고, 위쪽만 비우고 싶다면 추가 */
+.benefitList > * img + * {
+    margin-top: auto;         /* 이미지 아래 첫 요소부터 바닥으로 밀착 */
 }
