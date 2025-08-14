@@ -1,23 +1,23 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import OnboardingPage from '../pages/Onboarding/OnboardingPage';
-import CardRegisterPage from '../pages/CardRegister/CardRegisterPage';
-import HomePage from '../Pages/HomePage';
-import PayRegisterPage from '../pages/Register/PayRegisterPage';
-import TelcoRegisterPage from '../pages/Register/TelcoRegisterPage';
-import BenefitDetailPage from '../Pages/BenefitDetailPage';
+import OnboardingPage from '../pages/Onboarding/OnboardingPage.jsx';
+import CardRegisterPage from '../pages/CardRegister/CardRegisterPage.jsx';
+import HomePage from '../pages/HomePage.jsx';
+import PayRegisterPage from '../pages/Register/PayRegisterPage.jsx';
+import TelcoRegisterPage from '../pages/Register/TelcoRegisterPage.jsx';
+import BenefitDetailPage from '../pages/BenefitDetailPage.jsx';
 import MyPage from '../pages/MyPage/MyPage.jsx';
-import ManagePaymentPage from '../pages/MyPage/ManagePaymentPage';
-import RecommendedBenefitPage from '../Pages/RecommendedBenefitPage';
-import FavoriteBenefitPage from '../Pages/FavoriteBenefitPage';
-import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
-import CardBenefitPage from '../Pages/CardBenefitPage';
-import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
-import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
+import ManagePaymentPage from '../pages/MyPage/ManagePaymentPage.jsx';
+import RecommendedBenefitPage from '../pages/RecommendedBenefitPage.jsx';
+import FavoriteBenefitPage from '../pages/FavoriteBenefitPage.jsx';
+import RegisteredBenefitPage from '../pages/RegisteredBenefitPage.jsx';
+import CardBenefitPage from '../pages/CardBenefitPage.jsx';
+import SimplePayBenefitPage from '../pages/SimplePayBenefitPage.jsx';
+import TelcoBenefitPage from '../pages/TelcoBenefitPage.jsx';
 import FirstPage from '../pages/Onboarding/FirstPage.jsx';
-import BrandBenefitPage from '../Pages/BrandBenefitPage';
-import FavoriteBrandPage from '../Pages/FavoriteBrandPage';
+import BrandBenefitPage from '../pages/BrandBenefitPage.jsx';
+import FavoriteBrandPage from '../pages/FavoriteBrandPage.jsx';
 
 function AppRoutes() {
     return (
