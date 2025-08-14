@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import AuthDonePage from '../pages/Auth/AuthCallbackPage';
+import AuthDonePage from '../Pages/Auth/AuthCallbackPage';
 import OnboardingPage from '../pages/Onboarding/OnboardingPage';
 import CardRegisterPage from '../pages/CardRegister/CardRegisterPage';
 import HomePage from '../Pages/HomePage';
