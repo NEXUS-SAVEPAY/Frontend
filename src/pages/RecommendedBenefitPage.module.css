@@ -1,0 +1,62 @@
+.container {
+    width: 100vw;
+    padding: 0 16px;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.fixedHeader {
+    /*
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 1000;
+    */
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 32px;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: #222;
+    position: absolute;
+    left: 0;
+    font-weight: 900;
+}
+
+.title {
+    margin: 0 auto;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 콘텐츠 영역을 fixedHeader만큼 아래로 밀기 */
+.content {
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 32px;
+}
+
+.benefitListColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 아이템마다 여백 생김 */
+    padding-bottom: 32px;
+}
+

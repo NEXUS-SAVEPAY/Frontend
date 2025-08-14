@@ -1,0 +1,135 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 4px;
+    margin-bottom: 38px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.box {
+    background-color: #fffefe;
+    border: 1px solid #e0e0e0;
+    border-radius: 9px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rowBetween {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.toggleSwitch {
+    width: 48px;
+    height: 28px;
+    background-color: #ccc;
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggleSwitch.active {
+    background-color: #654EFF;
+}
+
+.knob {
+    width: 22px;
+    height: 22px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: left 0.3s ease;
+}
+
+.toggleSwitch.active .knob {
+    left: 23px;
+}
+
+.methodButtons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.methodButton {
+    flex: 1;
+    padding: 10px 0;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: #666;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.methodButton.selected {
+    background-color: #e8e5ff;
+    color: #654EFF;
+    font-weight: 600;
+}
+
+.methodCheckboxGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    gap: 6px;
+    cursor: pointer;
+}
+
+/* 기본 checkbox 숨기기 */
+.checkboxLabel input[type='checkbox'] {
+    display: none;
+}
+
+/* 커스텀 체크박스 */
+.customCheckbox {
+    width: 20px;
+    height: 20px;
+    background-color: #e6e9ec;
+    border-radius: 6px;
+    position: relative;
+}
+
+/* 체크 상태일 때 */
+.checkboxLabel input[type='checkbox']:checked + .customCheckbox {
+    background-color: #654EFF;
+}
+
+/* 체크 표시 (선택적으로 추가 가능) */
+.checkboxLabel input[type='checkbox']:checked + .customCheckbox::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}

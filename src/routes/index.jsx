@@ -6,18 +6,18 @@ import CardRegisterPage from '../pages/CardRegister/CardRegisterPage';
 import HomePage from '../Pages/HomePage';
 import PayRegisterPage from '../pages/Register/PayRegisterPage';
 import TelcoRegisterPage from '../pages/Register/TelcoRegisterPage';
-import BenefitDetailPage from '../Pages/BenefitDetailPage';
+import BenefitDetailPage from '../pages/BenefitDetailPage';
 import MyPage from '../pages/MyPage/MyPage.jsx';
 import ManagePaymentPage from '../pages/MyPage/ManagePaymentPage';
-import RecommendedBenefitPage from '../Pages/RecommendedBenefitPage';
-import FavoriteBenefitPage from '../Pages/FavoriteBenefitPage';
-import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
-import CardBenefitPage from '../Pages/CardBenefitPage';
-import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
-import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
+import RecommendedBenefitPage from '../pages/RecommendedBenefitPage';
+import FavoriteBenefitPage from '../pages/FavoriteBenefitPage';
+import RegisteredBenefitPage from '../pages/RegisteredBenefitPage';
+import CardBenefitPage from '../pages/CardBenefitPage';
+import SimplePayBenefitPage from '../pages/SimplePayBenefitPage';
+import TelcoBenefitPage from '../pages/TelcoBenefitPage';
 import FirstPage from '../pages/Onboarding/FirstPage.jsx';
-import BrandBenefitPage from '../Pages/BrandBenefitPage';
-import FavoriteBrandPage from '../Pages/FavoriteBrandPage';
+import BrandBenefitPage from '../pages/BrandBenefitPage';
+import FavoriteBrandPage from '../pages/FavoriteBrandPage';
 
 function AppRoutes() {
     return (
