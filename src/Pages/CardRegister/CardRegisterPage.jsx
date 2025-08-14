@@ -103,7 +103,7 @@ function CardRegisterPage({ isManageMode = false }) {
                         <HiChevronLeft size={24} />
                     </button>
                     */}
-                    <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
+                    <button className={styles.backButton} onClick={() => navigate(-1)}>〈</button>
                     <h1 className={styles.title}>{isManageMode ? '등록된 카드' : '카드 등록'}</h1>
                 </div>
 

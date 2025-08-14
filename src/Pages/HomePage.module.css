@@ -90,7 +90,7 @@
 /* 기존 brandList 교체 */
 .brandList {
     display: flex;
-    gap: 2px;                 /* 보기 좋게 약간 넓힘 */
+                /* 보기 좋게 약간 넓힘 */
     margin-bottom: 12px;
     overflow-x: auto;         /* ← 가로 스크롤 켜기 */
     -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */

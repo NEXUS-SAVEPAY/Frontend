@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
+import AuthDonePage from '../pages/Auth/AuthCallbackPage';
 import OnboardingPage from '../pages/Onboarding/OnboardingPage';
 import CardRegisterPage from '../pages/CardRegister/CardRegisterPage';
 import HomePage from '../Pages/HomePage';
@@ -25,6 +25,7 @@ function AppRoutes() {
             <Routes>
                 <Route path="/" element={<FirstPage />} />
                 <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/auth/callback" element={<AuthDonePage />} />
                 <Route path="/register/card" element={<CardRegisterPage isManageMode={false} />} />
                 <Route path="/register/simple-pay" element={<PayRegisterPage isManageMode={false}/>} />
                 <Route path="/register/telco" element={<TelcoRegisterPage isManageMode={false}/>} />
