@@ -1,0 +1,135 @@
+/*
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    background-color: #654eff;
+    box-sizing: border-box;
+    width: 100vw; 
+    height: 100vh;
+    overflow: hidden;
+}
+*/
+
+.container {
+    width: 100vw;              /* 브라우저 가로 전체 */
+    height: 100vh;             /* 브라우저 세로 전체 */
+    padding: 0 16px;           /* 좌우 여백 */
+    box-sizing: border-box;   /* padding 포함한 전체 사이즈 계산 */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* 수직 가운데 정렬 */
+    align-items: center;      /* 수평 가운데 정렬 */
+
+    background-color: #654eff; /* 배경색 지정 */
+    overflow: hidden;          /* 내부 스크롤 절대 방지 */
+}
+
+
+.character {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFD900;
+    margin-bottom: 12px;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.description {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+    white-space: pre-line;
+    color: white;
+    margin-bottom: 32px;
+    max-width: 100%;
+}
+
+.speechBubble {
+    background-color: #3E33A9;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 32px;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600;
+    font-size: 11.42px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 24px;
+}
+
+.speechBubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #3E33A9;
+}
+
+.loginDriver {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    text-align: center;
+    color: #EAEDF0;
+    margin: 0 0 32px;
+    position: relative;
+}
+
+.loginDriver::before,
+.loginDriver::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 120px;
+    height: 1px;
+    background-color: #EAEDF0;
+}
+
+.loginDriver::before {
+    left: -130px;
+}
+
+.loginDriver::after {
+    right: -130px;
+}
+
+.buttonWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    width: 100%;
+    gap: 16px;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.buttonWrapper button {
+    width: 100%;        
+    padding: 14px 0;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
+
