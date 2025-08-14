@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
@@ -25,9 +26,12 @@ function ManagePaymentPage() {
     const handleCardClick = (card, type) => {
         if (type === '카드') {
             setSelectedCard(card);
-            navigate('/manage-card');
+            navigate('/manage-card', {
+                state: { selectedCardId: card.id, isManageMode: true }
+            });
         }
     };
+
 
     const handleSimplePayClick = () => {
         navigate('/manage-simplepay');
@@ -109,7 +113,7 @@ function ManagePaymentPage() {
                     id: `simplepay_${p}_${idx}`,
                     name: PAYMENT_NAME[parent] || parent,
                     image: getPaymentImage(parent),
-                    tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '등록됨',
+                    tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '멤버십 없음',
                 };
             }),
         },

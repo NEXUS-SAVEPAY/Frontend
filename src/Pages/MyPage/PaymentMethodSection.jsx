@@ -44,12 +44,20 @@ function PaymentMethodSection({
                                     <span className={styles.companyBadge}>{item.tag}</span>
                                     <span className={styles.cardName}>{item.name}</span>
                                     {arrowIcon && (
-                                        <img
-                                            src={arrowIcon}
-                                            alt="화살표"
-                                            className={styles.arrowIcon}
-                                        />
-                                    )}
+                                        <button
+                                            type="button"
+                                            className={styles.arrowIconBtn}
+                                            onClick={(e) => {
+                                            e.stopPropagation(); // 부모(cardBox) onClick 전파 방지!
+                                            if (group.type === '카드') onCardClick?.(item, group.type);
+                                            else if (group.type === '간편결제') onSimplePayClick?.(item, group.type);
+                                            else if (group.type === '통신사') onTelcoClick?.(item, group.type);
+                                            }}
+                                            aria-label="자세히"
+                                        >
+                                            <img src={arrowIcon} alt="" className={styles.arrowIcon} />
+                                        </button>
+                                        )}
                                 </div>
                             </div>
                         ))}
