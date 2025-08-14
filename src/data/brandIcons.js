@@ -1,5 +1,5 @@
 // src/data/brandIcons.js
-import oliveyoung from '../assets/images/oliveyoung.svg';
+import oliveyoung from '../assets/images/oliveyoung_square.png';
 import starbucks from '../assets/images/starbucks.svg';
 import mcdonalds from '../assets/images/mcdonalds_rectangle.png';
 import megabox from '../assets/images/megabox.svg';
