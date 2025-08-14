@@ -31,8 +31,7 @@ function BenefitDetailPage() {
             </div>
 
             <div className={styles.content}>
-            {/* 이미지 */}
-            <img src={benefit.image} alt="혜택 이미지" className={styles.storeImage} />
+        
 
             {/* 브랜드 + 제목 + 설명 + 버튼 */}
             <div className={styles.summaryBox}>

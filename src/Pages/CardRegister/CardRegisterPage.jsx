@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { useNavigate, useLocation } from 'react-router-dom'; // ★ 추가
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HiChevronLeft } from 'react-icons/hi';
+import CardResultListSingle from '../../components/Card/CardResultListSingle';
 
 import {
     cardCompanyAtom,
@@ -32,19 +33,24 @@ function CardRegisterPage({ isManageMode = false }) {
     const [pendingDeleteCard, setPendingDeleteCard] = useRecoilState(pendingDeleteCardAtom);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const navigate = useNavigate();
-    const location = useLocation(); // ★ 추가
+    // ✅ manage-card 전용 로컬 작업 리스트 (초기 스냅샷만 가져오고, 이후엔 로컬에서만 수정)
+    const [localCards, setLocalCards] = useState(() => registeredCards);
 
-    // ★ 추가: 관리 모드에서 화살표로 들어온 특정 카드만 보여주기
-    const targetCardId = location.state?.cardId ?? null;
-    const displayedCards =
-        isManageMode && targetCardId
-            ? registeredCards.filter(c => String(c.id) === String(targetCardId))
-            : registeredCards;
+    const navigate = useNavigate();
+    const location = useLocation();
+    const selectedCardId = location?.state?.selectedCardId ?? null;
+
+    // 표시용 소스: manage면 localCards, 아니면 글로벌 registeredCards
+    const cardsSource = isManageMode ? localCards : registeredCards;
+
+    // manage 모드에서 단일 카드 진입 시 선택 카드 찾기
+    const selectedCard = isManageMode && selectedCardId
+        ? cardsSource.find(c => String(c.id) === String(selectedCardId))
+        : null;
 
     const currentStep = !cardCompany
         ? 1
-        : cardCompany && registeredCards.length === 0
+        : cardCompany && cardsSource.length === 0
         ? 2
         : 3;
 
@@ -69,11 +75,17 @@ function CardRegisterPage({ isManageMode = false }) {
     };
 
     const handleRegister = () => {
-        if (searchResult) {
+        if (!searchResult) return;
+
+        if (isManageMode) {
+            // ✅ manage: 로컬에만 추가 → 화면에서 즉시 여러 장 보이게
+            setLocalCards(prev => [...prev, searchResult]);
+        } else {
+            // 기존 동작 유지 (글로벌에 바로 추가)
             setRegisteredCards([...registeredCards, searchResult]);
-            setSearchResult(null);
-            setCardName('');
         }
+        setSearchResult(null);
+        setCardName('');
     };
 
     const handleDeleteClick = (card) => {
@@ -82,7 +94,13 @@ function CardRegisterPage({ isManageMode = false }) {
     };
 
     const confirmDelete = () => {
-        setRegisteredCards(registeredCards.filter((c) => c.id !== pendingDeleteCard.id));
+        if (isManageMode) {
+            // ✅ manage: 로컬에서만 삭제
+            setLocalCards(localCards.filter((c) => c.id !== pendingDeleteCard.id));
+        } else {
+            // 기존 동작 유지
+            setRegisteredCards(registeredCards.filter((c) => c.id !== pendingDeleteCard.id));
+        }
         setShowDeleteModal(false);
         setPendingDeleteCard(null);
     };
@@ -91,7 +109,12 @@ function CardRegisterPage({ isManageMode = false }) {
         setCardCompany(company);
         setCardName('');
         setSearchResult(null);
-        setRegisteredCards([]);
+        if (isManageMode) {
+            // ✅ manage: 로컬 리스트만 초기화
+            setLocalCards([]);
+        } else {
+            setRegisteredCards([]);
+        }
     };
 
     const handleComplete = () => {
@@ -99,6 +122,8 @@ function CardRegisterPage({ isManageMode = false }) {
     };
 
     const handleSave = () => {
+        // ✅ manage: 이 순간에만 글로벌에 반영
+        setRegisteredCards(localCards);
         navigate('/manage-payment');
     };
 
@@ -106,11 +131,9 @@ function CardRegisterPage({ isManageMode = false }) {
         <div className={styles.pageWrapper}>
             <div className={styles.contentWrapper}>
                 <div className={styles.header}>
-                    {/*
-                    <button className={styles.backButton} onClick={handleBack}>
+                    {/* <button className={styles.backButton} onClick={handleBack}>
                         <HiChevronLeft size={24} />
-                    </button>
-                    */}
+                    </button> */}
                     <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
                     <h1 className={styles.title}>{isManageMode ? '등록된 카드' : '카드 등록'}</h1>
                 </div>
@@ -148,7 +171,7 @@ function CardRegisterPage({ isManageMode = false }) {
                                 <div className={styles.circleAndLine}>
                                     <StepCircle
                                         number={2}
-                                        hasLineBelow={!isManageMode && currentStep >= 3}
+                                        hasLineBelow={!isManageMode && cardsSource.length > 0}
                                         lineHeight="300px"
                                     />
                                 </div>
@@ -191,19 +214,35 @@ function CardRegisterPage({ isManageMode = false }) {
                     </>
                 )}
 
-                {/* ▼ 여기부터 2곳만 displayedCards 사용 */}
-                {displayedCards.length > 0 && (
+                {cardsSource.length > 0 && (
                     <>
                         <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                             <div className={styles.resultWrapper}>
-                                <CardSearchResultList
-                                    cards={displayedCards} // ★ 변경
-                                    onDelete={handleDeleteClick}
-                                />
+                                {isManageMode ? (
+                                    // ✅ manage: 카드가 1장이면 단일, 2장 이상이면 리스트로 자동 전환
+                                    cardsSource.length === 1 ? (
+                                        <CardResultListSingle
+                                            card={selectedCard || cardsSource[0]}
+                                            onDelete={handleDeleteClick}
+                                            showDelete={true}
+                                        />
+                                    ) : (
+                                        <CardSearchResultList
+                                            cards={cardsSource}
+                                            onDelete={handleDeleteClick}
+                                        />
+                                    )
+                                ) : (
+                                    // 등록 플로우는 기존 그대로
+                                    <CardSearchResultList
+                                        cards={cardsSource}
+                                        onDelete={handleDeleteClick}
+                                    />
+                                )}
                             </div>
                         </div>
 
-                        {(!searchResult && (displayedCards.length > 0 || isManageMode)) && ( // ★ 변경
+                        {(!searchResult && (cardsSource.length > 0 || isManageMode)) && (
                             <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                                 {!isManageMode && (
                                     <div className={styles.stepWrapper}>
