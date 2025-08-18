@@ -17,7 +17,7 @@ export const cardNameAtom = atom({
 
 export const searchResultAtom = atom({
     key: 'searchResultAtom',
-    default: [],
+    default: null,
     effects_UNSTABLE: [persistAtom],
 });
 

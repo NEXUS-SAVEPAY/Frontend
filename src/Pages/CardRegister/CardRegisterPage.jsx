@@ -23,15 +23,28 @@ import StepCircle from '../../components/Common/StepCircle';
 
 import styles from './CardRegisterPage.module.css';
 import mockCardData from '../../data/mockCardData';
+import {
+  fetchCardImage,
+  registerCardToUser,
+  fetchRegisteredCards,
+  deleteCardFromUser,
+} from '../../services/api/cardApi';
 
 function CardRegisterPage({ isManageMode = false }) {
   const [cardCompany, setCardCompany] = useRecoilState(cardCompanyAtom);
   const [cardName, setCardName] = useRecoilState(cardNameAtom);
-  const [searchResult, setSearchResult] = useRecoilState(searchResultAtom);
+  const [searchResult, setSearchResult] = useRecoilState(searchResultAtom); // null 권장
   const [registeredCards, setRegisteredCards] = useRecoilState(registeredCardsAtom);
   const [showDeleteModal, setShowDeleteModal] = useRecoilState(showDeleteModalAtom);
   const [pendingDeleteCard, setPendingDeleteCard] = useRecoilState(pendingDeleteCardAtom);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
+
+  // 등록 중/에러 상태
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,44 +59,81 @@ function CardRegisterPage({ isManageMode = false }) {
   const cardsSource = isManageMode ? localCards : registeredCards;
 
   // manage 모드 단일 진입 시 선택 카드
-  const selectedCard = isManageMode && selectedCardId
-    ? cardsSource.find(c => String(c.id) === String(selectedCardId))
-    : null;
+  const selectedCard =
+    isManageMode && selectedCardId
+      ? cardsSource.find((c) => String(c.id) === String(selectedCardId))
+      : null;
 
-  const currentStep = !cardCompany
-    ? 1
-    : cardCompany && cardsSource.length === 0
-    ? 2
-    : 3;
+  const currentStep = !cardCompany ? 1 : cardCompany && cardsSource.length === 0 ? 2 : 3;
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!cardCompany || !cardName) return;
-    const foundCard = mockCardData.find(
-      (card) => card.company === cardCompany && card.name.includes(cardName)
-    );
-    if (foundCard) {
-      setSearchResult(foundCard);
-    } else {
-      setSearchResult({
-        id: Date.now(),
-        name: cardName,
-        company: cardCompany,
-        image: '/assets/images/sample-card.png',
-      });
+    setIsSearching(true);
+    setSearchError('');
+    try {
+      // 1) 백엔드 조회
+      const card = await fetchCardImage({ company: cardCompany, cardName });
+      setSearchResult(card);
+    } catch (e) {
+      // 2) 실패 시 mock/fallback
+      const fallback = mockCardData.find(
+        (c) => c.company === cardCompany && c.name.includes(cardName)
+      );
+      if (fallback) {
+        setSearchResult(fallback);
+      } else {
+        setSearchResult({
+          id: Date.now(),
+          name: cardName,
+          company: cardCompany,
+          image: '',
+        });
+        setSearchError('카드 이미지를 불러오지 못했어요. 등록은 계속할 수 있어요.');
+      }
+    } finally {
+      setIsSearching(false);
     }
   };
 
-  const handleRegister = () => {
-    if (!searchResult) return;
+  // 중복 없이 카드 추가(업서트)
+  const upsert = (arr, card) => {
+    const key = (c) => String(c?.id ?? `${c?.company ?? ''}::${c?.name ?? ''}`);
+    const map = new Map(arr.map((c) => [key(c), c]));
+    map.set(key(card), card);
+    return Array.from(map.values());
+  };
 
-    if (isManageMode) {
-      setLocalCards(prev => [...prev, searchResult]); // 로컬만 추가
-      setForceSingleView(false);                      // 이후 리스트 전환
-    } else {
-      setRegisteredCards(prev => [...prev, searchResult]); // 전역 추가
+  // DB 저장 → 성공 시 목록 동기화
+  const handleRegister = async () => {
+    if (!searchResult) return;
+    setRegisterError('');
+    setIsRegistering(true);
+    try {
+      // 1) DB 저장 (POST /api/cards/user?cardId=)
+      await registerCardToUser(searchResult.id);
+
+      // 2) 서버 목록으로 동기화
+      const latest = await fetchRegisteredCards();
+
+      if (isManageMode) {
+        setLocalCards(latest);
+        setForceSingleView(false); // 이후 리스트 전환
+      } else {
+        setRegisteredCards(latest);
+      }
+
+      // 3) 입력/미리보기 초기화
+      setSearchResult(null);
+      setCardName('');
+    } catch (e) {
+      if (e.code === 'CARD400') {
+        setRegisterError('이미 등록된 카드입니다.');
+      } else {
+        setRegisterError(e.message || '카드 등록에 실패했습니다.');
+      }
+    } finally {
+      setIsRegistering(false);
     }
-    setSearchResult(null);
-    setCardName('');
   };
 
   // X 클릭 → 모달 오픈 (두 모드 공통)
@@ -92,22 +142,40 @@ function CardRegisterPage({ isManageMode = false }) {
     setShowDeleteModal(true);
   };
 
-  // 모달 "네" → manage: 로컬 삭제, register: 전역 삭제
-  const confirmDelete = () => {
+  // 모달 "네" → DB 삭제 → 목록 동기화(404면 로컬만 제거)
+  const confirmDelete = async () => {
     if (!pendingDeleteCard) return;
 
-    const removeById = (arr) =>
-      arr.filter(c => String(c.id) !== String(pendingDeleteCard.id));
+    const removeById = (arr) => arr.filter((c) => String(c.id) !== String(pendingDeleteCard.id));
 
-    if (isManageMode) {
-      setLocalCards(prev => removeById(prev));
-      setForceSingleView(false); // 변경 발생 후 리스트 뷰 유지
-    } else {
-      setRegisteredCards(prev => removeById(prev));
+    try {
+      // 1) DB에서 삭제
+      await deleteCardFromUser(pendingDeleteCard.id);
+
+      // 2) 최신 목록 동기화
+      const latest = await fetchRegisteredCards();
+      if (isManageMode) {
+        setLocalCards(latest);
+      } else {
+        setRegisteredCards(latest);
+      }
+    } catch (e) {
+      if (e.code === 'USER_PAYMENT404') {
+        // 이미 서버에 없으면 로컬만 정리
+        if (isManageMode) {
+          setLocalCards((prev) => removeById(prev));
+        } else {
+          setRegisteredCards((prev) => removeById(prev));
+        }
+      } else {
+        alert(e.message || '삭제에 실패했습니다.');
+        return; // 실패 시 모달 유지
+      }
+    } finally {
+      setForceSingleView(false);
+      setShowDeleteModal(false);
+      setPendingDeleteCard(null);
     }
-
-    setShowDeleteModal(false);
-    setPendingDeleteCard(null);
   };
 
   const handleCompanySelect = (company) => {
@@ -117,12 +185,12 @@ function CardRegisterPage({ isManageMode = false }) {
     if (isManageMode) {
       setLocalCards([]);
       setForceSingleView(true);
-    } else {
-      setRegisteredCards([]);
     }
+    // 등록 모드에서 전역 카드 초기화하지 않음
   };
 
   const handleComplete = () => navigate('/register/simple-pay');
+
   const handleSave = () => {
     // 저장 시점에만 전역 반영
     setRegisteredCards(localCards);
@@ -133,7 +201,9 @@ function CardRegisterPage({ isManageMode = false }) {
     <div className={styles.pageWrapper}>
       <div className={styles.contentWrapper}>
         <div className={styles.header}>
-          <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
+          <button className={styles.backButton} onClick={() => navigate('/mypage')}>
+            〈
+          </button>
           <h1 className={styles.title}>{isManageMode ? '등록된 카드' : '카드 등록'}</h1>
         </div>
 
@@ -176,14 +246,15 @@ function CardRegisterPage({ isManageMode = false }) {
                 </div>
               </div>
               <div className={styles.inputWithButtonWrapper}>
-                <CardNameInput
-                  value={cardName}
-                  onChange={setCardName}
-                  onSearch={handleSearch}
-                />
-                <button className={styles.searchButton} onClick={handleSearch}>
-                  카드 검색 하기
+                <CardNameInput value={cardName} onChange={setCardName} onSearch={handleSearch} />
+                <button
+                  className={styles.searchButton}
+                  onClick={handleSearch}
+                  disabled={isSearching}
+                >
+                  {isSearching ? '검색 중…' : '카드 검색 하기'}
                 </button>
+                {searchError && <p className={styles.errorText}>{searchError}</p>}
               </div>
             </div>
 
@@ -198,15 +269,19 @@ function CardRegisterPage({ isManageMode = false }) {
                       setCardName('');
                     }}
                   >
-                    검색된 카드가 아니신가요?{' '}
-                    <span className={styles.retryUnderline}>다시 검색</span>
+                    검색된 카드가 아니신가요? <span className={styles.retryUnderline}>다시 검색</span>
                   </p>
 
                   <CardPreviewBox card={searchResult} />
 
-                  <button className={styles.registerButton} onClick={handleRegister}>
-                    카드 등록 하기
+                  <button
+                    className={styles.registerButton}
+                    onClick={handleRegister}
+                    disabled={isRegistering}
+                  >
+                    {isRegistering ? '등록 중…' : '카드 등록 하기'}
                   </button>
+                  {registerError && <p className={styles.errorText}>{registerError}</p>}
                 </div>
               </div>
             )}
@@ -225,21 +300,15 @@ function CardRegisterPage({ isManageMode = false }) {
                       showDelete={true}
                     />
                   ) : (
-                    <CardSearchResultList
-                      cards={cardsSource}
-                      onDelete={handleDeleteClick}
-                    />
+                    <CardSearchResultList cards={cardsSource} onDelete={handleDeleteClick} />
                   )
                 ) : (
-                  <CardSearchResultList
-                    cards={cardsSource}
-                    onDelete={handleDeleteClick}
-                  />
+                  <CardSearchResultList cards={cardsSource} onDelete={handleDeleteClick} />
                 )}
               </div>
             </div>
 
-            {(!searchResult && (cardsSource.length > 0 || isManageMode)) && (
+            {!searchResult && (cardsSource.length > 0 || isManageMode) && (
               <div className={`${styles.inputGroupWithStep} ${styles.alignMiddle}`}>
                 {!isManageMode && (
                   <div className={styles.stepWrapper}>
@@ -262,10 +331,7 @@ function CardRegisterPage({ isManageMode = false }) {
         )}
 
         {showDeleteModal && (
-          <CardDeleteModal
-            onConfirm={confirmDelete}
-            onCancel={() => setShowDeleteModal(false)}
-          />
+          <CardDeleteModal onConfirm={confirmDelete} onCancel={() => setShowDeleteModal(false)} />
         )}
       </div>
     </div>

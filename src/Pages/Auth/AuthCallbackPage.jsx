@@ -45,7 +45,7 @@ export default function AuthCallbackPage() {
                 if (data?.result === true) {
                     navigate('/home', { replace: true }); // 등록 끝난 사용자
                 } else {
-                    navigate('/register/telco', { replace: true }); // 등록 안 된 사용자 → 등록 페이지
+                    navigate('/register/card', { replace: true }); // 등록 안 된 사용자 → 등록 페이지
                 }
             } catch (err) {
                 console.error('[Onboarding check error]', err);
