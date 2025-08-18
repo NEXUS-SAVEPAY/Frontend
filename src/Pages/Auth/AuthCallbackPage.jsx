@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { authAtom } from '../../recoil/atoms/authAtom';
+import { setAccessToken } from '../../services/api/token';   // 👈 추가
+
 
 export default function AuthCallbackPage() {
     const navigate = useNavigate();
@@ -25,6 +27,12 @@ export default function AuthCallbackPage() {
             accessToken,
             refreshToken,
         }));
+
+        // 👉 localStorage에도 저장
+        setAccessToken(accessToken);
+        if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+        }
 
         // URL 깔끔하게: 토큰 쿼리 제거 + 다음 페이지로
         navigate('/register/card', { replace: true });
