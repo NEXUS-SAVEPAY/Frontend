@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { likedBrandsAtom } from '../../recoil/atoms/likedBrandsAtom';
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { userPaymentsAtom } from '../../recoil/atoms/userPaymentsAtom';
 import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
+import { fetchUserTelco } from '../../services/api/telcoService';
 
 import styles from './MyPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
@@ -57,7 +58,21 @@ function MyPage() {
 
     const registeredCards = useRecoilValue(registeredCardsAtom);
     const userPaymentRaw = useRecoilValue(userPaymentsAtom); // 배열/문자열 둘 다 올 수 있음
-    const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
+    const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
+
+    useEffect(() => {
+        async function loadTelco() {
+            const telcoRes = await fetchUserTelco();
+            if (telcoRes.isSuccess && telcoRes.result) {
+                setUserTelcoInfo({
+                    telco: telcoRes.result.telecomName,
+                    hasMembership: telcoRes.result.isMembership,
+                    grade: telcoRes.result.grade,
+                });
+            }
+        }
+        loadTelco();
+    }, [setUserTelcoInfo]);
 
     // ✅ 간편결제 값: 항상 배열로 정규화 + 'none' 제거
     const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
