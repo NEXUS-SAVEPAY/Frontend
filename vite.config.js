@@ -10,7 +10,7 @@ export default defineConfig({
                 target: 'http://3.35.204.188:8080',
                 changeOrigin: true,
                 secure: false,
-                rewrite: (p) => p.replace(/^\/api/, ''), // '/api/auth/me' -> '/auth/me'
+                // rewrite: (p) => p.replace(/^\/api/, ''), // '/api/auth/me' -> '/auth/me'
             },
         },
     },

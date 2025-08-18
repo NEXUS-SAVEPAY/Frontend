@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
+import { registerUserTelco, updateUserTelco, fetchUserTelco } from '../../services/api/telcoService';
 import TelcoOption from '../../components/Telco/TelcoOption';
 import MembershipSelector from '../../components/Telco/MembershipSelector';
 import styles from './PayRegisterPage.module.css';
@@ -14,33 +15,69 @@ function TelcoRegisterPage({ isManageMode = false }) {
     const [selectedTelco, setSelectedTelco] = useState('');
     const [membershipInfo, setMembershipInfo] = useState(null);
 
-    const telcos = ['SKT', 'LG U+', 'KT', '알뜰폰'];
 
-    // 관리모드일 경우 기존 값 미리 셋팅
+
+    const telcos = [
+        { label: "SKT", value: "SKT" },
+        { label: "LG U+", value: "LG" }, // 서버 enum에 맞춤
+        { label: "KT", value: "KT" },
+        { label: "알뜰폰", value: "MVNO" }, // 서버가 쓰는 값 확인 필요
+    ];
+    
+
+    // 관리모드일 경우 서버에서 불러오기
     useEffect(() => {
-        if (isManageMode && savedTelcoInfo) {
-            setSelectedTelco(savedTelcoInfo.telco || '');
-            setMembershipInfo({
-                hasMembership: savedTelcoInfo.hasMembership,
-                grade: savedTelcoInfo.grade || '',
-            });
+        async function loadTelco() {
+            if (isManageMode) {
+                try {
+                    const res = await fetchUserTelco();
+                    if (res.isSuccess && res.result) {
+                        setSelectedTelco(res.result.telecomName);
+                        setMembershipInfo({
+                            hasMembership: res.result.isMembership,
+                            grade: res.result.grade,
+                        });
+                        setUserTelcoInfo({
+                            telco: res.result.telecomName,
+                            hasMembership: res.result.isMembership,
+                            grade: res.result.grade,
+                        });
+                    }
+                } catch (err) {
+                    console.error('[TelcoRegisterPage] 통신사 불러오기 실패', err);
+                }
+            }
         }
-    }, [isManageMode, savedTelcoInfo]);
+        loadTelco();
+    }, [isManageMode, setUserTelcoInfo]);
 
-    const handleComplete = () => {
-        setUserTelcoInfo({
-            telco: selectedTelco,
-            hasMembership: membershipInfo?.hasMembership,
-            grade: membershipInfo?.grade || '',
-        });
+    const handleComplete = async () => {
+        try {
+            const payload = {
+                telco: selectedTelco,
+                hasMembership: membershipInfo?.hasMembership,
+                grade: membershipInfo?.grade || '',
+            };
 
-        // 등록 모드 → 홈으로, 관리 모드 → manage-payment로
-        if (isManageMode) {
-            navigate('/manage-payment');
-        } else {
-            navigate('/home');
+            // 등록/수정 구분
+            const res = isManageMode
+            ? await updateUserTelco(payload) // 수정 (PUT)
+            : await registerUserTelco(payload); // 등록 (POST)
+
+            if (res.isSuccess) {
+                setUserTelcoInfo(payload);
+                navigate(isManageMode ? '/manage-payment' : '/home');
+            } else {
+                alert('저장 실패: ' + res.message);
+            }
+        } catch (err) {
+        console.error('[TelcoRegisterPage] 저장 실패', err);
+        alert('서버 오류가 발생했습니다.');
         }
+
     };
+
+
 
     const showCompleteButton =
         (membershipInfo?.hasMembership === false) ||
@@ -72,27 +109,25 @@ function TelcoRegisterPage({ isManageMode = false }) {
 
             <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea_telco : ''}`}>
                 <div className={styles.buttonGroup}>
-                    {telcos.map((telco) => (
-                        <div key={telco} className={styles.telcoItem}>
-                            {selectedTelco === telco ? (
-                                <MembershipSelector
-                                    telco={telco}
-                                    onComplete={(info) => setMembershipInfo(info)}
-                                    initialMembershipInfo={
-                                        isManageMode ? membershipInfo : null
-                                    }
-                                />
-                            ) : (
-                                <TelcoOption
-                                    label={telco}
-                                    selected={false}
-                                    onClick={() => {
-                                        setSelectedTelco(telco);
-                                        setMembershipInfo(null);
-                                    }}
-                                />
-                            )}
-                        </div>
+                {telcos.map((telco) => (
+                    <div key={telco.value} className={styles.telcoItem}>
+                        {selectedTelco === telco.value ? (
+                        <MembershipSelector
+                            telco={telco.label} // 화면에 보여줄 라벨
+                            onComplete={(info) => setMembershipInfo(info)}
+                            initialMembershipInfo={isManageMode ? membershipInfo : null}
+                        />
+                        ) : (
+                        <TelcoOption
+                            label={telco.label}   // 👈 TelcoOption에는 string만 전달
+                            selected={false}
+                            onClick={() => {
+                            setSelectedTelco(telco.value); // 서버에 보낼 값 저장
+                            setMembershipInfo(null);
+                            }}
+                        />
+                        )}
+                    </div>
                     ))}
                 </div>
             </div>

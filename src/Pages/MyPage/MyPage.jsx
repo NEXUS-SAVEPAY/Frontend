@@ -1,12 +1,19 @@
+<<<<<<< HEAD
 // src/pages/MyPage/MyPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
+=======
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilValue, useRecoilState } from 'recoil';
+>>>>>>> 6477c92d7df0754b2bc0bca122245953e0836b8a
 import { likedBrandsAtom } from '../../recoil/atoms/likedBrandsAtom';
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { userPaymentsAtom } from '../../recoil/atoms/userPaymentsAtom';
 import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
+import { fetchUserTelco } from '../../services/api/telcoService';
 
 import styles from './MyPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
@@ -60,10 +67,30 @@ function MyPage() {
   const setRegisteredCards = useSetRecoilState(registeredCardsAtom);
   const registeredCards = useRecoilValue(registeredCardsAtom);
 
+<<<<<<< HEAD
   // 간편결제/통신사
   const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
   const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
+=======
+    const registeredCards = useRecoilValue(registeredCardsAtom);
+    const userPaymentRaw = useRecoilValue(userPaymentsAtom); // 배열/문자열 둘 다 올 수 있음
+    const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
+
+    useEffect(() => {
+        async function loadTelco() {
+            const telcoRes = await fetchUserTelco();
+            if (telcoRes.isSuccess && telcoRes.result) {
+                setUserTelcoInfo({
+                    telco: telcoRes.result.telecomName,
+                    hasMembership: telcoRes.result.isMembership,
+                    grade: telcoRes.result.grade,
+                });
+            }
+        }
+        loadTelco();
+    }, [setUserTelcoInfo]);
+>>>>>>> 6477c92d7df0754b2bc0bca122245953e0836b8a
 
   // 서버 카드 목록 불러오기
   const [loadingCards, setLoadingCards] = useState(false);

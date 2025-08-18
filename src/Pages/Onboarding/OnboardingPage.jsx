@@ -5,6 +5,7 @@ import styles from './OnboardingPage.module.css';
 import characterImage from '../../assets/images/character.svg';
 import SocialLoginButton from '../../components/Auth/SocialLoginButton';
 
+
 export default function OnboardingPage() {
 const navigate = useNavigate();
 

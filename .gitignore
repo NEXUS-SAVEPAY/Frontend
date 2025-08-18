@@ -4,9 +4,6 @@ node_modules/
 # 빌드 결과물
 dist/
 
-# 환경변수
-.env
-.env.local
 
 # 로그 파일
 npm-debug.log*
