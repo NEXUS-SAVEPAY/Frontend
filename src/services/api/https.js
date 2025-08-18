@@ -2,13 +2,16 @@
 import { getAccessToken } from './token';
 
 export async function authorizedFetch(path, options = {}) {
-    const token = getAccessToken(); // 'Bearer ...'
+    const token = getAccessToken();
+    console.log('[authorizedFetch] token =', token); // 👈 토큰 값 확인
     const headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         ...(options.headers || {}),
-        ...(token ? { Authorization: token } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
-    const url = path.startsWith('/api') ? path : `/api${path}`; // -> '/api/auth/me'
+    const url = path.startsWith('/api') ? path : `/api${path}`;
+    console.log('[authorizedFetch] url =', url);      // 👈 호출 경로 확인
+    console.log('[authorizedFetch] headers =', headers); // 👈 Authorization 헤더 확인
     return fetch(url, { ...options, headers });
 }
