@@ -1,4 +1,4 @@
-// src/pages/MyPage/MyPage.jsx (경로만 너 프로젝트에 맞게)
+// src/pages/MyPage/MyPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -21,7 +21,8 @@ import oliveyoungImg from '../../assets/images/oliveyoung.svg';
 import starbucksImg from '../../assets/images/starbucks.svg';
 import megaboxImg from '../../assets/images/megabox.svg';
 
-import { fetchRegisteredCards } from '../../services/api/cardApi'; // ✅ 추가
+import { fetchRegisteredCards } from '../../services/api/cardApi';
+import { fetchSimplePays } from '../../services/api/payApi'; // ✅ 추가
 
 function MyPage() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ function MyPage() {
   const handleAddBrand = () => navigate('/favorite-brand');
   const handleBrandClick = (brandName) => navigate(`/benefit/${encodeURIComponent(brandName)}`);
 
-  // 간편결제/통신사
+  // 이미지 매핑
   const getPaymentImage = (type) => {
     switch (type) {
       case 'kakao': return kakaopayImg;
@@ -55,14 +56,16 @@ function MyPage() {
     }
   };
 
-  // ✅ 카드 목록: 전역 상태 + 서버 동기화
+  // 카드 목록
   const setRegisteredCards = useSetRecoilState(registeredCardsAtom);
   const registeredCards = useRecoilValue(registeredCardsAtom);
 
+  // 간편결제/통신사
+  const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
   const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
 
-  // ✅ 서버 카드 목록 불러오기 (머지, 중복 제거)
+  // 서버 카드 목록 불러오기
   const [loadingCards, setLoadingCards] = useState(false);
   const [cardsError, setCardsError] = useState('');
   useEffect(() => {
@@ -74,7 +77,7 @@ function MyPage() {
         const serverCards = await fetchRegisteredCards();
         if (!mounted) return;
         setRegisteredCards((prev) => {
-          if (!Array.isArray(serverCards) || serverCards.length === 0) return prev; // 서버 비어있으면 유지
+          if (!Array.isArray(serverCards) || serverCards.length === 0) return prev;
           const keyOf = (c) => String(c?.id ?? `${c?.company ?? ''}::${c?.name ?? ''}`);
           const map = new Map();
           [...prev, ...serverCards].forEach((c) => map.set(keyOf(c), c));
@@ -89,11 +92,33 @@ function MyPage() {
     return () => { mounted = false; };
   }, [setRegisteredCards]);
 
-  // ✅ 간편결제 값: 항상 배열로 정규화 + 'none' 제거
+  // ✅ 서버 간편결제 불러와 Recoil 반영
+  const [loadingPays, setLoadingPays] = useState(false);
+  const [paysError, setPaysError] = useState('');
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingPays(true);
+        setPaysError('');
+        const selectedFromServer = await fetchSimplePays();
+        if (!mounted) return;
+        // 서버 값을 그대로 반영(서버 권위) — 필요 시 로컬과 병합 로직으로 바꿀 수 있음
+        setUserPayment(selectedFromServer);
+      } catch (e) {
+        if (mounted) setPaysError(e.message || '간편결제 정보를 불러오지 못했습니다.');
+      } finally {
+        if (mounted) setLoadingPays(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [setUserPayment]);
+
+  // 항상 배열로 정규화 + none 제거
   const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
   const userPayments = toArray(userPaymentRaw).filter(v => v && v !== 'none');
 
-  // ✅ 서브옵션 선택 시 부모 숨김
+  // 서브옵션이 있으면 부모 숨김
   const parentsWithSubs = new Set(
     userPayments.filter(v => v.includes('_')).map(v => v.split('_')[0])
   );
@@ -119,7 +144,7 @@ function MyPage() {
       items: registeredCards.map((card) => ({
         id: card.id,
         name: card.name,
-        image: card.image || cardImg, // ✅ placeholder
+        image: card.image || cardImg,
         tag: card.company,
       })),
     },
@@ -146,7 +171,6 @@ function MyPage() {
     },
   ];
 
-  // ❌ 기존 handleDelete는 setMethods를 참조해 오류 → 읽기 전용이라 삭제 핸들러 제거/무시
   const handleDelete = () => {};
 
   const [brandList] = useState([
@@ -171,10 +195,12 @@ function MyPage() {
 
       {loadingCards && <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>}
       {cardsError && <p className={styles.errorText}>{cardsError}</p>}
+      {loadingPays && <p className={styles.helperText}>간편결제를 불러오는 중…</p>}
+      {paysError && <p className={styles.errorText}>{paysError}</p>}
 
       <PaymentMethodSection
         groupedMethods={groupedMethods}
-        onDelete={handleDelete}  // 읽기 전용이면 이 prop 제거해도 됨
+        onDelete={handleDelete}
       />
 
       <BrandSection

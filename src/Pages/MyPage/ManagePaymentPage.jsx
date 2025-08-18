@@ -16,6 +16,7 @@ import kakaopayImg from '../../assets/images/kakaopay.png';
 import sktImg from '../../assets/images/skt.png';
 
 import { fetchRegisteredCards } from '../../services/api/cardApi';
+import { fetchSimplePays } from '../../services/api/payApi'; // ✅ 추가
 
 function ManagePaymentPage() {
   const navigate = useNavigate();
@@ -24,20 +25,22 @@ function ManagePaymentPage() {
   const setRegisteredCards = useSetRecoilState(registeredCardsAtom);
   const registeredCards = useRecoilValue(registeredCardsAtom);
 
+  const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
   const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
 
   const [loadingCards, setLoadingCards] = useState(false);
   const [cardsError, setCardsError] = useState('');
+  const [loadingPays, setLoadingPays] = useState(false);
+  const [paysError, setPaysError] = useState('');
 
-  // 🔧 prev + serverCards 머지(중복 제거)
   const mergeCards = (prev, next) => {
-    if (!Array.isArray(next) || next.length === 0) return prev; // 서버 비면 유지
+    if (!Array.isArray(next) || next.length === 0) return prev;
     const keyOf = (c) => String(c?.id ?? `${c?.company ?? ''}::${c?.name ?? ''}`);
     const map = new Map(prev.map((c) => [keyOf(c), c]));
     next.forEach((c) => {
       const k = keyOf(c);
-      map.set(k, { ...(map.get(k) || {}), ...c }); // 서버 값 우선
+      map.set(k, { ...(map.get(k) || {}), ...c });
     });
     return Array.from(map.values());
   };
@@ -59,6 +62,25 @@ function ManagePaymentPage() {
     })();
     return () => { mounted = false; };
   }, [setRegisteredCards]);
+
+  // ✅ 간편결제 조회
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingPays(true);
+        setPaysError('');
+        const selectedFromServer = await fetchSimplePays();
+        if (!mounted) return;
+        setUserPayment(selectedFromServer);
+      } catch (e) {
+        if (mounted) setPaysError(e.message || '간편결제 정보를 불러오지 못했습니다.');
+      } finally {
+        if (mounted) setLoadingPays(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [setUserPayment]);
 
   const handleCardClick = (card, type) => {
     if (type === '카드') {
@@ -158,6 +180,8 @@ function ManagePaymentPage() {
 
       {loadingCards && <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>}
       {cardsError && <p className={styles.errorText}>{cardsError}</p>}
+      {loadingPays && <p className={styles.helperText}>간편결제를 불러오는 중…</p>}
+      {paysError && <p className={styles.errorText}>{paysError}</p>}
 
       <PaymentMethodSection
         groupedMethods={groupedMethods}

@@ -1,3 +1,4 @@
+// src/pages/PayRegister/PayRegisterPage.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -20,146 +21,184 @@ import paycoSelectedIcon from '../../assets/icons/payco_select.svg';
 import noneIcon from '../../assets/icons/none.svg';
 import noneSelectedIcon from '../../assets/icons/none_select.svg';
 
+import { registerSimplePays, updateSimplePays } from '../../services/api/payApi';
+
 const OPTIONS = [
-    {
-        type: 'kakao',
-        label: '카카오 페이',
-        icon: kakaoIcon,
-        selectedIcon: kakaoSelectedIcon,
-    },
-    {
-        type: 'naver',
-        label: '네이버 페이',
-        icon: naverIcon,
-        selectedIcon: naverSelectedIcon,
-        options: [{ value: 'naver_membership', label: '네이버 멤버십 사용' }],
-    },
-    {
-        type: 'toss',
-        label: '토스 페이',
-        icon: tossIcon,
-        selectedIcon: tossSelectedIcon,
-        options: [{ value: 'toss_prime', label: '토스 프라임 사용' }],
-    },
-    {
-        type: 'payco',
-        label: '페이코 페이',
-        icon: paycoIcon,
-        selectedIcon: paycoSelectedIcon,
-    },
-    {
-        type: 'none',
-        label: '간편결제 미사용',
-        icon: noneIcon,
-        selectedIcon: noneSelectedIcon,
-    },
+  { type: 'kakao', label: '카카오 페이', icon: kakaoIcon, selectedIcon: kakaoSelectedIcon },
+  {
+    type: 'naver',
+    label: '네이버 페이',
+    icon: naverIcon,
+    selectedIcon: naverSelectedIcon,
+    options: [{ value: 'naver_membership', label: '네이버 멤버십 사용' }],
+  },
+  {
+    type: 'toss',
+    label: '토스 페이',
+    icon: tossIcon,
+    selectedIcon: tossSelectedIcon,
+    options: [{ value: 'toss_prime', label: '토스 프라임 사용' }],
+  },
+  { type: 'payco', label: '페이코 페이', icon: paycoIcon, selectedIcon: paycoSelectedIcon },
+  { type: 'none', label: '간편결제 미사용', icon: noneIcon, selectedIcon: noneSelectedIcon },
 ];
 
+// 프론트 타입 → 백엔드 ENUM 매핑
+const PROVIDER_MAP = {
+  kakao: 'KAKAO',
+  naver: 'NAVER',
+  toss: 'TOSS',
+  payco: 'PAYCO',
+  none: 'NONE',
+};
+
+// selected 배열을 스웨거 바디로 변환
+function buildPayRequestList(selected) {
+  if (selected.includes('none')) {
+    return [{ payProvider: PROVIDER_MAP.none, isMemberShip: false }];
+  }
+
+  const has = (key) => selected.includes(key);
+  const entries = [];
+
+  if (has('kakao')) entries.push({ payProvider: PROVIDER_MAP.kakao, isMemberShip: false });
+
+  if (has('naver') || has('naver_membership')) {
+    entries.push({
+      payProvider: PROVIDER_MAP.naver,
+      isMemberShip: has('naver_membership'),
+    });
+  }
+
+  if (has('toss') || has('toss_prime')) {
+    entries.push({
+      payProvider: PROVIDER_MAP.toss,
+      isMemberShip: has('toss_prime'),
+    });
+  }
+
+  if (has('payco')) entries.push({ payProvider: PROVIDER_MAP.payco, isMemberShip: false });
+
+  return entries;
+}
+
 function PayRegisterPage({ isManageMode = false }) {
-    const navigate = useNavigate();
-    const savedPayment = useRecoilValue(userPaymentsAtom); // 저장된 간편결제(과거 string일 수도, 배열일 수도)
-    const setUserPayment = useSetRecoilState(userPaymentsAtom);
+  const navigate = useNavigate();
+  const savedPayment = useRecoilValue(userPaymentsAtom);
+  const setUserPayment = useSetRecoilState(userPaymentsAtom);
 
-    const [selected, setSelected] = useState([]); // 여러 개 선택
+  const [selected, setSelected] = useState([]);
 
-    // 관리 모드일 때 기존 값 세팅 (string 호환)
-    useEffect(() => {
-        if (!isManageMode) return;
-        if (Array.isArray(savedPayment)) {
-            setSelected(savedPayment);
-        } else if (typeof savedPayment === 'string' && savedPayment) {
-            setSelected([savedPayment]);
-        } else {
-            setSelected([]);
-        }
-    }, [isManageMode, savedPayment]);
+  // 관리 모드일 때 기존 값 세팅 (string 호환)
+  useEffect(() => {
+    if (!isManageMode) return;
+    if (Array.isArray(savedPayment)) setSelected(savedPayment);
+    else if (typeof savedPayment === 'string' && savedPayment) setSelected([savedPayment]);
+    else setSelected([]);
+  }, [isManageMode, savedPayment]);
 
-    // 클릭 토글: 기본타입(ex. 'kakao') 또는 서브옵션(ex. 'naver_membership')
-    const handleSelect = (value) => {
-        setSelected((prev) => {
-            // 서브옵션: "type_sub" 형태라고 가정 → 같은 type의 기존 서브옵션 제거 후 추가
-            if (value.includes('_')) {
-                const parent = value.split('_')[0];
-                const withoutParentSubs = prev.filter(v => !(v.startsWith(parent + '_')));
-                // 부모 타입이 없으면 부모 타입도 포함(하이라이트 유지용)
-                const ensureParent = withoutParentSubs.includes(parent)
-                    ? withoutParentSubs
-                    : [...withoutParentSubs, parent];
-                // 이미 선택된 같은 서브옵션이면 해제, 아니면 교체/추가
-                return ensureParent.includes(value)
-                    ? ensureParent.filter(v => v !== value)
-                    : [...ensureParent, value];
-            }
+  // 클릭 토글
+  const handleSelect = (value) => {
+    setSelected((prev) => {
+      if (value === 'none') return prev.includes('none') ? [] : ['none'];
 
-            // 기본 타입 토글: 선택되어 있으면 해당 타입과 그 타입의 서브옵션 전부 제거
-            if (prev.includes(value)) {
-                return prev.filter(v => v !== value && !v.startsWith(value + '_'));
-            }
-            return [...prev, value];
-        });
-    };
+      if (value.includes('_')) {
+        const parent = value.split('_')[0];
+        const base = prev.filter((v) => v !== 'none' && !(v.startsWith(parent + '_')));
+        const ensureParent = base.includes(parent) ? base : [...base, parent];
+        return ensureParent.includes(value)
+          ? ensureParent.filter((v) => v !== value)
+          : [...ensureParent, value];
+      }
 
-    const handleComplete = () => {
+      const base = prev.filter((v) => v !== 'none');
+      if (base.includes(value)) {
+        return base.filter((v) => v !== value && !v.startsWith(value + '_'));
+      }
+      return [...base, value];
+    });
+  };
+
+  // 서버 반영 + 로컬 상태 갱신 + 다음 단계 이동
+  const persistAndThen = async (next) => {
+    try {
+      const list = buildPayRequestList(selected);
+
+      if (list.length === 0) {
         setUserPayment(selected);
-        navigate('/register/telco');
-    };
+        next();
+        return;
+      }
 
-    const handleSave = () => {
-        setUserPayment(selected);
-        navigate('/manage-payment');
-    };
+      if (isManageMode) {
+        await updateSimplePays(list);   // 수정(PUT)
+      } else {
+        await registerSimplePays(list); // 신규(POST)
+      }
 
-    return (
-        <div className={styles.container}>
-            {/* 헤더 */}
-            <div className={`${styles.fixedHeader} ${isManageMode ? styles.headerCompact : ''}`}>
-                <div className={styles.header}>
-                    <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
-                    <h2 className={styles.title}>
-                        {isManageMode ? '등록된 간편결제' : '간편결제 등록'}
-                    </h2>
-                </div>
+      setUserPayment(selected);
+      next();
+    } catch (err) {
+      console.error(err);
+      window.alert(err?.message || '간편결제 저장 중 오류가 발생했습니다.');
+    }
+  };
 
-                {/* 진행 단계 (관리 모드에서는 생략) */}
-                {!isManageMode && (
-                    <div className={styles.stepContainer}>
-                        <p className={styles.stepText}>2단계</p>
-                        <div className={styles.progressBar}>
-                            <div className={styles.secondProgress} />
-                        </div>
-                    </div>
-                )}
+  const handleComplete = () => {
+    persistAndThen(() => navigate('/register/telco'));
+  };
 
-                {!isManageMode && (
-                    <p className={styles.subTitle}>자주 사용하는 간편결제를 등록해주세요.</p>
-                )}
-            </div>
+  const handleSave = () => {
+    persistAndThen(() => navigate('/manage-payment'));
+  };
 
-            {/* 간편결제 선택 */}
-            <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea_pay : ''}`}>
-                {OPTIONS.map((option) => (
-                    <SimplePayOption
-                        key={option.type}
-                        {...option}
-                        selected={selected}        // 배열 전달
-                        onSelect={handleSelect}     // 토글 핸들러
-                    />
-                ))}
-            </div>
-
-            {/* 완료 or 저장 버튼 */}
-            <div className={styles.fixedUnder}>
-                {selected.length > 0 && (  /* 배열 길이 기준으로 표시 */
-                    <button
-                        className={styles.completeButton}
-                        onClick={isManageMode ? handleSave : handleComplete}
-                    >
-                        {isManageMode ? '저장' : '완료'}
-                    </button>
-                )}
-            </div>
+  return (
+    <div className={styles.container}>
+      <div className={`${styles.fixedHeader} ${isManageMode ? styles.headerCompact : ''}`}>
+        <div className={styles.header}>
+          <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
+          <h2 className={styles.title}>
+            {isManageMode ? '등록된 간편결제' : '간편결제 등록'}
+          </h2>
         </div>
-    );
+
+        {!isManageMode && (
+          <div className={styles.stepContainer}>
+            <p className={styles.stepText}>2단계</p>
+            <div className={styles.progressBar}>
+              <div className={styles.secondProgress} />
+            </div>
+          </div>
+        )}
+
+        {!isManageMode && (
+          <p className={styles.subTitle}>자주 사용하는 간편결제를 등록해주세요.</p>
+        )}
+      </div>
+
+      <div className={`${styles.scrollArea} ${isManageMode ? styles.manageScrollArea_pay : ''}`}>
+        {OPTIONS.map((option) => (
+          <SimplePayOption
+            key={option.type}
+            {...option}
+            selected={selected}
+            onSelect={handleSelect}
+          />
+        ))}
+      </div>
+
+      <div className={styles.fixedUnder}>
+        {selected.length > 0 && (
+          <button
+            className={styles.completeButton}
+            onClick={isManageMode ? handleSave : handleComplete}
+          >
+            {isManageMode ? '저장' : '완료'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default PayRegisterPage;
