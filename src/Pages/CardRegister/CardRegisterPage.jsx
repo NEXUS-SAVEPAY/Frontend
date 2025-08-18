@@ -201,7 +201,7 @@ function CardRegisterPage({ isManageMode = false }) {
     <div className={styles.pageWrapper}>
       <div className={styles.contentWrapper}>
         <div className={styles.header}>
-          <button className={styles.backButton} onClick={() => navigate('/mypage')}>
+          <button className={styles.backButton} onClick={() => navigate(-1)}>
             〈
           </button>
           <h1 className={styles.title}>{isManageMode ? '등록된 카드' : '카드 등록'}</h1>
