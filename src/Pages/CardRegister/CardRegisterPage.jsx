@@ -23,7 +23,12 @@ import StepCircle from '../../components/Common/StepCircle';
 
 import styles from './CardRegisterPage.module.css';
 import mockCardData from '../../data/mockCardData';
-import { fetchCardImage } from '../../services/api/cardApi';
+import {
+  fetchCardImage,
+  registerCardToUser,
+  fetchRegisteredCards,
+  deleteCardFromUser,
+} from '../../services/api/cardApi';
 
 function CardRegisterPage({ isManageMode = false }) {
   const [cardCompany, setCardCompany] = useRecoilState(cardCompanyAtom);
@@ -36,6 +41,10 @@ function CardRegisterPage({ isManageMode = false }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
+
+  // 등록 중/에러 상태
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,17 +103,37 @@ function CardRegisterPage({ isManageMode = false }) {
     return Array.from(map.values());
   };
 
-  const handleRegister = () => {
+  // DB 저장 → 성공 시 목록 동기화
+  const handleRegister = async () => {
     if (!searchResult) return;
+    setRegisterError('');
+    setIsRegistering(true);
+    try {
+      // 1) DB 저장 (POST /api/cards/user?cardId=)
+      await registerCardToUser(searchResult.id);
 
-    if (isManageMode) {
-      setLocalCards((prev) => upsert(prev, searchResult)); // 로컬만 추가/업데이트
-      setForceSingleView(false); // 이후 리스트 전환
-    } else {
-      setRegisteredCards((prev) => upsert(prev, searchResult)); // 전역 추가/업데이트
+      // 2) 서버 목록으로 동기화
+      const latest = await fetchRegisteredCards();
+
+      if (isManageMode) {
+        setLocalCards(latest);
+        setForceSingleView(false); // 이후 리스트 전환
+      } else {
+        setRegisteredCards(latest);
+      }
+
+      // 3) 입력/미리보기 초기화
+      setSearchResult(null);
+      setCardName('');
+    } catch (e) {
+      if (e.code === 'CARD400') {
+        setRegisterError('이미 등록된 카드입니다.');
+      } else {
+        setRegisterError(e.message || '카드 등록에 실패했습니다.');
+      }
+    } finally {
+      setIsRegistering(false);
     }
-    setSearchResult(null);
-    setCardName('');
   };
 
   // X 클릭 → 모달 오픈 (두 모드 공통)
@@ -113,21 +142,40 @@ function CardRegisterPage({ isManageMode = false }) {
     setShowDeleteModal(true);
   };
 
-  // 모달 "네" → manage: 로컬 삭제, register: 전역 삭제
-  const confirmDelete = () => {
+  // 모달 "네" → DB 삭제 → 목록 동기화(404면 로컬만 제거)
+  const confirmDelete = async () => {
     if (!pendingDeleteCard) return;
 
     const removeById = (arr) => arr.filter((c) => String(c.id) !== String(pendingDeleteCard.id));
 
-    if (isManageMode) {
-      setLocalCards((prev) => removeById(prev));
-      setForceSingleView(false); // 변경 발생 후 리스트 뷰 유지
-    } else {
-      setRegisteredCards((prev) => removeById(prev));
-    }
+    try {
+      // 1) DB에서 삭제
+      await deleteCardFromUser(pendingDeleteCard.id);
 
-    setShowDeleteModal(false);
-    setPendingDeleteCard(null);
+      // 2) 최신 목록 동기화
+      const latest = await fetchRegisteredCards();
+      if (isManageMode) {
+        setLocalCards(latest);
+      } else {
+        setRegisteredCards(latest);
+      }
+    } catch (e) {
+      if (e.code === 'USER_PAYMENT404') {
+        // 이미 서버에 없으면 로컬만 정리
+        if (isManageMode) {
+          setLocalCards((prev) => removeById(prev));
+        } else {
+          setRegisteredCards((prev) => removeById(prev));
+        }
+      } else {
+        alert(e.message || '삭제에 실패했습니다.');
+        return; // 실패 시 모달 유지
+      }
+    } finally {
+      setForceSingleView(false);
+      setShowDeleteModal(false);
+      setPendingDeleteCard(null);
+    }
   };
 
   const handleCompanySelect = (company) => {
@@ -138,7 +186,7 @@ function CardRegisterPage({ isManageMode = false }) {
       setLocalCards([]);
       setForceSingleView(true);
     }
-    // ✅ 등록 모드에서 전역 카드 초기화하지 않음 (기존 카드가 사라지는 문제 방지)
+    // 등록 모드에서 전역 카드 초기화하지 않음
   };
 
   const handleComplete = () => navigate('/register/simple-pay');
@@ -199,7 +247,11 @@ function CardRegisterPage({ isManageMode = false }) {
               </div>
               <div className={styles.inputWithButtonWrapper}>
                 <CardNameInput value={cardName} onChange={setCardName} onSearch={handleSearch} />
-                <button className={styles.searchButton} onClick={handleSearch} disabled={isSearching}>
+                <button
+                  className={styles.searchButton}
+                  onClick={handleSearch}
+                  disabled={isSearching}
+                >
                   {isSearching ? '검색 중…' : '카드 검색 하기'}
                 </button>
                 {searchError && <p className={styles.errorText}>{searchError}</p>}
@@ -217,15 +269,19 @@ function CardRegisterPage({ isManageMode = false }) {
                       setCardName('');
                     }}
                   >
-                    검색된 카드가 아니신가요?{' '}
-                    <span className={styles.retryUnderline}>다시 검색</span>
+                    검색된 카드가 아니신가요? <span className={styles.retryUnderline}>다시 검색</span>
                   </p>
 
                   <CardPreviewBox card={searchResult} />
 
-                  <button className={styles.registerButton} onClick={handleRegister}>
-                    카드 등록 하기
+                  <button
+                    className={styles.registerButton}
+                    onClick={handleRegister}
+                    disabled={isRegistering}
+                  >
+                    {isRegistering ? '등록 중…' : '카드 등록 하기'}
                   </button>
+                  {registerError && <p className={styles.errorText}>{registerError}</p>}
                 </div>
               </div>
             )}
