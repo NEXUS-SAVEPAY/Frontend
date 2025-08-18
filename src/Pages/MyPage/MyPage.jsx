@@ -1,19 +1,16 @@
-<<<<<<< HEAD
 // src/pages/MyPage/MyPage.jsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-
-=======
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue, useRecoilState } from 'recoil';
->>>>>>> 6477c92d7df0754b2bc0bca122245953e0836b8a
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
+
 import { likedBrandsAtom } from '../../recoil/atoms/likedBrandsAtom';
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { userPaymentsAtom } from '../../recoil/atoms/userPaymentsAtom';
 import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
+
 import { fetchUserTelco } from '../../services/api/telcoService';
+import { fetchRegisteredCards } from '../../services/api/cardApi';
+import { fetchSimplePays } from '../../services/api/payApi';
 
 import styles from './MyPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
@@ -24,12 +21,6 @@ import TabBar from '../../components/Common/TabBar';
 import cardImg from '../../assets/images/card.png';
 import kakaopayImg from '../../assets/images/kakaopay.png';
 import sktImg from '../../assets/images/skt.png';
-import oliveyoungImg from '../../assets/images/oliveyoung.svg';
-import starbucksImg from '../../assets/images/starbucks.svg';
-import megaboxImg from '../../assets/images/megabox.svg';
-
-import { fetchRegisteredCards } from '../../services/api/cardApi';
-import { fetchSimplePays } from '../../services/api/payApi'; // ✅ 추가
 
 function MyPage() {
   const navigate = useNavigate();
@@ -41,7 +32,8 @@ function MyPage() {
     .map(([brand]) => brand);
 
   const handleAddBrand = () => navigate('/favorite-brand');
-  const handleBrandClick = (brandName) => navigate(`/benefit/${encodeURIComponent(brandName)}`);
+  const handleBrandClick = (brandName) =>
+    navigate(`/benefit/${encodeURIComponent(brandName)}`);
 
   // 이미지 매핑
   const getPaymentImage = (type) => {
@@ -63,36 +55,16 @@ function MyPage() {
     }
   };
 
-  // 카드 목록
+  // 카드
   const setRegisteredCards = useSetRecoilState(registeredCardsAtom);
   const registeredCards = useRecoilValue(registeredCardsAtom);
 
-<<<<<<< HEAD
   // 간편결제/통신사
   const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
-  const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
-=======
-    const registeredCards = useRecoilValue(registeredCardsAtom);
-    const userPaymentRaw = useRecoilValue(userPaymentsAtom); // 배열/문자열 둘 다 올 수 있음
-    const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
+  const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
 
-    useEffect(() => {
-        async function loadTelco() {
-            const telcoRes = await fetchUserTelco();
-            if (telcoRes.isSuccess && telcoRes.result) {
-                setUserTelcoInfo({
-                    telco: telcoRes.result.telecomName,
-                    hasMembership: telcoRes.result.isMembership,
-                    grade: telcoRes.result.grade,
-                });
-            }
-        }
-        loadTelco();
-    }, [setUserTelcoInfo]);
->>>>>>> 6477c92d7df0754b2bc0bca122245953e0836b8a
-
-  // 서버 카드 목록 불러오기
+  // 서버: 카드 목록
   const [loadingCards, setLoadingCards] = useState(false);
   const [cardsError, setCardsError] = useState('');
   useEffect(() => {
@@ -119,7 +91,7 @@ function MyPage() {
     return () => { mounted = false; };
   }, [setRegisteredCards]);
 
-  // ✅ 서버 간편결제 불러와 Recoil 반영
+  // 서버: 간편결제
   const [loadingPays, setLoadingPays] = useState(false);
   const [paysError, setPaysError] = useState('');
   useEffect(() => {
@@ -130,8 +102,7 @@ function MyPage() {
         setPaysError('');
         const selectedFromServer = await fetchSimplePays();
         if (!mounted) return;
-        // 서버 값을 그대로 반영(서버 권위) — 필요 시 로컬과 병합 로직으로 바꿀 수 있음
-        setUserPayment(selectedFromServer);
+        setUserPayment(selectedFromServer); // 서버 권위
       } catch (e) {
         if (mounted) setPaysError(e.message || '간편결제 정보를 불러오지 못했습니다.');
       } finally {
@@ -141,7 +112,28 @@ function MyPage() {
     return () => { mounted = false; };
   }, [setUserPayment]);
 
-  // 항상 배열로 정규화 + none 제거
+  // 서버: 통신사
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const telcoRes = await fetchUserTelco();
+        if (!mounted) return;
+        if (telcoRes?.isSuccess && telcoRes.result) {
+          setUserTelcoInfo({
+            telco: telcoRes.result.telecomName,
+            hasMembership: telcoRes.result.isMembership,
+            grade: telcoRes.result.grade,
+          });
+        }
+      } catch {
+        /* 필요시 에러 처리 */
+      }
+    })();
+    return () => { mounted = false; };
+  }, [setUserTelcoInfo]);
+
+  // 간편결제: 배열로 정규화 + 'none' 제거
   const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
   const userPayments = toArray(userPaymentRaw).filter(v => v && v !== 'none');
 
@@ -198,13 +190,7 @@ function MyPage() {
     },
   ];
 
-  const handleDelete = () => {};
-
-  const [brandList] = useState([
-    { name: '올리브영', image: oliveyoungImg },
-    { name: '스타벅스', image: starbucksImg },
-    { name: '메가박스', image: megaboxImg },
-  ]);
+  const handleDelete = () => {}; // 현재는 사용 안 함
 
   return (
     <div className={styles.pageWrapper}>
