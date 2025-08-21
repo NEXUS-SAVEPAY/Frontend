@@ -11,6 +11,7 @@ import { userTelcoInfoAtom } from '../../recoil/atoms/userTelcoInfoAtom';
 import { fetchUserTelco } from '../../services/api/telcoService';
 import { fetchRegisteredCards } from '../../services/api/cardApi';
 import { fetchSimplePays } from '../../services/api/payApi';
+import { getUserFavoriteBrands } from '../../services/api/interestbrandApi';
 
 import styles from './MyPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
@@ -25,41 +26,88 @@ import sktImg from '../../assets/images/skt.png';
 function MyPage() {
   const navigate = useNavigate();
 
-  // 관심 브랜드
-  const likedBrands = useRecoilValue(likedBrandsAtom);
-  const likedBrandList = Object.entries(likedBrands)
-    .filter(([, isLiked]) => isLiked)
-    .map(([brand]) => brand);
+  // ---------------- 관심 브랜드(서버 진실) ----------------
+  const [favBrands, setFavBrands] = useState([]); // [{ id, name, image }, ...]
+  const [favLoading, setFavLoading] = useState(false);
+  const [favError, setFavError] = useState('');
+  const [, setLikedBrandsMirror] = useRecoilState(likedBrandsAtom); // Recoil은 미러로만 유지
+
+  const refreshFavorites = async () => {
+    setFavLoading(true);
+    setFavError('');
+    try {
+      const res = await getUserFavoriteBrands(); // 보통은 이미 [{id,name,image}]로 normalize 되어 옴
+
+      // 응답이 이미 배열이면 그대로, 아니면 방어적으로 풀어줌
+      const raw = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.result)
+        ? res.result
+        : Array.isArray(res?.data)
+        ? res.data
+        : [];
+
+      const normalized = raw
+        .map((it) => ({
+          id: it.id ?? it.interestBrandId ?? it.brandId,
+          name: it.name ?? it.brandName ?? it.brand,
+          image: it.image ?? it.brandImage ?? it.logo ?? '',
+        }))
+        .filter((b) => !!b.name);
+
+      setFavBrands(normalized);
+
+      // Recoil 미러 (다른 페이지에서 사용)
+      const mirror = {};
+      normalized.forEach((b) => {
+        mirror[b.name] = true;
+      });
+      setLikedBrandsMirror(mirror);
+    } catch (e) {
+      setFavError(e?.message || '관심 브랜드를 불러오지 못했습니다.');
+      setFavBrands([]);
+    } finally {
+      setFavLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshFavorites();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAddBrand = () => navigate('/favorite-brand');
   const handleBrandClick = (brandName) =>
     navigate(`/benefit/${encodeURIComponent(brandName)}`);
 
-  // 이미지 매핑
+  // ---------------- 이미지 매핑 ----------------
   const getPaymentImage = (type) => {
     switch (type) {
-      case 'kakao': return kakaopayImg;
-      case 'naver': return null;
-      case 'toss':  return null;
-      case 'payco': return null;
-      default: return null;
+      case 'kakao':
+        return kakaopayImg;
+      // case 'naver': return naverImg;
+      // case 'toss':  return tossImg;
+      // case 'payco': return paycoImg;
+      default:
+        return null;
     }
   };
   const getTelcoImage = (telco) => {
     switch (telco) {
-      case 'SKT': return sktImg;
-      case 'KT': return null;
-      case 'LG U+': return null;
-      case '알뜰폰': return null;
-      default: return null;
+      case 'SKT':
+        return sktImg;
+      // case 'KT': return ktImg;
+      // case 'LG U+': return lguImg;
+      // case '알뜰폰': return alddulImg;
+      default:
+        return null;
     }
   };
 
-  // 카드
+  // ---------------- 카드/간편결제/통신사 ----------------
   const setRegisteredCards = useSetRecoilState(registeredCardsAtom);
   const registeredCards = useRecoilValue(registeredCardsAtom);
 
-  // 간편결제/통신사
   const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
   const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
@@ -88,7 +136,9 @@ function MyPage() {
         if (mounted) setLoadingCards(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [setRegisteredCards]);
 
   // 서버: 간편결제
@@ -109,7 +159,9 @@ function MyPage() {
         if (mounted) setLoadingPays(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [setUserPayment]);
 
   // 서버: 통신사
@@ -130,18 +182,21 @@ function MyPage() {
         /* 필요시 에러 처리 */
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [setUserTelcoInfo]);
 
   // 간편결제: 배열로 정규화 + 'none' 제거
-  const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
-  const userPayments = toArray(userPaymentRaw).filter(v => v && v !== 'none');
+  const toArray = (v) =>
+    Array.isArray(v) ? v : typeof v === 'string' && v ? [v] : [];
+  const userPayments = toArray(userPaymentRaw).filter((v) => v && v !== 'none');
 
-  // 서브옵션이 있으면 부모 숨김
+  // 서브옵션 존재 시 부모 숨김
   const parentsWithSubs = new Set(
-    userPayments.filter(v => v.includes('_')).map(v => v.split('_')[0])
+    userPayments.filter((v) => v.includes('_')).map((v) => v.split('_')[0])
   );
-  const displayPayments = userPayments.filter(v => {
+  const displayPayments = userPayments.filter((v) => {
     const isParent = !v.includes('_');
     return !(isParent && parentsWithSubs.has(v));
   });
@@ -149,7 +204,7 @@ function MyPage() {
   const PAYMENT_NAME = {
     kakao: '카카오페이',
     naver: '네이버페이',
-    toss:  '토스페이',
+    toss: '토스페이',
     payco: '페이코',
   };
   const SUBOPTION_LABELS = {
@@ -181,12 +236,18 @@ function MyPage() {
     },
     {
       type: '통신사',
-      items: userTelcoInfo?.telco ? [{
-        id: 'telco',
-        name: userTelcoInfo.telco,
-        image: getTelcoImage(userTelcoInfo.telco),
-        tag: userTelcoInfo.hasMembership ? (userTelcoInfo.grade || '') : '멤버십 없음',
-      }] : [],
+      items: userTelcoInfo?.telco
+        ? [
+            {
+              id: 'telco',
+              name: userTelcoInfo.telco,
+              image: getTelcoImage(userTelcoInfo.telco),
+              tag: userTelcoInfo.hasMembership
+                ? userTelcoInfo.grade || ''
+                : '멤버십 없음',
+            },
+          ]
+        : [],
     },
   ];
 
@@ -206,21 +267,30 @@ function MyPage() {
         </button>
       </div>
 
-      {loadingCards && <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>}
+      {loadingCards && (
+        <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>
+      )}
       {cardsError && <p className={styles.errorText}>{cardsError}</p>}
-      {loadingPays && <p className={styles.helperText}>간편결제를 불러오는 중…</p>}
+      {loadingPays && (
+        <p className={styles.helperText}>간편결제를 불러오는 중…</p>
+      )}
       {paysError && <p className={styles.errorText}>{paysError}</p>}
 
-      <PaymentMethodSection
-        groupedMethods={groupedMethods}
-        onDelete={handleDelete}
-      />
+      <PaymentMethodSection groupedMethods={groupedMethods} onDelete={handleDelete} />
 
-      <BrandSection
-        brands={likedBrandList}
-        onAdd={handleAddBrand}
-        onBrandClick={handleBrandClick}
-      />
+      {/* ✅ 관심 브랜드: 서버 진실 기준(객체 배열 그대로 전달) */}
+      {favLoading && (
+        <p className={styles.helperText}>관심 브랜드를 불러오는 중…</p>
+      )}
+      {favError && <p className={styles.errorText}>{favError}</p>}
+      {!favLoading && !favError && (
+        <BrandSection
+          brands={favBrands} // ← [{id,name,image}] 그대로 전달
+          onAdd={handleAddBrand}
+          onBrandClick={handleBrandClick}
+        />
+      )}
+
       <NotificationSection />
       <TabBar />
     </div>

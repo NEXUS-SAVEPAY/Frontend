@@ -4,26 +4,63 @@ import { useNavigate } from 'react-router-dom';
 import styles from './BenefitListItem.module.css';
 import brandIcons from '../../data/brandIcons';
 
-function BenefitListItem({ id, brand, description, detail, imageSrc, onClick }) {
-        const navigate = useNavigate();
-    
-        const handleDetailClick = () => {
-            navigate(`/benefit/${brand}/${id}`);
-        };
+function BenefitListItem({
+  id,             // number | string
+  brand,          // string (예: '스타벅스')
+  description,    // 예: '20% 할인'
+  detail,         // 상세 문구
+  imageSrc,       // 백엔드 brandImage
+  infoLink,       // 백엔드 infoLink (있으면 새 탭 이동)
+  onClickDetail,  // 부모 콜백 우선
+}) {
+  const navigate = useNavigate();
 
-        console.log('BenefitListItem - brand:', brand);
+  const handleDetailClick = () => {
+    if (typeof onClickDetail === 'function') {
+      onClickDetail();
+      return;
+    }
+    // infoLink가 절대 URL이면 새 탭으로
+    if (typeof infoLink === 'string' && /^https?:\/\//i.test(infoLink)) {
+      window.open(infoLink, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    // 기본 라우팅: /benefit/:brand/:id
+    const safeBrand = encodeURIComponent(brand ?? '');
+    navigate(`/benefit/${safeBrand}/${id}`);
+  };
 
-    return (
-        <div className={styles.selectedBrandBenefit}>
-            <div className={styles.benefitTextBlock}>
-                <h4 className={styles.brandTitle}>{brand}</h4>
-                <h3 className={styles.brandDescription}>{description}</h3>
-                <p className={styles.brandSubText}>{detail}</p>
-                <button className={styles.detailButton} onClick={handleDetailClick}>자세히 보기 〉</button>
-            </div>
-            <img src={imageSrc || brandIcons[brand]} alt={brand} className={styles.brandImage} />
-        </div>
-    );
+  const imgSrc = imageSrc || brandIcons[brand] || '';
+
+  return (
+    <div className={styles.selectedBrandBenefit} data-id={id} data-brand={brand}>
+      <div className={styles.benefitTextBlock}>
+        <h4 className={styles.brandTitle}>{brand}</h4>
+        <h3 className={styles.brandDescription}>{description}</h3>
+        <p className={styles.brandSubText}>{detail}</p>
+
+        <button
+          className={styles.detailButton}
+          type="button"
+          onClick={handleDetailClick}
+        >
+          자세히 보기 〉
+        </button>
+      </div>
+
+      <img
+        src={imgSrc}
+        alt={brand}
+        className={styles.brandImage}
+        onError={(e) => {
+          const fallback = brandIcons?.[brand];
+          if (fallback && e.currentTarget.src !== fallback) {
+            e.currentTarget.src = fallback;
+          }
+        }}
+      />
+    </div>
+  );
 }
 
 export default BenefitListItem;

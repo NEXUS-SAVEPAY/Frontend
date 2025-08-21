@@ -30,7 +30,7 @@
 
 .brand {
     font-size: 15px;
-    font-weight: 700;
+    font-weight:800;
     color: #17171B;
     margin: 0;
     padding: 0;
@@ -38,7 +38,7 @@
 }
 
 .description {
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 700;
     color: #17171B;
     margin-top: 0;
