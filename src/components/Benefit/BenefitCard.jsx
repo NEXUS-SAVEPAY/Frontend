@@ -1,4 +1,3 @@
-// src/components/Benefit/BenefitCard.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BenefitCard.module.css';
@@ -7,12 +6,15 @@ import brandIcons from '../../data/brandIcons';
 function BenefitCard({ id, brand, description, imageSrc }) {
   const navigate = useNavigate();
 
-  const handleDetailClick = () => {
-    navigate(`/benefit/${encodeURIComponent(brand)}/${id}`);
+  const handleDetailClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!brand || id == null) return; // 가드
+    navigate(`/benefit/${encodeURIComponent(String(brand).trim())}/${String(id)}`);
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={handleDetailClick} role="button" tabIndex={0}>
       <img
         src={imageSrc || brandIcons[brand] || ''}
         alt={brand}

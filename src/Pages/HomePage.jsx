@@ -1,5 +1,4 @@
 // src/pages/HomePage.jsx
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -29,13 +28,14 @@ import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
 import { fetchRecommendedBenefits } from '../services/api/benefitApi';
 
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
+const MAX_PREVIEW = 6; // 홈 프리뷰 개수 제한
 
 function HomePage() {
   const navigate = useNavigate();
   const handleScrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // ---------- 추천 혜택(서버) ----------
-  const [recBenefits, setRecBenefits] = useState([]); // 서버 추천 혜택
+  const [recBenefits, setRecBenefits] = useState([]);
   const [recLoading, setRecLoading] = useState(false);
   const [recError, setRecError] = useState('');
 
@@ -73,14 +73,15 @@ function HomePage() {
     setFavError('');
     try {
       const list = await getUserFavoriteBrands(); // 서버 진실
-      setFavBrands(list);
+      setFavBrands(Array.isArray(list) ? list : []);
       const mirrored = {};
-      for (const b of list) mirrored[b.name] = true;
+      for (const b of list || []) mirrored[b.name] = true;
       setLikedBrandsMirror(mirrored);
-      return list;
+      return Array.isArray(list) ? list : [];
     } catch (e) {
       setFavError(e?.message || '관심 브랜드를 불러오지 못했습니다.');
       setFavBrands([]);
+      setLikedBrandsMirror({});
       return [];
     } finally {
       setFavLoading(false);
@@ -92,14 +93,19 @@ function HomePage() {
   const [benefitLoading, setBenefitLoading] = useState(false);
   const [benefitError, setBenefitError] = useState('');
 
-  const refreshBenefits = async () => {
+  // ✨ favsFromServer를 인자로 받아 최신 목록 기준으로 필터 (상태 반영 지연 이슈 회피)
+  const refreshBenefits = async (favsFromServer = []) => {
     setBenefitLoading(true);
     setBenefitError('');
     try {
       const groups = await fetchFavoriteBenefits(); // [{ brand, brandImage, benefits: [...] }]
-      // ✅ 내가 등록한 관심 브랜드만 필터
-      const likeSet = new Set((favBrands || []).map(b => (b?.name ?? '').trim().toLowerCase()));
-      const filtered = groups.filter(g => likeSet.has((g.brand ?? '').trim().toLowerCase()));
+      // 내 관심 브랜드만 필터 (서버가 이미 필터했다면 교집합이 비더라도 원본 사용)
+      const likeSet = new Set((favsFromServer || []).map(b => norm(b?.name)));
+      let filtered = groups;
+      if (likeSet.size > 0) {
+        const inter = groups.filter(g => likeSet.has(norm(g.brand)));
+        filtered = inter.length > 0 ? inter : groups;
+      }
       setBenefitGroups(filtered);
       return filtered;
     } catch (e) {
@@ -111,11 +117,11 @@ function HomePage() {
     }
   };
 
-  // 최초 진입 시: 관심 브랜드 → 관심 혜택 → 추천 혜택 순서로 보장
+  // 최초 진입 시: 관심 브랜드 → 관심 혜택 → 추천 혜택 순서 보장
   useEffect(() => {
     (async () => {
-      await refreshFavorites();
-      await refreshBenefits();
+      const favs = await refreshFavorites();
+      await refreshBenefits(favs);
       await refreshRecommended();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -189,22 +195,25 @@ function HomePage() {
   });
 
   // ---------- 표시용: 관심 브랜드 혜택 프리뷰 ----------
-  // 서버 그룹을 평탄화해서 BenefitListItem에 공급
+  // 서버 그룹을 평탄화 → 프리뷰 개수 제한(MAX_PREVIEW)
   const serverFlatBenefits = useMemo(() => {
     if (benefitGroups.length === 0) return [];
-    return benefitGroups.flatMap((g) =>
+    const flat = benefitGroups.flatMap((g) =>
       (g.benefits || []).map((b) => ({
         id: b.id,
         brand: g.brand,
         description: b.description,
         detail: b.detail,
-        imageSrc: b.imageSrc,
+        imageSrc: b.imageSrc || g.brandImage,
         infoLink: b.infoLink,
+        pointInfo: b.pointInfo,
+        createdAt: b.createdAt,
       }))
     );
+    return flat.slice(0, MAX_PREVIEW);
   }, [benefitGroups]);
 
-  // 서버 실패 시 로컬 목데이터에서 "내 관심 브랜드만" 추려서 표시
+  // 서버 실패 시 로컬 목데이터에서 "내 관심 브랜드만" 추려서 표시(동일 개수 제한)
   const serverNameSet = useMemo(() => {
     const s = new Set();
     for (const b of favBrands) s.add(norm(b.name));
@@ -212,7 +221,7 @@ function HomePage() {
   }, [favBrands]);
 
   const localFlatBenefits = useMemo(() => {
-    return favoriteBrandBenefits
+    const flat = favoriteBrandBenefits
       .filter((g) => serverNameSet.has(norm(g.brand)))
       .flatMap((g) =>
         g.benefits.map((b) => ({
@@ -223,6 +232,7 @@ function HomePage() {
           imageSrc: b.imageSrc,
         }))
       );
+    return flat.slice(0, MAX_PREVIEW);
   }, [serverNameSet]);
 
   const previewBenefits = serverFlatBenefits.length > 0 ? serverFlatBenefits : localFlatBenefits;
@@ -315,13 +325,15 @@ function HomePage() {
                  (benefitError && <span className={styles.errorText}>{benefitError}</span>)}
                 {previewBenefits.map((benefit) => (
                   <BenefitListItem
-                    key={benefit.id}
+                    key={`${benefit.brand}-${benefit.id}`}
                     id={benefit.id}
                     brand={benefit.brand}
                     description={benefit.description}
                     detail={benefit.detail}
                     imageSrc={benefit.imageSrc}
                     infoLink={benefit.infoLink}
+                    pointInfo={benefit.pointInfo}
+                    createdAt={benefit.createdAt}
                   />
                 ))}
               </div>
