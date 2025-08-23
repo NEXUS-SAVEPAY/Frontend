@@ -153,7 +153,7 @@ export default function BenefitDetailPage() {
   };
 
   // -------- Render --------
-  if (loading) return <div className={styles.pageWrapper}>불러오는 중…</div>;
+  if (loading) return null;
   if (error) return <div className={styles.pageWrapper}>🚨 {error}</div>;
   if (!view) return <div className={styles.pageWrapper}>혜택 정보가 없습니다.</div>;
 
