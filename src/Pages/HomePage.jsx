@@ -128,24 +128,34 @@ function HomePage() {
 
   const refreshInterestOrPayment = async () => {
     try {
-      // 1) 등록 여부 API
       const check = await checkUserHasFavoriteBrands();
+      console.log('[checkUserHasFavoriteBrands 응답]', check);
   
-      // 2) 혜택 조회
       const data = await fetchInterestOrPaymentBenefits();
+      console.log('[fetchInterestOrPaymentBenefits 응답]', data);
+  
       const list = Array.isArray(data?.result) ? data.result : [];
       setInterestOrPaymentBenefits(list);
   
-      // 🔑 등록 여부 + list 안에 brandName 있는지 확인
-      const hasBrands = check?.result === true || list.some((b) => !!b.brandName);
-      setHasLikedBrandsByApi(hasBrands);
-  
+      if (check?.result === true) {
+        setHasLikedBrandsByApi(true);
+      } else if (check?.result === false) {
+        setHasLikedBrandsByApi(false);
+      } else {
+        console.warn('[check.result가 애매함]', check);
+        setHasLikedBrandsByApi(false); // fallback
+      }
     } catch (e) {
       console.error('[HomePage] interest-or-payment API error:', e);
       setInterestOrPaymentBenefits([]);
       setHasLikedBrandsByApi(false);
     }
   };
+  
+  
+  
+  
+  
 
     // 결제수단별 그룹핑
     const benefitsBySource = interestOrPaymentBenefits.reduce((acc, b) => {

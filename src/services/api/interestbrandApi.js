@@ -187,9 +187,14 @@ export async function removeFavoriteBrandById(interestBrandId) {
   return data?.result ?? 'OK';
 }
 
-// 관심브랜드 등록 여부 확인 API
+/**
+ * 관심 브랜드 등록 여부 조회
+ * GET /api/interest/brand/check
+ */
 export async function checkUserHasFavoriteBrands() {
-  return await authorizedFetch('/api/interest/brand/check', {
-    method: 'GET',
-  });
+  const url = withBase('/api/interest/brand/check');
+  const data = await getJson(url);
+  const ok = data?.isSuccess ?? data?.success ?? false;
+  if (!ok) throw new Error(data?.message || '관심 브랜드 등록 여부 조회 실패');
+  return data;
 }
