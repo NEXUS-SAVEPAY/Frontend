@@ -10,6 +10,7 @@ export const userTelcoInfoAtom = atom({
         telco: '',
         hasMembership: null,
         grade: '',
+        image: null,
     },
     effects_UNSTABLE: [persistAtom],
 });
