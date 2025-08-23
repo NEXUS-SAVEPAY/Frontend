@@ -1,3 +1,4 @@
+// src/pages/BenefitDetailPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -6,6 +7,7 @@ import ExternalLinkModal from '../components/Modal/ExternalLinkModal';
 import styles from './BenefitDetailPage.module.css';
 import owlImage from '../assets/images/character.svg';
 import { fetchBenefitDetail } from '../services/api/benefitDetailApi';
+import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ✅ 추가
 
 export default function BenefitDetailPage() {
   const navigate = useNavigate();
@@ -13,19 +15,26 @@ export default function BenefitDetailPage() {
   const { brand, discountId: idParam, id: legacyIdParam } = useParams();
   const selected = useRecoilValue(selectedBenefitAtom);
 
+  // -------- id 정규화 --------
   const discountId = String(
     idParam ?? legacyIdParam ?? selected?.id ?? selected?.discountId ?? ''
   ).trim();
+
   const isIdValid =
     discountId &&
     discountId.toLowerCase() !== 'undefined' &&
     discountId.toLowerCase() !== 'null';
 
+  // -------- 상태 --------
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
+  // ✅ /api/discount/card 목록 포함 여부
+  const [hideCtaByCardApi, setHideCtaByCardApi] = useState(false);
+
+  // -------- 없는 id를 Recoil 선택값으로 정규화 --------
   useEffect(() => {
     if (!isIdValid && selected?.id) {
       const brandForUrl = selected.brand ?? selected.brandName ?? 'brand';
@@ -33,8 +42,10 @@ export default function BenefitDetailPage() {
     }
   }, [isIdValid, selected?.id, selected?.brand, selected?.brandName, navigate]);
 
+  // -------- 상세 Fetch --------
   useEffect(() => {
     let cancelled = false;
+
     async function run() {
       if (!isIdValid) {
         setDetail(null);
@@ -46,62 +57,61 @@ export default function BenefitDetailPage() {
       setError('');
       try {
         const data = await fetchBenefitDetail(discountId);
-        if (!cancelled) setDetail(data.result ?? null);
+        if (!cancelled) setDetail(data?.result ?? null);
       } catch (e) {
-        if (!cancelled) setError(e.message || '상세 정보를 불러오지 못했습니다.');
+        if (!cancelled) setError(e?.message || '상세 정보를 불러오지 못했습니다.');
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
+
     run();
     return () => { cancelled = true; };
   }, [isIdValid, discountId, idParam, legacyIdParam, selected?.id]);
 
+  // ✅ 현재 discountId가 /api/discount/card 목록에 속하는지 확인
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!isIdValid) {
+        if (mounted) setHideCtaByCardApi(false);
+        return;
+      }
+      const ok = await isCardDiscountId(discountId);
+      if (mounted) setHideCtaByCardApi(!!ok);
+    })();
+    return () => { mounted = false; };
+  }, [isIdValid, discountId]);
+
+  // API 응답(우선) 또는 selected fallback
   const src = detail ?? (isIdValid ? null : selected);
 
-  // ---------------------------
-  // 카드 혜택 판정 (강화)
-  // 1) 명시 필드(type/registeredType 등)에 'card|카드' 포함
-  // 2) 휴리스틱: 브랜드/상세/타입 텍스트에 카드 키워드 포함
-  // 3) 경로 기반: /benefit/cards.* 로 온 경우 카드로 간주 (선택적 오버라이드)
-  const CARD_KW = [
-    '카드','신용카드','체크카드','bc','비씨','kb','국민','신한','삼성','현대','롯데','하나','우리','nh','농협','ibk','씨티','제주','전북','수협'
-  ];
-  const lower = (v) => (v ?? '').toString().toLowerCase();
-  const hasAny = (s, kws) => kws.some(k => lower(s).includes(lower(k)));
+  // -------- (보조) 진입 경로 기반 카드 리스트 판정 --------
+  const isFromCardList = useMemo(() => {
+    const byState =
+      location?.state?.source === 'card' ||
+      location?.state?.sourceType === 'card';
+    const byQuery =
+      new URLSearchParams(location?.search || '').get('source') === 'card';
+    const byPath = /\/benefit\/cards/i.test(location?.pathname || '');
+    const bySelected =
+      selected?.__from === 'card' || selected?.source === 'card';
+    return !!(byState || byQuery || byPath || bySelected);
+  }, [location?.state, location?.search, location?.pathname, selected]);
 
-  const isCardByExplicit = useMemo(() => {
-    const hint = [
-      src?.type,
-      src?.paymentType,
-      src?.category,
-      src?.registeredType,
-      src?.benefitType,
-      src?.categoryType,
-      src?.methodType,
-    ].filter(Boolean).map(String).join('|').toLowerCase();
-    return /card|카드/.test(hint);
-  }, [src]);
+  // 🔒 최종 CTA 숨김 여부: 카드 API 판정이 1순위, 실패 대비로 경로 판정 보조
+  const hideCTA = hideCtaByCardApi || isFromCardList;
 
-  const isCardByHeuristic = useMemo(() => {
-    const text = [
-      src?.brand, src?.brandName, src?.details, src?.discountType, src?.pointInfo, src?.infoLink
-    ].filter(Boolean).join(' ');
-    return hasAny(text, CARD_KW);
-  }, [src]);
-
-  const isCardByPath = useMemo(() => /\/benefit\/cards/i.test(location?.pathname || ''), [location?.pathname]);
-
-  const isCardBenefit = isCardByExplicit || isCardByHeuristic || isCardByPath;
-  // ---------------------------
-
+  // -------- View 모델 --------
   const view = useMemo(() => {
     if (!src) return null;
+
     const title =
       src.title ||
       (src.brandName && src.discountPercent != null
         ? `${src.brandName} ${src.discountType ?? ''} ${src.discountPercent}%`
         : (src.brandName ?? '혜택 상세'));
+
     const description = src.description || src.details || '';
     const point = src.point ?? src.pointInfo ?? '';
     const cashback =
@@ -109,6 +119,7 @@ export default function BenefitDetailPage() {
       (src.discountPercent != null
         ? `${src.discountPercent}% ${src.discountType ?? ''}`.trim()
         : '');
+
     const steps =
       Array.isArray(src.instructions)
         ? src.instructions
@@ -118,9 +129,9 @@ export default function BenefitDetailPage() {
         ? src.details.split(/\r?\n|•/g).map(s => s.trim()).filter(Boolean)
         : [];
 
-    // 🔒 카드 혜택이면 외부 이동 URL 자체를 비워서 안전장치
+    // 카드 혜택이면 외부 이동 비활성화
     const externalUrlRaw = src.externalUrl || src.infoLink || '';
-    const externalUrl = isCardBenefit ? '' : externalUrlRaw;
+    const externalUrl = hideCTA ? '' : externalUrlRaw;
 
     return {
       brand: src.brand || src.brandName || '',
@@ -132,13 +143,16 @@ export default function BenefitDetailPage() {
       steps,
       externalUrl,
     };
-  }, [src, isCardBenefit]);
+  }, [src, hideCTA]);
 
   const handleConfirm = () => {
     setShowModal(false);
-    if (view?.externalUrl) window.open(view.externalUrl, '_blank', 'noopener,noreferrer');
+    if (view?.externalUrl) {
+      window.open(view.externalUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
+  // -------- Render --------
   if (loading) return <div className={styles.pageWrapper}>불러오는 중…</div>;
   if (error) return <div className={styles.pageWrapper}>🚨 {error}</div>;
   if (!view) return <div className={styles.pageWrapper}>혜택 정보가 없습니다.</div>;
@@ -157,10 +171,10 @@ export default function BenefitDetailPage() {
           {view.brand && <span className={styles.brandTag}>{view.brand}</span>}
           <h2 className={styles.benefitTitle}>{view.title}</h2>
 
-          <div className={styles.subTextRow}>
+        <div className={styles.subTextRow}>
             {view.description && <p className={styles.subText}>{view.description}</p>}
-            {/* 🦉 카드 혜택이면 CTA 섹션 자체를 렌더하지 않음 */}
-            {!isCardBenefit && (
+            {/* ✅ /api/discount/card 포함이면 CTA 미노출 */}
+            {!hideCTA && (
               <div className={styles.owlButtonWrapper}>
                 <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
                 <button onClick={() => setShowModal(true)} className={styles.inlineButton}>
@@ -200,8 +214,8 @@ export default function BenefitDetailPage() {
           </div>
         </div>
 
-        {/* 🔒 카드 혜택이면 CTA/모달 DOM 자체를 제거 */}
-        {!isCardBenefit && (
+        {/* ✅ /api/discount/card 포함이면 CTA/모달 제거 */}
+        {!hideCTA && (
           <>
             <button onClick={() => setShowModal(true)} className={styles.bottomButton}>
               혜택 받으러 이동하기
