@@ -1,12 +1,70 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Frontend
+프론트엔드 레포지터리 입니다.
+---
+**💻 코드 컨벤션**
 
-Currently, two official plugins are available:
+1. **네이밍 규칙**
+- 함수와 변수는 camelCase로 작성한다.
+- 컴포넌트와 파일명은 PascalCase로 작성한다.
+- Boolean 변수는 긍정형으로 작성하며, is, has, can 등의 접두어를 사용한다.
+- Boolean을 반환하는 함수는 is으로 시작하고, 값을 반환하는 함수는 get등으로 시작한다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+2. **코드 스타일 규칙**
+- 들여쓰기는 공백 4칸을 사용한다.
+- 문자열은 작은따옴표(' ')를 기본으로 사용한다.
+- 문장 끝에는 세미콜론(;)을 반드시 붙인다!!!!!!!!!!!
+- inline style은 사용하지 않는다!!!
+- HTML 태그는 소문자로 작성한다.
+- JSX 속성은 camelCase로 작성한다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+3. **주석 규칙**
+- 코드 블록 단위로 명확하게 문단 주석을 작성한다.
+
+---
+
+4. **파일 및 디렉토리 구조**
+- 컴포넌트는 components/, 페이지는 pages/, 공통 스타일은 styles/, 정적 자원은 assets/, 유틸 함수는 utils/에 위치시킨다.
+- 컴포넌트 파일은 .jsx 또는 .tsx 확장자를 사용한다.
+
+<br>
+<br/>
+
+**💻 PR 규칙**
+
+       1. PR 템플릿(복사해서 사용)
+  
+        ## PR 요약
+  
+        - 무엇을 변경했는지 요약하기
+        
+        ## 변경 UI 스크린샷 (필수 x)
+        
+        - 변경된 화면이 있다면 이미지 첨부하기
+        
+        ## 테스트 방법
+        
+        - 어떤 방식으로 기능을 테스트했는지 설명하기
+        
+        ## 관련 이슈
+        
+        - 관련 이슈를 태그하기
+        
+        ## 기타 참고 사항
+        
+        - 리뷰어가 알면 좋을 추가 정보를 적기
+
+---
+
+1. 커밋 메시지 컨벤션
+- feat : 새로운 기능 추가
+- fix : 버그 수정
+- docs : 문서 관련 수정(README 등)
+- style : 포맷팅 수정 (세미콜론, 들여쓰기, 공백 등) 로직 변경 없음
+- refactor : 코드 리팩토링(동작은 동일, 코드 개선)
+- chore : 빌드, 패키지, 설정 변경 등 유지보수
+
