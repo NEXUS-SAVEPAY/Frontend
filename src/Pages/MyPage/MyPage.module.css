@@ -1,0 +1,164 @@
+.pageWrapper {
+    width: 100%;
+    margin: 0 auto;
+    padding: 8px 16px 40px 16px;
+    font-family: 'Pretendard', sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* 제목 */
+.title {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+/* 섹션 상단 (제목 + 버튼) */
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-left:5px;
+}
+
+/* 관심 브랜드 섹션 */
+.brandSection {
+    margin-top: 24px;
+}
+
+.brandTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.brandTitle {
+    font-size: 16px;
+    font-weight: 600;
+    margin-left:-10px;
+}
+
+.addBrandButton {
+    background-color:#654EFF;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+/* 브랜드 로고 리스트 */
+.brandList {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+
+.brandItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.brandItem img {
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    object-fit: cover;
+    margin-bottom: 4px;
+}
+
+/* 혜택 알림 섹션 */
+.notificationSection {
+    margin-top: 32px;
+}
+
+.toggleGroup {
+    margin-top: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 12px;
+    background-color: #fafafa;
+}
+
+/* 토글 라벨 + 스위치 (기본 스타일 제공용) */
+.toggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.toggleLabel {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toggleSwitch {
+    width: 42px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.toggleSwitch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: left 0.3s ease;
+}
+
+/* 활성화된 토글 예시 */
+.toggleSwitch.active {
+    background-color: #7456f0;
+}
+
+.toggleSwitch.active::after {
+    left: 20px;
+}
+
+/*화살표 통일해야 함. payregister 화살표 사용할 예정*/
+.changeButton {
+    background-color: #654EFF;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right:0;
+}
+
+/* 화살표 스타일 */
+.arrow {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid white;
+    border-right: 2px solid white;
+    transform: rotate(45deg);
+    margin-left: 4px;
+}

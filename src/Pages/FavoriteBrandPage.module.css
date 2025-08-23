@@ -1,0 +1,103 @@
+.container {
+    padding: 0 16px;
+    width: 100vw;
+    box-sizing: border-box;
+    padding-bottom: 70px;
+}
+
+.fixedHeader {
+    /*
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 1000;
+    */
+    /*padding: 16px;*/
+    box-sizing: border-box;
+    padding-top: 12px;
+}
+
+.header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 22px;
+    margin-top: 4px; 
+    margin-bottom: 12px; 
+    padding: 16px;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    font-size: 22px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: #222;
+    position: absolute;
+    left: 0;
+    font-weight: 900;
+    margin-left: 8px;
+}
+
+.title {
+    margin: 0 auto;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.subTitle {
+    font-size: 19px;
+    font-weight: 600;
+    color: #222;
+    margin: 20px 0 12px 4px;
+}
+
+.registeredBrandSection {
+    margin-top: 1px;
+}
+
+.withPadding {
+    padding-top: 1px; /* fixedHeader 높이만큼 */
+
+}
+
+.brandList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.saveButton {
+    width: calc(100% - 32px);  /* 좌우 padding 16px씩 고려 */
+    padding: 12px 0;
+    border-radius: 24px;
+    background-color: #654EFF;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+
+    /* 하단 고정 */
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 1000;
+}
+
+.searchSection {
+    margin-top: 14px; /* fixedHeader 높이만큼 밀어줌 */
+}
+
+.emptyResult {
+    font-size: 14px;
+    color: #999;
+    margin-left: 4px;
+    margin-bottom: 12px;
+}

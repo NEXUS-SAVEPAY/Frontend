@@ -1,0 +1,23 @@
+/* 통신사 옵션 버튼 */
+.optionButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 12px;
+    background-color: #EAEDF0;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    color: #8B95A1;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;             /* 부모 기준으로 꽉 차게 */
+}
+
+/* 선택된 상태 스타일 */
+.selected {
+    background-color: #654EFF;
+    color: white;
+}

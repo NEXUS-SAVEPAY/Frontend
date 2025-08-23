@@ -1,0 +1,79 @@
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* 닫힌 상태 */
+.dropdownTrigger {
+    background-color: #f0f2f5;
+    border-radius: 999px;
+    padding: 16px 24px;
+    font-size: 15px;
+    font-weight: bold;
+    color: black;
+    position: relative;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #654eff;
+    color: white;
+}
+
+/* 글자 가운데, 화살표 오른쪽 */
+.dropdownTrigger span:first-child {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.dropdownTrigger span:last-child {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 5px;
+}
+
+/* 펼쳐진 리스트 */
+.dropdownList {
+    margin-top: 0px;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f2f5;
+    border-radius: 16px; /* 리스트 전체를 둥글게 */
+    overflow: hidden;     /* 모서리 깔끔하게 */
+}
+
+
+.dropdownItem {
+    background-color: #EAEDF0;
+    padding: 16px 24px;
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+    position: relative;
+    cursor: pointer;
+}
+
+/* 드롭다운 항목도 동일하게 처리 */
+.dropdownItem span:first-child {
+    display: block;
+    text-align: center;
+    width: 100%;
+}
+
+.dropdownItem span:last-child {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.dropdownWrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
+}
+
