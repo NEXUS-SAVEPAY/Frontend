@@ -1,5 +1,7 @@
 {
     "rewrites": [
-        { "source": "/(.*)", "destination": "/" }
+      { "source": "/api/(.*)", "destination": "https://www.savepay.site/api/$1" },
+      { "source": "/(.*)", "destination": "/" }
     ]
-}
+  }
+  
