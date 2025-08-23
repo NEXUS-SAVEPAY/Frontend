@@ -31,9 +31,11 @@ function CardBenefitPage() {
         setLoading(true);
         setErrorMsg('');
 
+        // 서비스가 { signal } 옵션 지원
         const raw = await fetchCardRelatedBrandBenefits({ signal: ac.signal });
         if (!mounted) return;
 
+        // ⚠️ map에 index가 넘어가므로 mapCardBenefitToUI의 fallback id가 동작
         const mapped = raw.map(mapCardBenefitToUI).filter(Boolean);
         setItems(mapped);
       } catch (err) {
@@ -51,9 +53,9 @@ function CardBenefitPage() {
     };
   }, []);
 
-  // ✅ 상세 이동
+  // 상세 이동
   const openDetail = (benefit) => {
-    const discountId = benefit?.id;                  // map에서 보장
+    const discountId = benefit?.id;
     const brand = benefit?.brand ?? 'brand';
 
     if (!discountId) {
@@ -62,7 +64,21 @@ function CardBenefitPage() {
       return;
     }
 
-    navigate(`/benefit/${encodeURIComponent(brand)}/${discountId}`);
+    // ❗ 임시 id(tmp-*)인 경우: 서버 상세 페이지가 없을 수 있으니 infoLink가 있으면 외부 링크로 대체
+    if (String(discountId).startsWith('tmp-')) {
+      if (benefit?.infoLink) {
+        window.open(benefit.infoLink, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      // infoLink도 없으면 안내
+      alert('상세 ID가 없어 외부 상세 페이지로 이동할 수 없습니다.');
+      return;
+    }
+
+    // 정상 id면 내부 상세 페이지로 이동
+    navigate(`/benefit/${encodeURIComponent(brand)}/${discountId}?source=card`, {
+      state: { source: 'card' },
+    });
   };
 
   return (
@@ -89,12 +105,14 @@ function CardBenefitPage() {
           <div className={styles.benefitListColumn}>
             {items.map((benefit) => (
               <BenefitListItem
-                key={benefit.id}                         
+                key={benefit.id}
+                id={benefit.id}
                 brand={benefit.brand}
                 description={benefit.description}
                 detail={benefit.detail}
                 imageSrc={benefit.imageSrc}
-                onClickDetail={() => openDetail(benefit)} 
+                source="card"
+                onClickDetail={() => openDetail(benefit)}
               />
             ))}
           </div>

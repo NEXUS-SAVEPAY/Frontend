@@ -8,25 +8,41 @@ const withBase = (path) =>
     typeof window !== 'undefined' ? window.location.origin : undefined
   ).toString();
 
-// 안전한 배열화
+// -------- 유틸 --------
 const toArray = (x) => {
   if (Array.isArray(x)) return x;
   if (x && typeof x === 'object') {
-    // { items: [...] } 같은 케이스 처리
     if (Array.isArray(x.items)) return x.items;
+    if (Array.isArray(x.data)) return x.data;
+    if (Array.isArray(x.result)) return x.result;
     return Object.values(x);
   }
   return [];
 };
 
-// 캐시 키
+const norm = (s) => (s ?? '').toString().trim();
+const lower = (s) => norm(s).toLowerCase();
+
+// 중복 제거하면서 보기 좋게 이어붙이기
+const joinParts = (...parts) =>
+  parts
+    .map((s) => (s ?? '').toString().trim())
+    .filter(Boolean)
+    .filter((val, idx, arr) => {
+      const n = (x) => x.replace(/\s+/g, ' ').toLowerCase();
+      return arr.findIndex((y) => n(y) === n(val)) === idx;
+    })
+    .join(' · ');
+
 const ID_SET_CACHE_KEY = 'CARD_BENEFIT_ID_SET_V1';
 
+// -------- API --------
+
 /**
- * /api/discount/card 목록을 가져옵니다.
- * 서버 포맷이 { result: [...] } 라고 가정하고, 방어적으로 result/data/items를 모두 탐색합니다.
+ * /api/discount/card 목록 조회
+ * @param {{signal?: AbortSignal}=} opts
  */
-export async function fetchCardBenefits() {
+export async function fetchCardBenefits(opts = {}) {
   const token = typeof getAccessToken === 'function' ? getAccessToken() : null;
 
   const res = await fetch(withBase('/api/discount/card'), {
@@ -37,6 +53,7 @@ export async function fetchCardBenefits() {
     },
     credentials: token ? 'omit' : 'include',
     redirect: 'follow',
+    signal: opts.signal,
   });
 
   if (!res.ok) {
@@ -45,7 +62,6 @@ export async function fetchCardBenefits() {
   }
 
   const json = await res.json().catch(() => ({}));
-  // 다양한 응답 래핑 방어
   const raw =
     json?.result ??
     json?.data ??
@@ -57,60 +73,119 @@ export async function fetchCardBenefits() {
 }
 
 /**
- * 현재 discountId가 카드 혜택 목록에 포함되는지 확인.
- * - 세션 캐시에 Set<string>으로 저장하여 재호출 가속
- * - 캐시에 없으면 API 호출
+ * 현재 discountId가 카드 혜택 목록에 포함되는지 확인
  */
 export async function isCardDiscountId(discountId) {
-  const key = String(discountId ?? '').trim();
+  const key = norm(discountId);
   if (!key) return false;
 
-  // 1) 세션 캐시 확인
+  // 세션 캐시 먼저 확인
   try {
     const cached = sessionStorage.getItem(ID_SET_CACHE_KEY);
     if (cached) {
-      const ids = new Set(JSON.parse(cached)); // 배열 형태로 저장
+      const ids = new Set(JSON.parse(cached));
       return ids.has(key);
     }
-  } catch {
-    // 캐시 파싱 실패는 무시
-  }
+  } catch {}
 
-  // 2) API 호출해서 새로 구성
+  // API 호출로 실 id 수집
   try {
     const list = await fetchCardBenefits();
-
-    // id / discountId 다양한 필드 방어
     const ids = new Set(
       list
         .map((it) =>
-          String(
+          norm(
             it?.id ?? it?.discountId ?? it?.discountID ?? it?.discount_id ?? ''
-          ).trim()
+          )
         )
-        .filter(Boolean)
+        .filter(Boolean) // 진짜 id만 저장 (tmp-* 같은 건 여기 없음)
     );
-
-    // 세션 캐시 저장 (배열로)
     try {
       sessionStorage.setItem(ID_SET_CACHE_KEY, JSON.stringify([...ids]));
-    } catch {
-      /* ignore */
-    }
-
+    } catch {}
     return ids.has(key);
-  } catch (e) {
-    // API 실패 시 카드 여부를 결정 못하므로 false 반환
-    // 필요하면 여기서 로깅만 하고, 상세 페이지에서 다른 힌트(쿼리/state)에 fallback 가능
-    return false;
+  } catch {
+    return false; // 판단 불가 시 보수적으로 false
   }
 }
 
-/** (선택) 캐시 무효화가 필요할 때 호출 */
 export function invalidateCardBenefitIdCache() {
   try {
     sessionStorage.removeItem(ID_SET_CACHE_KEY);
-  } catch {
-    /* ignore */
+  } catch {}
+}
+
+/**
+ * ✅ 호환용 별칭
+ *  - 인자로 문자열(브랜드명) 또는 객체 { brandName, signal } 모두 허용
+ *  - 인자 없으면 전체 반환
+ */
+export async function fetchCardRelatedBrandBenefits(arg) {
+  let brandName, signal;
+  if (typeof arg === 'string') {
+    brandName = arg;
+  } else if (arg && typeof arg === 'object') {
+    brandName = arg.brandName;
+    signal = arg.signal;
   }
+
+  const list = await fetchCardBenefits({ signal });
+  if (!brandName) return list;
+
+  const target = lower(brandName);
+  return list.filter((it) => {
+    const b1 = lower(it?.brand);
+    const b2 = lower(it?.brandName);
+    return b1 === target || b2 === target;
+  });
+}
+
+/**
+ * ✅ UI 매핑 함수 export (CardBenefitPage에서 사용)
+ *  - id가 없으면 tmp-<index>로 fallback 생성하여 리스트에 반드시 노출
+ *  - detail은 details + pointInfo를 결합해서 항상 표시
+ *  - description도 (할인타입 + 퍼센트) → details → pointInfo 순으로 보강
+ *
+ *  ⚠️ 주의: Array.prototype.map이 (value, index)를 넘기므로 idx를 두번째 인자로 받는다.
+ */
+export function mapCardBenefitToUI(it, idx) {
+  if (!it) return null;
+
+  // id 우선 탐색, 없으면 임시 id 부여
+  let id = norm(it?.id ?? it?.discountId ?? it?.discountID ?? it?.discount_id ?? '');
+  if (!id) id = `tmp-${idx}`;
+
+  const brand = norm(it?.brand ?? it?.brandName);
+  const discountPercentRaw = it?.discountPercent;
+
+  // percent 안전 처리 (10 -> 10%, '10' -> 10%, '10%' 유지)
+  const percentPart =
+    typeof discountPercentRaw === 'number'
+      ? `${discountPercentRaw}%`
+      : (norm(discountPercentRaw) || '').replace(/\s*%?$/, (m) =>
+          (m && m.includes('%')) ? m : '%'
+        );
+
+  const discountType = norm(it?.discountType);
+  const details = norm(it?.details);
+  const pointInfo = norm(it?.pointInfo);
+  const brandImage = norm(it?.brandImage);
+  const infoLink = norm(it?.infoLink ?? it?.externalUrl ?? '');
+
+  // 항상 어느 정도 정보가 보이도록 보강
+  const detail = joinParts(details, pointInfo) || '상세 내용을 확인해 주세요';
+  const description =
+    joinParts(discountType, percentPart) ||
+    details ||
+    pointInfo ||
+    '혜택 상세';
+
+  return {
+    id,
+    brand,
+    description, // h3에 노출
+    detail,      // p에 노출
+    imageSrc: brandImage,
+    infoLink,    // 외부 상세 링크(있으면)
+  };
 }

@@ -7,7 +7,7 @@ import ExternalLinkModal from '../components/Modal/ExternalLinkModal';
 import styles from './BenefitDetailPage.module.css';
 import owlImage from '../assets/images/character.svg';
 import { fetchBenefitDetail } from '../services/api/benefitDetailApi';
-import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ✅ 추가
+import { isCardDiscountId } from '../services/api/cardBenefitApi';
 
 export default function BenefitDetailPage() {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ export default function BenefitDetailPage() {
   // API 응답(우선) 또는 selected fallback
   const src = detail ?? (isIdValid ? null : selected);
 
-  // -------- (보조) 진입 경로 기반 카드 리스트 판정 --------
+  // (보조) 진입 경로 기반 카드 리스트 판정 — API 실패 시 대비
   const isFromCardList = useMemo(() => {
     const byState =
       location?.state?.source === 'card' ||
@@ -99,7 +99,7 @@ export default function BenefitDetailPage() {
     return !!(byState || byQuery || byPath || bySelected);
   }, [location?.state, location?.search, location?.pathname, selected]);
 
-  // 🔒 최종 CTA 숨김 여부: 카드 API 판정이 1순위, 실패 대비로 경로 판정 보조
+  // 🔒 최종 CTA 숨김 여부
   const hideCTA = hideCtaByCardApi || isFromCardList;
 
   // -------- View 모델 --------
@@ -171,7 +171,7 @@ export default function BenefitDetailPage() {
           {view.brand && <span className={styles.brandTag}>{view.brand}</span>}
           <h2 className={styles.benefitTitle}>{view.title}</h2>
 
-        <div className={styles.subTextRow}>
+          <div className={styles.subTextRow}>
             {view.description && <p className={styles.subText}>{view.description}</p>}
             {/* ✅ /api/discount/card 포함이면 CTA 미노출 */}
             {!hideCTA && (
