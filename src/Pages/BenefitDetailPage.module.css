@@ -255,3 +255,6 @@
     z-index: 1;         /* 부엉이보다 위에 올리려면 조절 */
 }
 
+.content {
+    padding-bottom: 80px; /* ✅ 하단 버튼 높이(약 60px) + 여유 */
+}
