@@ -5,21 +5,21 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // ✅ 경로 대소문자 혼용이 있다면, 실제 폴더/파일명과 일치하도록 맞추세요.
 // (아래는 사용자가 제공한 import를 그대로 유지)
 import AuthDonePage from '../Pages/Auth/AuthCallbackPage';
-import OnboardingPage from '../pages/Onboarding/OnboardingPage';
-import CardRegisterPage from '../pages/CardRegister/CardRegisterPage';
+import OnboardingPage from '../Pages/Onboarding/OnboardingPage';
+import CardRegisterPage from '../Pages/CardRegister/CardRegisterPage';
 import HomePage from '../Pages/HomePage';
-import PayRegisterPage from '../pages/Register/PayRegisterPage';
-import TelcoRegisterPage from '../pages/Register/TelcoRegisterPage';
-import BenefitDetailPage from '../pages/BenefitDetailPage';
-import MyPage from '../pages/MyPage/MyPage.jsx';
-import ManagePaymentPage from '../pages/MyPage/ManagePaymentPage';
+import PayRegisterPage from '../Pages/Register/PayRegisterPage';
+import TelcoRegisterPage from '../Pages/Register/TelcoRegisterPage';
+import BenefitDetailPage from '../Pages/BenefitDetailPage';
+import MyPage from '../Pages/MyPage/MyPage.jsx';
+import ManagePaymentPage from '../Pages/MyPage/ManagePaymentPage';
 import RecommendedBenefitPage from '../Pages/RecommendedBenefitPage';
 import FavoriteBenefitPage from '../Pages/FavoriteBenefitPage';
 import RegisteredBenefitPage from '../Pages/RegisteredBenefitPage';
-import CardBenefitPage from '../pages/CardBenefitPage';
-import SimplePayBenefitPage from '../pages/SimplePayBenefitPage';
-import TelcoBenefitPage from '../pages/TelcoBenefitPage';
-import FirstPage from '../pages/Onboarding/FirstPage.jsx';
+import CardBenefitPage from '../Pages/CardBenefitPage';
+import SimplePayBenefitPage from '../Pages/SimplePayBenefitPage';
+import TelcoBenefitPage from '../Pages/TelcoBenefitPage';
+import FirstPage from '../Pages/Onboarding/FirstPage.jsx';
 import BrandBenefitPage from '../Pages/BrandBenefitPage';
 import FavoriteBrandPage from '../Pages/FavoriteBrandPage';
 
