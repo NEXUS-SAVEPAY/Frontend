@@ -62,6 +62,7 @@ function RecommendedBenefitPage() {
                     {isLoaded && displayBenefits.map((benefit) => (
                         <BenefitListItem
                             key={benefit.id}
+                            id={benefit.id} 
                             brand={benefit.brand}
                             description={benefit.description}
                             detail={benefit.detail}
