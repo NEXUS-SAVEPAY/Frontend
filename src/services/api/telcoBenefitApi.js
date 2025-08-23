@@ -38,7 +38,7 @@ export async function fetchTelcoBenefits() {
         return data.result.map((item) => ({
             id: item.id,
             brand: item.brandName,
-            imageSrc: item.brandImage,
+            imageSrc: item.image,
             description: `${item.discountPercent}% ${item.discountType}`, // ex: "10% 할인"
             detail: item.details,
             infoLink: item.infoLink,
