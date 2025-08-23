@@ -80,9 +80,9 @@ const BrandBenefitPage = () => {
             try {
                 // 관심 브랜드 최신화
                 await syncFavorites();
-
                 // 브랜드별 혜택 불러오기
                 const data = await fetchDiscountsByBrand(decodedBrand);
+                console.log('[BrandBenefitPage] fetchDiscountsByBrand raw data:', data);
                 if (Array.isArray(data?.result)) {
                     const mapped = data.result.map((it) => ({
                         id: it.id,
