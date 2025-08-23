@@ -36,7 +36,7 @@ function TelcoBenefitPage() {
             {/* 콘텐츠 */}
             <div className={styles.content}>
                 {loading ? (
-                    <p>불러오는 중...</p>
+                    null
                 ) : (
                     <div className={styles.benefitListColumn}>
                         {benefits.map((benefit) => (

@@ -26,6 +26,10 @@ import owlImage from '../assets/images/character.svg';
 import { getUserFavoriteBrands } from '../services/api/interestbrandApi';
 import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
 import { fetchRecommendedBenefits } from '../services/api/benefitApi';
+import { fetchInterestOrPaymentBenefits } from '../services/api/interestOrPaymentApi';
+import { checkUserHasFavoriteBrands } from '../services/api/interestbrandApi';
+import { fetchDiscountsByBrand } from '../services/api/discountApi';
+
 
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
 const MAX_PREVIEW = 6; // 홈 프리뷰 개수 제한
@@ -117,32 +121,80 @@ function HomePage() {
     }
   };
 
+
+  // ---------- 관심브랜드 or 결제수단 혜택 (새 API) ----------
+  const [interestOrPaymentBenefits, setInterestOrPaymentBenefits] = useState([]);
+  const [hasLikedBrandsByApi, setHasLikedBrandsByApi] = useState(false);
+
+  const refreshInterestOrPayment = async () => {
+    try {
+      // 1) 등록 여부 API
+      const check = await checkUserHasFavoriteBrands();
+  
+      // 2) 혜택 조회
+      const data = await fetchInterestOrPaymentBenefits();
+      const list = Array.isArray(data?.result) ? data.result : [];
+      setInterestOrPaymentBenefits(list);
+  
+      // 🔑 등록 여부 + list 안에 brandName 있는지 확인
+      const hasBrands = check?.result === true || list.some((b) => !!b.brandName);
+      setHasLikedBrandsByApi(hasBrands);
+  
+    } catch (e) {
+      console.error('[HomePage] interest-or-payment API error:', e);
+      setInterestOrPaymentBenefits([]);
+      setHasLikedBrandsByApi(false);
+    }
+  };
+
+    // 결제수단별 그룹핑
+    const benefitsBySource = interestOrPaymentBenefits.reduce((acc, b) => {
+        const key = b.source; // "CARD", "PAY", "TELCO"
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(b);
+        return acc;
+    }, {});
+  
+
   // 최초 진입 시: 관심 브랜드 → 관심 혜택 → 추천 혜택 순서 보장
   useEffect(() => {
     (async () => {
       const favs = await refreshFavorites();
       await refreshBenefits(favs);
       await refreshRecommended();
+      await refreshInterestOrPayment();
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+    // 로딩 상태 하나라도 true면 흰 화면 보여주기
+    const isLoadingAll = recLoading || favLoading || benefitLoading || interestOrPaymentBenefits.length === 0;
+
   // ---------- 검색 ----------
   const [showNoResult, setShowNoResult] = useState(false);
-  const handleSearch = (keyword) => {
+  const handleSearch = async (keyword) => {
     const brandName = (keyword ?? '').trim();
     if (!brandName) return;
-
-    const serverHas = favBrands.some((b) => b.name === brandName);
-    const localHas = favoriteBrandBenefits.some((b) => b.brand === brandName);
-
-    if (serverHas || localHas) {
-      navigate(`/benefit/${encodeURIComponent(brandName)}`);
-    } else {
+  
+    try {
+      // ✅ 서버에서 검색 (brandName이 DB에 존재하는지 확인)
+      const data = await fetchDiscountsByBrand(brandName);
+  
+      if (Array.isArray(data?.result) && data.result.length > 0) {
+        // DB에 해당 브랜드 혜택이 존재 → 상세 페이지 이동
+        navigate(`/benefit/${encodeURIComponent(brandName)}`);
+      } else {
+        // DB에 없는 브랜드
+        setShowNoResult(true);
+        setTimeout(() => setShowNoResult(false), 2000);
+      }
+    } catch (e) {
+      console.error('[HomePage] 검색 API 오류', e);
       setShowNoResult(true);
       setTimeout(() => setShowNoResult(false), 2000);
     }
   };
+  
 
   // ---------- 결제수단(카드/간편/통신) ----------
   const registeredCards = useRecoilValue(registeredCardsAtom);
@@ -254,109 +306,135 @@ function HomePage() {
       </div>
 
       <div className={styles.content}>
+      {isLoadingAll ? (
+        null
+     ) : (
+        <>
         {/* 추천 혜택 */}
         <section className={styles.section}>
-          <div className={styles.sectionHeader}>
+        <div className={styles.sectionHeader}>
             <h1 className={styles.title}>추천혜택</h1>
             <button 
-              className={styles.viewAllButton}
-              onClick={() => navigate('/benefit/recommended')}
+            className={styles.viewAllButton}
+            onClick={() => navigate('/benefit/recommended')}
             >
-              전체 보기  〉
+            전체 보기  〉
             </button>
-          </div>
-          <div className={styles.benefitList}>
-            {recLoading && <span className={styles.dimText}>불러오는 중…</span>}
-            {recError && !recLoading && (
-              <span className={styles.errorText}>{recError} (임시로 로컬 데이터 표시)</span>
-            )}
-            {(recBenefits.length > 0 ? recBenefits : recommendedBenefits).map((benefit) => (
-              <BenefitCard
+        </div>
+        <div className={styles.benefitList}>
+            {/* 에러가 있을 때만 목데이터 보여주기 */}
+            {recError ? (
+            recommendedBenefits.map((benefit) => (
+                <BenefitCard
                 key={benefit.id}
                 id={benefit.id}
                 brand={benefit.brand}
                 description={benefit.description}
                 imageSrc={benefit.imageSrc}
-              />
-            ))}
-          </div>
+                />
+            ))
+            ) : (
+            recBenefits.map((benefit) => (
+                <BenefitCard
+                key={benefit.id}
+                id={benefit.id}
+                brand={benefit.brand}
+                description={benefit.description}
+                imageSrc={benefit.imageSrc}
+                />
+            ))
+            )}
+        </div>
         </section>
 
         {/* 관심 브랜드 혜택 OR 결제 수단 혜택 */}
         <section className={styles.section2}>
-          <div className={styles.sectionHeader}>
+        <div className={styles.sectionHeader}>
             <h1 className={styles.title}>
-              {hasLikedBrands ? '관심 브랜드 혜택' : '결제 수단 혜택'}
+            {hasLikedBrandsByApi ? '관심 브랜드 혜택' : '결제 수단 혜택'}
             </h1>
 
             <button
-              className={styles.viewAllButton}
-              onClick={() =>
-                hasLikedBrands
-                  ? navigate('/benefit/favorites')
-                  : navigate('/benefit/registered')
-              }
+            className={styles.viewAllButton}
+            onClick={() =>
+                hasLikedBrandsByApi
+                ? navigate('/benefit/favorites')
+                : navigate('/benefit/registered')
+            }
             >
-              전체 보기  〉
+            전체 보기 〉
             </button>
-          </div>
+        </div>
 
-          {hasLikedBrands ? (
+        {hasLikedBrandsByApi ? (
             <>
-              {/* 🔹 서버 관심 브랜드 아이콘 그리드 */}
-              <div className={styles.brandList}>
-                {favLoading && <span className={styles.dimText}>불러오는 중…</span>}
-                {favError && <span className={styles.errorText}>{favError}</span>}
-                {!favLoading && !favError && likedBrandIconList.map((b) => (
-                  <div
-                    key={b.name}
+            {/* 🔹 관심 브랜드 아이콘 + 혜택 */}
+            <div className={styles.brandList}>
+                {interestOrPaymentBenefits.map((b) => (
+                <div
+                    key={b.id}
                     className={styles.brandItem}
-                    onClick={() => navigate(`/benefit/${encodeURIComponent(b.name)}`)}
-                  >
-                    <img src={b.image} alt={b.name} className={styles.brandIcon} />
-                    <span className={styles.brandLabel}>{b.name}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* 🔹 관심 브랜드 혜택 프리뷰 (서버 우선, 실패 시 로컬 폴백) */}
-              <div className={styles.listColumn}>
-                {(benefitLoading && <span className={styles.dimText}>불러오는 중…</span>) ||
-                 (benefitError && <span className={styles.errorText}>{benefitError}</span>)}
-                {previewBenefits.map((benefit) => (
-                  <BenefitListItem
-                    key={`${benefit.brand}-${benefit.id}`}
-                    id={benefit.id}
-                    brand={benefit.brand}
-                    description={benefit.description}
-                    detail={benefit.detail}
-                    imageSrc={benefit.imageSrc}
-                    infoLink={benefit.infoLink}
-                    pointInfo={benefit.pointInfo}
-                    createdAt={benefit.createdAt}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            hasAnyPayment ? (
-              <>
-                <div className={styles.brandList}>
-                  {paymentItems.map((item) => (
-                    <div key={item.key} className={styles.brandItem} onClick={item.onClick}>
-                      <img src={item.image} alt={item.name} className={styles.brandIcon} />
-                      <span className={styles.brandLabel}>{item.name}</span>
-                    </div>
-                  ))}
+                    onClick={() => navigate(`/benefit/${encodeURIComponent(b.brandName)}`)}
+                >
+                    <img src={b.brandImage} alt={b.brandName} className={styles.brandIcon} />
+                    <span className={styles.brandLabel}>{b.brandName}</span>
                 </div>
+                ))}
+            </div>
 
-                {/* 사용자의 결제수단 기반 혜택은 기존 로직 유지 */}
-              </>
-            ) : (
-              <p className={styles.emptyText}>마이페이지에서 결제 수단을 먼저 등록해주세요.</p>
-            )
-          )}
+            <div className={styles.listColumn}>
+                {interestOrPaymentBenefits.map((b) => (
+                <BenefitListItem
+                    key={b.id}
+                    id={b.id}
+                    brand={b.brandName}
+                    description={`${b.discountPercent}% ${b.discountType}`}
+                    detail={b.details}
+                    imageSrc={b.brandImage}
+                    infoLink={b.infoLink}
+                    pointInfo={b.pointInfo}
+                    createdAt={b.createdAt}
+                />
+                ))}
+            </div>
+            </>
+        ) : (
+            <>
+            
+            <div className={styles.brandList}>
+                {paymentItems.map((item) => (
+                <div
+                    key={item.key}
+                    className={styles.brandItem}
+                    onClick={item.onClick}
+                >
+                    <img src={item.image} alt={item.name} className={styles.brandIcon} />
+                    <span className={styles.brandLabel}>{item.name}</span>
+                </div>
+                ))}
+            </div>
+            
+
+                <div className={styles.listColumn}>
+                {interestOrPaymentBenefits.map((b) => (
+                    <BenefitListItem
+                    key={b.id}
+                    id={b.id}
+                    brand={b.source}  // PAY / CARD / TELCO 등
+                    description={`${b.brandName} ${b.discountPercent}% ${b.discountType}`}
+                    detail={b.details}
+                    imageSrc={b.brandImage}
+                    />
+                ))}
+            </div>
+
+
+            </>
+        )}
         </section>
+        </>
+     )}
+
       </div>
 
       <div className={styles.owlButtonWrapper}>

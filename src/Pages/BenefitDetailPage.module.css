@@ -185,8 +185,11 @@
 
 /* 하단 버튼 */
 .bottomButton {
-    display: block;
-    width: 100%;
+    position: fixed;       /* 화면에 고정 */
+    bottom: 16px;          /* 화면 아래에서 16px 위 */
+    left: 16px;            /* 좌측 여백 */
+    right: 16px;           /* 우측 여백 */
+    width: calc(100% - 32px); /* 좌우 여백 고려 */
     background-color: #5c4cf2;
     color: #ffffff;
     text-align: center;
@@ -195,10 +198,11 @@
     font-weight: 700;
     border: none;
     border-radius: 999px;
-    margin-top: 40px;
     cursor: pointer;
     text-decoration: none;
+    z-index: 100;          /* 다른 요소보다 위로 */
 }
+
 /*
 .inlineButton {
     background-color: #5c4cf2;

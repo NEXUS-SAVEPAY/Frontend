@@ -37,7 +37,7 @@ function SimplePayBenefitPage() {
       {/* 콘텐츠 */}
       <div className={styles.content}>
         {loading ? (
-          <p>불러오는 중...</p>
+          null
         ) : errMsg ? (
           <p className={styles.errorText}>{errMsg}</p>
         ) : (

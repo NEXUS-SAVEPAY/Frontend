@@ -36,7 +36,7 @@
     position: absolute;
     left: 0;
     font-weight: 900;
-    margin-left: 0px;
+    margin-left: 30px;
 }
 
 .title {
@@ -49,9 +49,8 @@
     padding-top: 24px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 28px;
     padding-bottom: 32px;
-    margin-bottom:-40px;
 }
 
 .benefitListColumn {
@@ -65,8 +64,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 2px;
+    margin-bottom: 2px;
 }
 
 .brandTitle {
@@ -85,5 +84,3 @@
     display: flex;
     align-items: center;
 }
-
-

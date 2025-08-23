@@ -177,12 +177,12 @@ function ManagePaymentPage() {
         <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
         <h2 className={styles.title}>등록된 결제 수단</h2>
       </header>
-
+{/*
       {loadingCards && <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>}
       {cardsError && <p className={styles.errorText}>{cardsError}</p>}
       {loadingPays && <p className={styles.helperText}>간편결제를 불러오는 중…</p>}
       {paysError && <p className={styles.errorText}>{paysError}</p>}
-
+*/}
       <PaymentMethodSection
         groupedMethods={groupedMethods}
         onCardClick={handleCardClick}

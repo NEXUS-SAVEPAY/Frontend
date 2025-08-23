@@ -77,7 +77,7 @@ function CardBenefitPage() {
 
       {/* 콘텐츠 */}
       <div className={styles.content}>
-        {loading && <div className={styles.emptyState}>불러오는 중…</div>}
+        {loading && null}
 
         {!loading && errorMsg && <div className={styles.errorState}>{errorMsg}</div>}
 

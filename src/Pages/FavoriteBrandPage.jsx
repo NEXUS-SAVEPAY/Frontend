@@ -109,6 +109,7 @@ function FavoriteBrandPage() {
 
       if (!isFavoritedOnServer) {
         // 등록
+        {/*
         const res = await addFavoriteBrandByName(brandName);
         const latest = await refreshFavorites();
         if (latest.some((b) => norm(b.name) === nameKey)) {
@@ -119,6 +120,9 @@ function FavoriteBrandPage() {
             2500
           );
         }
+          */}
+        await addFavoriteBrandByName(brandName);
+        await refreshFavorites();
       } else {
         // 삭제: id 필요 → 최신 서버 목록에서 찾음
         let target = favBrands.find((b) => norm(b.name) === nameKey);
@@ -129,12 +133,15 @@ function FavoriteBrandPage() {
         if (!target?.id) throw new Error('삭제용 ID를 찾지 못했습니다.');
 
         await removeFavoriteBrandById(target.id);
+        {/*
         const latest = await refreshFavorites();
         if (latest.some((b) => norm(b.name) === nameKey)) {
           showToast('서버 목록에서 제거되지 않았습니다.', 2500);
         } else {
           showToast('관심 브랜드에서 삭제되었습니다.');
         }
+          */}
+        await refreshFavorites();
       }
     } catch (e) {
       showToast(e?.message || '요청 실패');

@@ -42,10 +42,11 @@ function RegisteredBenefitPage() {
       <h2 className={styles.pageTitle}>등록 수단별 혜택</h2>
 
       {loading ? (
-        <p>불러오는 중...</p>
+        null
       ) : errMsg ? (
         <p className={styles.errorText}>{errMsg}</p>
       ) : (
+
         <>
           {/* 카드 혜택 TOP2 */}
           <section className={styles.section}>

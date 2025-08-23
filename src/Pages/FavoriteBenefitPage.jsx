@@ -1,49 +1,53 @@
-// src/pages/FavoriteBenefitsPage.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+// src/pages/FavoriteBenefit/FavoriteBenefitPage.jsx
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './FavoriteBenefitPage.module.css';
+import { useRecoilState } from 'recoil';
+
+import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
+import styles from './FavoriteBenefitPage.module.css';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
 
+// ✅ API
 import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
-import { getUserFavoriteBrands } from '../services/api/interestbrandApi';
+import { getUserFavoriteBrands, addFavoriteBrandByName, removeFavoriteBrandById } from '../services/api/interestbrandApi';
 
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
 
-export default function FavoriteBenefitsPage() {
+const FavoriteBenefitPage = () => {
   const navigate = useNavigate();
+  const [likedBrands, setLikedBrands] = useRecoilState(likedBrandsAtom);
 
-  const [favBrands, setFavBrands] = useState([]); // [{id, name, image}]
-  const [groups, setGroups] = useState([]);       // [{ brand, brandImage, benefits:[...] }]
+  // 서버 데이터
+  const [favBrands, setFavBrands] = useState([]); // 관심 브랜드 [{id, name, image}]
+  const [groups, setGroups] = useState([]);       // 혜택 [{ brand, brandImage, benefits:[...] }]
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
+  // 서버 목록 동기화
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setErr('');
 
-        // 1) 서버가 이미 "관심사 기반"으로 돌려주므로
-        //    우선 전체를 받아온다.
         const serverGroups = await fetchFavoriteBenefits();
-
-        // 2) (선택) 관심 브랜드 목록이 정상 응답이면 이름이 완전히 다른 경우를 대비해 얇게 필터
-        //    - 서버가 이미 필터해주면 likeSet과 매칭되지 않아도 serverGroups를 그대로 사용
         let filtered = serverGroups;
 
         try {
           const brands = await getUserFavoriteBrands();
           setFavBrands(Array.isArray(brands) ? brands : []);
+          const mirrored = {};
+          for (const b of brands) mirrored[b.name] = true;
+          setLikedBrands(mirrored);
+
           const likeSet = new Set((brands || []).map(b => norm(b?.name)));
-          // 관심 브랜드 목록이 비어있지 않을 때만 추가 필터 (안 비면 교집합 느낌으로)
           if (likeSet.size > 0) {
             filtered = serverGroups.filter(g => likeSet.has(norm(g.brand)));
-            // 만약 교집합이 비면 서버 응답을 그대로 사용 (서버가 이미 관심사 기준이라고 가정)
             if (filtered.length === 0) filtered = serverGroups;
           }
         } catch {
-          // 관심 브랜드 API 실패 시에도 서버 응답은 그대로 사용
           setFavBrands([]);
         }
 
@@ -55,63 +59,105 @@ export default function FavoriteBenefitsPage() {
         setLoading(false);
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const flat = useMemo(() => {
-    return groups.flatMap((g) =>
-      (g.benefits || []).map((b) => ({
-        ...b,
-        brand: g.brand,
-        brandImage: g.brandImage,
-      }))
-    );
-  }, [groups]);
+  // 서버 목록 Set
+  const serverNameSet = useMemo(() => {
+    const s = new Set();
+    for (const b of favBrands) s.add(norm(b.name));
+    return s;
+  }, [favBrands]);
+
+
+    // 좋아요 토글 (API 반영)
+    const toggleLike = async (brandName) => {
+        if (busy) return;
+        setBusy(true);
+    
+        try {
+        if (!serverNameSet.has(norm(brandName))) {
+            // ⭐ 등록
+            await addFavoriteBrandByName(brandName);
+        } else {
+            // ⭐ 해제 → UI에서도 즉시 제거
+            const target = favBrands.find(b => norm(b.name) === norm(brandName));
+            if (target?.id) {
+            await removeFavoriteBrandById(target.id);
+    
+            // ⬇️ UI에서도 해당 그룹 제거
+            setGroups((prev) => prev.filter((g) => norm(g.brand) !== norm(brandName)));
+            }
+        }
+    
+        // 서버 동기화 (최신 상태 유지)
+        const latestBrands = await getUserFavoriteBrands();
+        setFavBrands(latestBrands);
+        const mirrored = {};
+        for (const b of latestBrands) mirrored[b.name] = true;
+        setLikedBrands(mirrored);
+    
+        } catch (e) {
+        console.error('toggleLike error', e);
+        alert(e?.message || '관심 브랜드 변경 실패');
+        } finally {
+        setBusy(false);
+        }
+    };
+    
 
   return (
     <div className={styles.container}>
-      {/* 고정 헤더 */}
-      <div className={styles.fixedHeader}>
-        <div className={styles.header}>
-          <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
-          <h2 className={styles.title}>관심 브랜드 혜택</h2>
-        </div>
-      </div>
-
       <div className={styles.content}>
-        {loading && <p className={styles.dimText}>불러오는 중…</p>}
+        {loading && null}
         {err && !loading && <p className={styles.error}>{err}</p>}
 
-        {/* 브랜드별 섹션 */}
-        {groups.map((g) => (
-          <section key={g.brand} className={styles.brandSection}>
-            <h3 className={styles.brandHeader}>{g.brand}</h3>
-            <div className={styles.benefitListColumn}>
-              {g.benefits.map((b) => (
-                <BenefitListItem
-                  key={`${g.brand}-${b.id}`}
-                  id={b.id}
-                  brand={g.brand}
-                  description={b.description}
-                  detail={b.detail}
-                  imageSrc={b.imageSrc || g.brandImage}
-                  infoLink={b.infoLink}
-                  pointInfo={b.pointInfo}
-                  createdAt={b.createdAt}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
-
-        {/* 데이터 없을 때 */}
-        {!loading && !err && groups.length === 0 && (
-          <p className={styles.emptyText}>
-            등록된 관심 브랜드와 관련된 혜택이 없습니다.
-          </p>
+        {groups.length === 0 && !loading && !err && (
+          <p className={styles.emptyMessage}>관심 브랜드가 없습니다.</p>
         )}
+
+        {groups.map((g, index) => (
+        <div key={g.brand} className={styles.benefitListColumn}>
+            {/* ⬇️ 브랜드명 + (첫 번째만 뒤로가기) + 즐겨찾기 버튼 */}
+            <div className={styles.brandTitleWrapper}>
+            {index === 0 && (
+                <span
+                className={styles.backButton}
+                onClick={() => navigate(-1)}
+                >
+                〈
+                </span>
+            )}
+              <span className={styles.brandTitle}>{g.brand}</span>
+              <button
+                className={styles.starButton}
+                onClick={() => toggleLike(g.brand)}
+                disabled={busy}
+              >
+                {likedBrands[g.brand] ? '★' : '☆'}
+              </button>
+            </div>
+
+            {g.benefits.map((b) => (
+              <BenefitListItem
+                key={`${g.brand}-${b.id}`}
+                id={b.id}
+                brand={g.brand}
+                description={b.description}
+                detail={b.detail}
+                imageSrc={b.imageSrc || g.brandImage}
+                infoLink={b.infoLink}
+                pointInfo={b.pointInfo}
+                createdAt={b.createdAt}
+              />
+            ))}
+          </div>
+        ))}
       </div>
 
       <OwlScrollTop />
     </div>
   );
-}
+};
+
+export default FavoriteBenefitPage;

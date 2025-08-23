@@ -15,3 +15,12 @@ export async function authorizedFetch(path, options = {}) {
     console.log('[authorizedFetch] headers =', headers); // 👈 Authorization 헤더 확인
     return fetch(url, { ...options, headers });
 }
+
+// ✅ JSON 파싱 전용 함수
+export async function getJson(path, options = {}) {
+    const res = await authorizedFetch(path, { method: 'GET', ...options });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+    return await res.json();
+}

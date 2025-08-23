@@ -266,7 +266,7 @@ function MyPage() {
           결제 수단 변경 <span className={styles.arrow}></span>
         </button>
       </div>
-
+{/*
       {loadingCards && (
         <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>
       )}
@@ -275,7 +275,7 @@ function MyPage() {
         <p className={styles.helperText}>간편결제를 불러오는 중…</p>
       )}
       {paysError && <p className={styles.errorText}>{paysError}</p>}
-
+*/}
       <PaymentMethodSection groupedMethods={groupedMethods} onDelete={handleDelete} />
 
       {/* ✅ 관심 브랜드: 서버 진실 기준(객체 배열 그대로 전달) */}

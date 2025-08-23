@@ -1,5 +1,6 @@
 // src/services/api/interestbrandApi.js
 import { getAccessToken } from './token';
+import { authorizedFetch } from './https';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const withBase = (path) =>
@@ -184,4 +185,11 @@ export async function removeFavoriteBrandById(interestBrandId) {
   const ok = data?.isSuccess ?? data?.success ?? false;
   if (!ok) throw new Error(data?.message || '관심 브랜드 삭제 실패');
   return data?.result ?? 'OK';
+}
+
+// 관심브랜드 등록 여부 확인 API
+export async function checkUserHasFavoriteBrands() {
+  return await authorizedFetch('/api/interest/brand/check', {
+    method: 'GET',
+  });
 }
