@@ -115,6 +115,7 @@ export async function updateSimplePays(payRequestOneDtoList) {
 }
 
 // ---------- 간편결제 조회(GET) ----------
+// src/services/api/payApi.js
 export async function fetchSimplePays() {
   const url = withBase('/api/pays/user').toString();
   const data = await getJson(url);
@@ -128,27 +129,11 @@ export async function fetchSimplePays() {
 
   const list = data?.result?.payResponseOneDtoList ?? [];
 
-  const PROV_TO_BASE = {
-    KAKAO: 'kakao',
-    NAVER: 'naver',
-    TOSS: 'toss',
-    PAYCO: 'payco',
-    NONE: 'none',
-  };
-
-  const selected = [];
-  for (const item of list) {
-    const base = PROV_TO_BASE[item?.payProvider?.toUpperCase?.() || ''] || null;
-    if (!base) continue;
-    if (base === 'none') {
-      selected.push('none');
-      continue;
-    }
-    selected.push(base);
-    if (item?.isMembership === true) {
-      if (base === 'naver') selected.push('naver_membership');
-      if (base === 'toss')  selected.push('toss_prime');
-    }
-  }
-  return selected;
+  // ✅ 서버 데이터 그대로 normalize
+  return list.map((item) => ({
+    provider: item.payProvider,   // "KAKAO", "TOSS", ...
+    company: item.company,        // 소문자 "kakao", "toss", ...
+    image: item.image,            // DB 이미지 URL
+    isMembership: item.isMembership === true,
+  }));
 }

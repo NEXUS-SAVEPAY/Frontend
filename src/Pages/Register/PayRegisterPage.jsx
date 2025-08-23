@@ -89,13 +89,24 @@ function PayRegisterPage({ isManageMode = false }) {
 
   const [selected, setSelected] = useState([]);
 
-  // 관리 모드일 때 기존 값 세팅 (string 호환)
+  // 관리 모드일 때 기존 값 세팅
   useEffect(() => {
     if (!isManageMode) return;
-    if (Array.isArray(savedPayment)) setSelected(savedPayment);
-    else if (typeof savedPayment === 'string' && savedPayment) setSelected([savedPayment]);
-    else setSelected([]);
+
+    if (Array.isArray(savedPayment)) {
+      // ✅ 객체 배열일 경우 company만 추출
+      if (typeof savedPayment[0] === 'object') {
+        setSelected(savedPayment.map((p) => p.company));
+      } else {
+        setSelected(savedPayment);
+      }
+    } else if (typeof savedPayment === 'string' && savedPayment) {
+      setSelected([savedPayment]);
+    } else {
+      setSelected([]);
+    }
   }, [isManageMode, savedPayment]);
+
 
   // 클릭 토글
   const handleSelect = (value) => {

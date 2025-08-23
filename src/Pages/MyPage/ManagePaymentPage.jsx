@@ -12,14 +12,10 @@ import styles from './ManagePaymentPage.module.css';
 import PaymentMethodSection from './PaymentMethodSection';
 
 import rightArrowImg from '../../assets/images/rightArrowImg.png';
-import kakaopayImg from '../../assets/images/kakaopay.png';
-import sktImg from '../../assets/images/skt.png';
 
 import { fetchRegisteredCards } from '../../services/api/cardApi';
-import { fetchSimplePays } from '../../services/api/payApi'; // ✅ 추가
-// src/pages/ManagePaymentPage/ManagePaymentPage.jsx
-import { fetchUserTelco } from '../../services/api/telcoService'; // ✅ 추가
-
+import { fetchSimplePays } from '../../services/api/payApi';
+import { fetchUserTelco } from '../../services/api/telcoService';
 
 function ManagePaymentPage() {
   const navigate = useNavigate();
@@ -37,6 +33,7 @@ function ManagePaymentPage() {
   const [loadingPays, setLoadingPays] = useState(false);
   const [paysError, setPaysError] = useState('');
 
+  // 카드 병합 (중복 제거)
   const mergeCards = (prev, next) => {
     if (!Array.isArray(next) || next.length === 0) return prev;
     const keyOf = (c) => String(c?.id ?? `${c?.company ?? ''}::${c?.name ?? ''}`);
@@ -48,28 +45,29 @@ function ManagePaymentPage() {
     return Array.from(map.values());
   };
 
-    // ✅ 통신사 정보 동기화 (MyPage랑 동일하게 추가)
-    useEffect(() => {
-        let mounted = true;
-        (async () => {
-          try {
-            const telcoRes = await fetchUserTelco();
-            if (!mounted) return;
-            if (telcoRes?.isSuccess && telcoRes.result) {
-              setUserTelcoInfo({
-                telco: telcoRes.result.telecomName,
-                hasMembership: telcoRes.result.isMembership,
-                grade: telcoRes.result.grade,
-                image: telcoRes.result.image, // 여기서 바로 DB 이미지 저장
-              });
-            }
-          } catch (e) {
-            console.error('[ManagePaymentPage] fetchUserTelco error', e);
-          }
-        })();
-        return () => { mounted = false; };
-      }, [setUserTelcoInfo]);
+  // ✅ 통신사 동기화
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const telcoRes = await fetchUserTelco();
+        if (!mounted) return;
+        if (telcoRes?.isSuccess && telcoRes.result) {
+          setUserTelcoInfo({
+            telco: telcoRes.result.telecomName,
+            hasMembership: telcoRes.result.isMembership,
+            grade: telcoRes.result.grade,
+            image: telcoRes.result.image, // DB 이미지
+          });
+        }
+      } catch (e) {
+        console.error('[ManagePaymentPage] fetchUserTelco error', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [setUserTelcoInfo]);
 
+  // ✅ 카드 조회
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -95,9 +93,9 @@ function ManagePaymentPage() {
       try {
         setLoadingPays(true);
         setPaysError('');
-        const selectedFromServer = await fetchSimplePays();
+        const paysFromServer = await fetchSimplePays(); // ✅ 객체 배열
         if (!mounted) return;
-        setUserPayment(selectedFromServer);
+        setUserPayment(paysFromServer);
       } catch (e) {
         if (mounted) setPaysError(e.message || '간편결제 정보를 불러오지 못했습니다.');
       } finally {
@@ -107,60 +105,41 @@ function ManagePaymentPage() {
     return () => { mounted = false; };
   }, [setUserPayment]);
 
+  // ---------------- 클릭 핸들러 ----------------
   const handleCardClick = (card, type) => {
     if (type === '카드') {
       setSelectedCard(card);
       navigate('/manage-card', {
-        state: { selectedCardId: card.id, isManageMode: true }
+        state: { selectedCardId: card.id, isManageMode: true },
       });
     }
   };
-
   const handleSimplePayClick = () => navigate('/manage-simplepay');
   const handleTelcoClick = () => navigate('/manage-telco');
 
-  const getPaymentImage = (type) => {
-    switch (type) {
-      case 'kakao': return kakaopayImg;
-      case 'naver': return null;
-      case 'toss':  return null;
-      case 'payco': return null;
-      default: return null;
-    }
-  };
+  // ---------------- 데이터 정리 ----------------
+  const toArray = (v) =>
+    Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
+  const userPayments = toArray(userPaymentRaw).filter((v) => v);
 
-  const getTelcoImage = (telco) => {
-    switch (telco) {
-      case 'SKT': return sktImg;
-      case 'KT': return null;
-      case 'LG U+': return null;
-      case '알뜰폰': return null;
-      default: return null;
-    }
-  };
-
-  const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
-  const userPayments = toArray(userPaymentRaw).filter(v => v && v !== 'none');
-
+  // 부모/자식 옵션 처리 (객체 기준)
   const parentsWithSubs = new Set(
-    userPayments.filter(v => v.includes('_')).map(v => v.split('_')[0])
+    userPayments
+      .filter((v) => typeof v.company === 'string' && v.company.includes('_'))
+      .map((v) => v.company.split('_')[0])
   );
 
-  const displayPayments = userPayments.filter(v => {
-    const isParent = !v.includes('_');
-    return !(isParent && parentsWithSubs.has(v));
+  const displayPayments = userPayments.filter((v) => {
+    if (!v || typeof v.company !== 'string') return false;
+    const isParent = !v.company.includes('_');
+    return !(isParent && parentsWithSubs.has(v.company));
   });
 
   const PAYMENT_NAME = {
     kakao: '카카오페이',
     naver: '네이버페이',
-    toss:  '토스페이',
+    toss: '토스페이',
     payco: '페이코',
-  };
-
-  const SUBOPTION_LABELS = {
-    naver_membership: '멤버십',
-    toss_prime: '프라임',
   };
 
   const groupedMethods = [
@@ -175,39 +154,42 @@ function ManagePaymentPage() {
     },
     {
       type: '간편결제',
-      items: displayPayments.map((p, idx) => {
-        const parent = p.split('_')[0];
-        return {
-          id: `simplepay_${p}_${idx}`,
-          name: PAYMENT_NAME[parent] || parent,
-          image: getPaymentImage(parent),
-          tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '멤버십 없음',
-        };
-      }),
+      items: displayPayments.map((p, idx) => ({
+        id: `simplepay_${p.company}_${idx}`,
+        name: PAYMENT_NAME[p.company] || p.company,
+        image: p.image, // ✅ DB에서 받은 이미지
+        tag: p.isMembership ? '멤버십' : '멤버십 없음',
+      })),
     },
     {
       type: '통신사',
-      items: userTelcoInfo?.telco ? [{
-        id: 'telco',
-        name: userTelcoInfo.telco,
-        image: userTelcoInfo.image,
-        tag: userTelcoInfo.hasMembership ? (userTelcoInfo.grade || '') : '멤버십 없음',
-      }] : [],
+      items: userTelcoInfo?.telco
+        ? [
+            {
+              id: 'telco',
+              name: userTelcoInfo.telco,
+              image: userTelcoInfo.image,
+              tag: userTelcoInfo.hasMembership
+                ? userTelcoInfo.grade || ''
+                : '멤버십 없음',
+            },
+          ]
+        : [],
     },
   ];
 
   return (
     <div className={styles.pageWrapper}>
       <header className={styles.header}>
-        <button className={styles.backButton} onClick={() => navigate('/mypage')}>〈</button>
+        <button
+          className={styles.backButton}
+          onClick={() => navigate('/mypage')}
+        >
+          〈
+        </button>
         <h2 className={styles.title}>등록된 결제 수단</h2>
       </header>
-{/*
-      {loadingCards && <p className={styles.helperText}>등록된 카드를 불러오는 중…</p>}
-      {cardsError && <p className={styles.errorText}>{cardsError}</p>}
-      {loadingPays && <p className={styles.helperText}>간편결제를 불러오는 중…</p>}
-      {paysError && <p className={styles.errorText}>{paysError}</p>}
-*/}
+
       <PaymentMethodSection
         groupedMethods={groupedMethods}
         onCardClick={handleCardClick}
