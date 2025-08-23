@@ -176,6 +176,7 @@ function MyPage() {
             telco: telcoRes.result.telecomName,
             hasMembership: telcoRes.result.isMembership,
             grade: telcoRes.result.grade,
+            image: telcoRes.result.image, 
           });
         }
       } catch {
@@ -241,7 +242,7 @@ function MyPage() {
             {
               id: 'telco',
               name: userTelcoInfo.telco,
-              image: getTelcoImage(userTelcoInfo.telco),
+              image: userTelcoInfo.image,
               tag: userTelcoInfo.hasMembership
                 ? userTelcoInfo.grade || ''
                 : '멤버십 없음',

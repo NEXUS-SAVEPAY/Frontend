@@ -1,7 +1,7 @@
 // src/pages/ManagePaymentPage/ManagePaymentPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil';
 
 import { registeredCardsAtom } from '../../recoil/atoms/CardRegisterAtom';
 import { selectedCardAtom } from '../../recoil/atoms/selectedCardAtom';
@@ -17,6 +17,9 @@ import sktImg from '../../assets/images/skt.png';
 
 import { fetchRegisteredCards } from '../../services/api/cardApi';
 import { fetchSimplePays } from '../../services/api/payApi'; // ✅ 추가
+// src/pages/ManagePaymentPage/ManagePaymentPage.jsx
+import { fetchUserTelco } from '../../services/api/telcoService'; // ✅ 추가
+
 
 function ManagePaymentPage() {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ function ManagePaymentPage() {
 
   const setUserPayment = useSetRecoilState(userPaymentsAtom);
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
-  const userTelcoInfo = useRecoilValue(userTelcoInfoAtom);
+  const [userTelcoInfo, setUserTelcoInfo] = useRecoilState(userTelcoInfoAtom);
 
   const [loadingCards, setLoadingCards] = useState(false);
   const [cardsError, setCardsError] = useState('');
@@ -44,6 +47,28 @@ function ManagePaymentPage() {
     });
     return Array.from(map.values());
   };
+
+    // ✅ 통신사 정보 동기화 (MyPage랑 동일하게 추가)
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+          try {
+            const telcoRes = await fetchUserTelco();
+            if (!mounted) return;
+            if (telcoRes?.isSuccess && telcoRes.result) {
+              setUserTelcoInfo({
+                telco: telcoRes.result.telecomName,
+                hasMembership: telcoRes.result.isMembership,
+                grade: telcoRes.result.grade,
+                image: telcoRes.result.image, // 여기서 바로 DB 이미지 저장
+              });
+            }
+          } catch (e) {
+            console.error('[ManagePaymentPage] fetchUserTelco error', e);
+          }
+        })();
+        return () => { mounted = false; };
+      }, [setUserTelcoInfo]);
 
   useEffect(() => {
     let mounted = true;
@@ -165,7 +190,7 @@ function ManagePaymentPage() {
       items: userTelcoInfo?.telco ? [{
         id: 'telco',
         name: userTelcoInfo.telco,
-        image: getTelcoImage(userTelcoInfo.telco),
+        image: userTelcoInfo.image,
         tag: userTelcoInfo.hasMembership ? (userTelcoInfo.grade || '') : '멤버십 없음',
       }] : [],
     },
