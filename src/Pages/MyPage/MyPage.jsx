@@ -142,17 +142,15 @@ function MyPage() {
   }, [setRegisteredCards]);
 
   // 서버: 간편결제
-  const [loadingPays, setLoadingPays] = useState(false);
-  const [paysError, setPaysError] = useState('');
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoadingPays(true);
         setPaysError('');
-        const selectedFromServer = await fetchSimplePays();
+        const paysFromServer = await fetchSimplePays(); // ✅ 객체 배열
         if (!mounted) return;
-        setUserPayment(selectedFromServer); // 서버 권위
+        setUserPayment(paysFromServer); // 문자열 X, 객체 배열 그대로 저장
       } catch (e) {
         if (mounted) setPaysError(e.message || '간편결제 정보를 불러오지 못했습니다.');
       } finally {
@@ -163,6 +161,7 @@ function MyPage() {
       mounted = false;
     };
   }, [setUserPayment]);
+
 
   // 서버: 통신사
   useEffect(() => {
@@ -193,13 +192,16 @@ function MyPage() {
     Array.isArray(v) ? v : typeof v === 'string' && v ? [v] : [];
   const userPayments = toArray(userPaymentRaw).filter((v) => v && v !== 'none');
 
-  // 서브옵션 존재 시 부모 숨김
   const parentsWithSubs = new Set(
-    userPayments.filter((v) => v.includes('_')).map((v) => v.split('_')[0])
+    (Array.isArray(userPayments) ? userPayments : [])
+      .filter((v) => typeof v.company === 'string' && v.company.includes('_'))
+      .map((v) => v.company.split('_')[0])
   );
-  const displayPayments = userPayments.filter((v) => {
-    const isParent = !v.includes('_');
-    return !(isParent && parentsWithSubs.has(v));
+  
+  const displayPayments = (Array.isArray(userPayments) ? userPayments : []).filter((v) => {
+    if (!v || typeof v.company !== 'string') return false;
+    const isParent = !v.company.includes('_');
+    return !(isParent && parentsWithSubs.has(v.company));
   });
 
   const PAYMENT_NAME = {
@@ -225,16 +227,14 @@ function MyPage() {
     },
     {
       type: '간편결제',
-      items: displayPayments.map((p, idx) => {
-        const parent = p.split('_')[0];
-        return {
-          id: `simplepay_${p}_${idx}`,
-          name: PAYMENT_NAME[parent] || parent,
-          image: getPaymentImage(parent),
-          tag: SUBOPTION_LABELS[p] ? SUBOPTION_LABELS[p] : '멤버십 없음',
-        };
-      }),
+      items: (Array.isArray(userPaymentRaw) ? userPaymentRaw : []).map((p, idx) => ({
+        id: `simplepay_${p.company}_${idx}`,
+        name: p.company,                  // "kakao", "toss" ...
+        image: p.image,                   // ✅ DB에서 받은 이미지
+        tag: p.isMembership ? '멤버십' : '멤버십 없음',
+      })),
     },
+    
     {
       type: '통신사',
       items: userTelcoInfo?.telco
