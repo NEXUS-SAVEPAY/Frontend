@@ -15,7 +15,7 @@ import {
   addFavoriteBrandByName,
   removeFavoriteBrandById,
 } from '../../services/api/interestbrandApi';
-import { isCardDiscountId } from '../../services/api/cardBenefitApi'; // ★ 카드 혜택 판정
+import { isCardDiscountId } from '../../services/api/cardBenefitApi'; // 카드 혜택 판정
 
 // 문자열 정규화 (공백 제거 + 소문자 변환)
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
@@ -26,12 +26,12 @@ const FavoriteBenefitPage = () => {
 
   // 서버 데이터
   const [favBrands, setFavBrands] = useState([]); // 관심 브랜드 목록
-  const [groups, setGroups] = useState([]);       // 혜택 그룹 [{ brand, benefits: [...] }]
+  const [groups, setGroups] = useState([]);       // [{ brand, brandImage, benefits:[...] }]
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
 
-  // ★ 카드 혜택 ID 집합(사전 최적화; 없어도 동작)
+  // 카드 혜택 ID 집합(사전 최적화; 없어도 동작)
   const [cardIdSet, setCardIdSet] = useState(null); // Set<string> | null
 
   // 서버 목록 동기화
@@ -50,14 +50,14 @@ const FavoriteBenefitPage = () => {
 
           // Recoil likedBrands 동기화
           const mirrored = {};
-          for (const b of brands) mirrored[b.name] = true;
+          for (const b of brands || []) mirrored[b.name] = true;
           setLikedBrands(mirrored);
 
           // 관심 브랜드만 필터링
           const likeSet = new Set((brands || []).map((b) => norm(b?.name)));
           if (likeSet.size > 0) {
-            filtered = serverGroups.filter((g) => likeSet.has(norm(g.brand)));
-            if (filtered.length === 0) filtered = serverGroups;
+            const inter = serverGroups.filter((g) => likeSet.has(norm(g.brand)));
+            filtered = inter.length > 0 ? inter : serverGroups;
           }
         } catch {
           setFavBrands([]);
@@ -74,27 +74,32 @@ const FavoriteBenefitPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ★ 그룹이 준비되면 카드 혜택 판정해서 Set 구성(있으면 사용, 없어도 아래 클릭시 재확인)
+  // 그룹이 준비되면 카드 혜택 판정해서 Set 구성(있으면 사용, 없어도 아래 클릭시 재확인)
   useEffect(() => {
     (async () => {
       if (!groups || groups.length === 0) {
         setCardIdSet(new Set());
         return;
       }
-      const ids = Array.from(new Set(groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id)))));
+      const ids = Array.from(
+        new Set(groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id))))
+      );
       if (ids.length === 0) {
         setCardIdSet(new Set());
         return;
       }
       try {
-        const res = await Promise.all(ids.map(async (id) => {
-          try {
-            const ok = await isCardDiscountId(/^\d+$/.test(id) ? Number(id) : id);
-            return ok ? id : null;
-          } catch {
-            return null;
-          }
-        }));
+        const res = await Promise.all(
+          ids.map(async (id) => {
+            try {
+              const normalized = /^\d+$/.test(id) ? Number(id) : id;
+              const ok = await isCardDiscountId(normalized);
+              return ok ? id : null;
+            } catch {
+              return null;
+            }
+          })
+        );
         setCardIdSet(new Set(res.filter(Boolean).map(String)));
       } catch {
         setCardIdSet(new Set());
@@ -123,7 +128,6 @@ const FavoriteBenefitPage = () => {
         const target = favBrands.find((b) => norm(b.name) === norm(brandName));
         if (target?.id) {
           await removeFavoriteBrandById(target.id);
-
           // UI에서도 해당 그룹 제거
           setGroups((prev) => prev.filter((g) => norm(g.brand) !== norm(brandName)));
         }
@@ -133,7 +137,7 @@ const FavoriteBenefitPage = () => {
       const latestBrands = await getUserFavoriteBrands();
       setFavBrands(latestBrands);
       const mirrored = {};
-      for (const b of latestBrands) mirrored[b.name] = true;
+      for (const b of latestBrands || []) mirrored[b.name] = true;
       setLikedBrands(mirrored);
     } catch (e) {
       console.error('toggleLike error', e);
@@ -143,20 +147,20 @@ const FavoriteBenefitPage = () => {
     }
   };
 
-  // ★ 클릭 시 최종 확인하고 이동 (자식의 source 우선)
+  // 클릭 시 최종 확인하고 이동 (자식의 source 우선)
   const openDetailWithCardCheck = async ({ id, brand, source }) => {
     const safeBrand = encodeURIComponent(String(brand).trim());
     let isCard = false;
 
-    // A) 자식이 이미 source='card'로 넘겼다면 최우선 존중
+    // 1) 자식이 이미 source='card'로 넘겼다면 최우선 존중
     if (source === 'card') isCard = true;
 
-    // B) 사전 판정 Set
+    // 2) 사전 판정 Set
     if (!isCard && cardIdSet && cardIdSet.size > 0) {
       isCard = cardIdSet.has(String(id));
     }
 
-    // C) 클릭 시점 최종 확인 (id 숫자형 변환 시도)
+    // 3) 클릭 시점 최종 확인
     if (!isCard) {
       const maybeNum = /^\d+$/.test(String(id)) ? Number(id) : id;
       try {
@@ -201,8 +205,11 @@ const FavoriteBenefitPage = () => {
             </div>
 
             {g.benefits.map((b) => {
-              // 사전 판정은 있으면 UI 힌트로만 사용 (navigate는 클릭 시 최종 확인)
-              const isCard = cardIdSet?.has(String(b.id));
+              // 🔸 외부 링크가 없으면 카드 간주
+              const isCardByNoLink = !String(b?.infoLink || '').trim();
+              // 사전 판정 Set 결과와 OR
+              const isCard = isCardByNoLink || cardIdSet?.has(String(b.id));
+
               return (
                 <BenefitListItem
                   key={`${g.brand}-${b.id}`}
@@ -215,7 +222,7 @@ const FavoriteBenefitPage = () => {
                   pointInfo={b.pointInfo}
                   createdAt={b.createdAt}
                   source={isCard ? 'card' : undefined}
-                  onClickDetail={openDetailWithCardCheck}   // ★ 클릭 시점 최종 확인 & 이동
+                  onClickDetail={openDetailWithCardCheck} // 클릭 시점 최종 확인 & 이동
                 />
               );
             })}

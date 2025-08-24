@@ -15,7 +15,6 @@ export default function BenefitDetailPage() {
   const { brand, discountId: idParam, id: legacyIdParam } = useParams();
   const selected = useRecoilValue(selectedBenefitAtom);
 
-  // -------- id 정규화 --------
   const discountId = String(
     idParam ?? legacyIdParam ?? selected?.id ?? selected?.discountId ?? ''
   ).trim();
@@ -25,16 +24,13 @@ export default function BenefitDetailPage() {
     discountId.toLowerCase() !== 'undefined' &&
     discountId.toLowerCase() !== 'null';
 
-  // -------- 상태 --------
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  // /api/discount/card 목록 포함 여부
   const [isCardListId, setIsCardListId] = useState(false);
 
-  // -------- 없는 id를 Recoil 선택값으로 정규화 --------
   useEffect(() => {
     if (!isIdValid && selected?.id) {
       const brandForUrl = selected.brand ?? selected.brandName ?? 'brand';
@@ -42,7 +38,6 @@ export default function BenefitDetailPage() {
     }
   }, [isIdValid, selected?.id, selected?.brand, selected?.brandName, navigate]);
 
-  // -------- 상세 Fetch --------
   useEffect(() => {
     let cancelled = false;
 
@@ -69,7 +64,7 @@ export default function BenefitDetailPage() {
     return () => { cancelled = true; };
   }, [isIdValid, discountId, idParam, legacyIdParam, selected?.id]);
 
-  // 현재 discountId가 /api/discount/card 목록에 속하는지 확인 (실패 대비)
+  // /api/discount/card 포함 여부 (실패 시 false로 안전 처리)
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -81,7 +76,7 @@ export default function BenefitDetailPage() {
         const maybeNum = /^\d+$/.test(String(discountId)) ? Number(discountId) : discountId;
         const ok = await isCardDiscountId(maybeNum);
         if (mounted) setIsCardListId(!!ok);
-      } catch (e) {
+      } catch {
         if (mounted) setIsCardListId(false);
       }
     })();
@@ -91,7 +86,7 @@ export default function BenefitDetailPage() {
   // API 응답(우선) 또는 selected fallback
   const src = detail ?? (isIdValid ? null : selected);
 
-  // (보조) 진입 경로 기반 카드 리스트 판정 — API 실패 시 대비
+  // 진입 경로 기반 카드 판정
   const isFromCardList = useMemo(() => {
     const byState =
       location?.state?.source === 'card' ||
@@ -104,8 +99,15 @@ export default function BenefitDetailPage() {
     return !!(byState || byQuery || byPath || bySelected);
   }, [location?.state, location?.search, location?.pathname, selected]);
 
-  // 최종적으로 "카드 혜택 여부" 판단
-  const isCardBenefit = isCardListId || isFromCardList;
+  // 🔸 외부 링크가 없으면 카드 혜택 간주
+  const noExternalLink = useMemo(() => {
+    const link =
+      (src?.externalUrl ?? '') || (src?.infoLink ?? '');
+    return !String(link).trim();
+  }, [src]);
+
+  // 최종 카드 여부
+  const isCardBenefit = isCardListId || isFromCardList || noExternalLink;
 
   // -------- View 모델 --------
   const view = useMemo(() => {
@@ -155,8 +157,8 @@ export default function BenefitDetailPage() {
   const ctaLabelBottom = isCardBenefit ? '해당 카드로 결제해주세요' : '혜택 받으러 이동하기';
 
   const handleCtaClick = () => {
-    if (isCardBenefit) return; // 카드 혜택이면 동작 없음
-    setShowModal(true);        // 일반 혜택이면 모달 오픈
+    if (isCardBenefit) return;
+    setShowModal(true);
   };
 
   const handleConfirm = () => {
@@ -166,7 +168,6 @@ export default function BenefitDetailPage() {
     }
   };
 
-  // -------- Render --------
   if (loading) return null;
   if (error) return <div className={styles.pageWrapper}>🚨 {error}</div>;
   if (!view) return <div className={styles.pageWrapper}>혜택 정보가 없습니다.</div>;
@@ -230,7 +231,6 @@ export default function BenefitDetailPage() {
           </div>
         </div>
 
-        {/* 하단 CTA: 항상 보이되, 카드 혜택이면 비활성/문구 변경 */}
         <button
           onClick={handleCtaClick}
           className={styles.bottomButton}
@@ -240,7 +240,6 @@ export default function BenefitDetailPage() {
           {ctaLabelBottom}
         </button>
 
-        {/* 일반 혜택일 때만 모달이 열림 */}
         <ExternalLinkModal
           isOpen={showModal}
           onClose={() => setShowModal(false)}
