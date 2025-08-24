@@ -1,3 +1,4 @@
+// src/pages/FavoriteBenefitsPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FavoriteBenefitPage.module.css';
@@ -33,10 +34,10 @@ export default function FavoriteBenefitsPage() {
           setFavBrands(Array.isArray(brands) ? brands : []);
           const likeSet = new Set((brands || []).map(b => norm(b?.name)));
 
-          // 관심 브랜드 목록이 비어있지 않을 때만 추가 필터
+          // 관심 브랜드 목록이 비어있지 않을 때만 추가 필터 (교집합)
           if (likeSet.size > 0) {
-            filtered = serverGroups.filter(g => likeSet.has(norm(g.brand)));
-            if (filtered.length === 0) filtered = serverGroups;
+            const inter = serverGroups.filter(g => likeSet.has(norm(g.brand)));
+            filtered = inter.length > 0 ? inter : serverGroups;
           }
         } catch {
           // 관심 브랜드 API 실패 시에도 서버 응답은 그대로 사용
@@ -80,11 +81,14 @@ export default function FavoriteBenefitsPage() {
         {/* 브랜드별 섹션 */}
         {groups.map((g) => (
           <section key={g.brand} className={styles.brandSection}>
-            <h3 className={styles.brandHeader}>{g.brand}</h3>
+            <h3 className={styles.brandHeader}>
+              {/* ★ 별 아이콘 복구 (CSS 변경 없이 표시됨) */}
+              <span aria-hidden="true">★</span>&nbsp;{g.brand}
+            </h3>
             <div className={styles.benefitListColumn}>
               {g.benefits.map((b) => (
                 <BenefitListItem
-                  key={`${g.brand}-${b.id}`}
+                  key={`${g.brand}-${b.id}`}  // ← 키 템플릿 복구
                   id={b.id}
                   brand={g.brand}
                   description={b.description}
