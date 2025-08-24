@@ -39,7 +39,7 @@ export async function fetchTelcoBenefits() {
             const discountPercent = Number(item.discountPercent ?? 0) || 0;
             const discountType = (item.discountType ?? '').toString().trim();
 
-            // 📌 0일 때 퍼센트 빼고 타입만
+            // 0일 때 퍼센트 빼고 타입만
             const discountLabel =
                 discountPercent && discountType
                     ? `${discountPercent}% ${discountType}`
