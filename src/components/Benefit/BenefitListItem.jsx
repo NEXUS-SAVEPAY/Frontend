@@ -32,7 +32,8 @@ function BenefitListItem({
     e.stopPropagation();
 
     if (typeof onClickDetail === 'function') {
-      onClickDetail();
+      // ★ 컨텍스트를 부모에 전달해서 부모가 navigate할 때도 source를 붙일 수 있게 함
+      onClickDetail({ id, brand, source });
       return;
     }
     handleGoDetail();
