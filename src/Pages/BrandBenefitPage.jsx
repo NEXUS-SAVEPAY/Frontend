@@ -71,21 +71,34 @@ const BrandBenefitPage = () => {
     };
 
     // 서버 호출 + 매핑
-    // 서버 호출 (API에서 매핑까지 해줌)
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             setError('');
             try {
+                // 관심 브랜드 최신화
                 await syncFavorites();
-                // 🔹 API에서 이미 description 매핑 완료
-                const mapped = await fetchDiscountsByBrand(decodedBrand);
-                setBenefits(mapped);
+                // 브랜드별 혜택 불러오기
+                const data = await fetchDiscountsByBrand(decodedBrand);
+                console.log('[BrandBenefitPage] fetchDiscountsByBrand raw data:', data);
+                if (Array.isArray(data?.result)) {
+                    const mapped = data.result.map((it) => ({
+                        id: it.id,
+                        brand: it.brandName,
+                        description: `${it.discountPercent ?? ''}% 할인`,
+                        detail: it.details ?? '',
+                        imageSrc: it.brandImage ?? '',
+                        type: (it.source ?? '').toLowerCase(),
+                    }));
+                    setBenefits(mapped);
+                } else {
+                    setBenefits([]);
+                }
             } catch (e) {
                 console.error('[BrandBenefitPage] API 에러:', e);
                 setError(e?.message || '혜택을 불러오지 못했습니다.');
 
-                // fallback: 로컬 목데이터 (기존 그대로)
+                // fallback: 로컬 목데이터
                 const local = favoriteBrandBenefits.find(item => item.brand === decodedBrand);
                 const mappedLocal = (local?.benefits || []).map((it) => ({
                     id: it.id,
@@ -101,8 +114,8 @@ const BrandBenefitPage = () => {
             }
         };
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [decodedBrand]);
-
 
     // type별 분리
     const cardBenefits = benefits.filter((b) => b.type === 'card');

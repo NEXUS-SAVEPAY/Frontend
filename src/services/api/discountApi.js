@@ -20,34 +20,7 @@ async function fetchDiscountsByBrand(brandName) {
         throw new Error(text || `요청 실패 (${res.status})`);
     }
 
-    const data = await res.json();
-
-    // 🔹 응답 매핑: 0%일 때는 퍼센트 빼고 discountType만 표시
-    if (Array.isArray(data?.result)) {
-        return data.result.map((it) => {
-            const discountPercent = Number(it.discountPercent ?? 0) || 0;
-            const discountType = (it.discountType ?? '').toString().trim();
-
-            const discountLabel =
-                discountPercent && discountType
-                    ? `${discountPercent}% ${discountType}`
-                    : discountType || '';
-
-            return {
-                id: it.id,
-                brand: it.brandName,
-                description: discountLabel || it.details || '',
-                detail: it.details ?? '',
-                imageSrc: it.brandImage ?? '',
-                type: (it.source ?? '').toLowerCase(),
-                infoLink: it.infoLink ?? '',
-                pointInfo: it.pointInfo ?? '',
-                createdAt: it.createdAt ?? '',
-            };
-        });
-    }
-
-    return [];
+    return await res.json();
 }
 
 export { fetchDiscountsByBrand };
