@@ -1,6 +1,6 @@
 // src/pages/HomePage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
 
 import { registeredCardsAtom } from '../recoil/atoms/CardRegisterAtom';
@@ -96,7 +96,7 @@ function HomePage() {
   const [benefitLoading, setBenefitLoading] = useState(false);
   const [benefitError, setBenefitError] = useState('');
 
-  // ✨ favsFromServer를 인자로 받아 최신 목록 기준으로 필터 (상태 반영 지연 이슈 회피)
+  // ✨ favsFromServer를 인자로 받아 최신 목록 기준으로 필터
   const refreshBenefits = async (favsFromServer = []) => {
     setBenefitLoading(true);
     setBenefitError('');
@@ -166,6 +166,69 @@ function HomePage() {
     return Array.from(map.values());
   }, [interestOrPaymentBenefits]);
 
+  // ---------- 결제수단(카드/간편/통신) ----------
+  const registeredCards = useRecoilValue(registeredCardsAtom);
+  const userPaymentRaw = useRecoilValue(userPaymentsAtom);
+  const telcoInfo = useRecoilValue(userTelcoInfoAtom);
+
+  // ✅ 결제수단 원시 데이터 → 부모 프로바이더 문자열 배열로 정규화
+  const normalizeSimplePays = (raw) => {
+    const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    const set = new Set();
+
+    for (const it of arr) {
+      if (!it) continue;
+
+      if (typeof it === 'string') {
+        // 예: 'kakao_membership' → 'kakao'
+        const parent = it.split('_')[0];
+        if (parent) set.add(parent.toLowerCase());
+        continue;
+      }
+
+      if (typeof it === 'object') {
+        // 서버 객체형: { provider, company, image, isMembership }
+        const prov = (it.provider ?? '').toString().trim().toLowerCase();
+        if (prov) set.add(prov);
+        continue;
+      }
+    }
+
+    return [...set]; // 중복 제거된 부모 프로바이더 목록
+  };
+
+  const payParents = useMemo(() => normalizeSimplePays(userPaymentRaw), [userPaymentRaw]);
+
+  const PAYMENT_NAME = {
+    kakao: '카카오페이',
+    naver: '네이버페이',
+    toss:  '토스페이',
+    payco: '페이코',
+  };
+  const payIconMap = { kakao: kakaopayImg /* naver, toss, payco 아이콘 추가 가능 */ };
+  const telcoIconMap = { 'SKT': sktImg /* 'KT': ktImg, 'LG U+': lguplusImg */ };
+
+  const paymentItems = [
+    ...(registeredCards || []).map(card => ({
+      key: `card-${card.id}`,
+      name: card.name,
+      image: card.image,
+      onClick: () => navigate('/benefit/cards'),
+    })),
+    ...payParents.map(p => ({
+      key: `pay-${p}`,
+      name: PAYMENT_NAME[p] || p,
+      image: payIconMap[p],
+      onClick: () => navigate('/benefit/simplepay'),
+    })),
+    ...(telcoInfo?.telco ? [{
+      key: `telco-${telcoInfo.telco}`,
+      name: telcoInfo.telco,
+      image: telcoIconMap[telcoInfo.telco],
+      onClick: () => navigate('/benefit/telco'),
+    }] : []),
+  ];
+
   // 결제수단별 그룹핑 (필요 시 사용)
   const benefitsBySource = interestOrPaymentBenefits.reduce((acc, b) => {
     const key = b.source; // "CARD", "PAY", "TELCO"
@@ -212,45 +275,6 @@ function HomePage() {
       setTimeout(() => setShowNoResult(false), 2000);
     }
   };
-
-  // ---------- 결제수단(카드/간편/통신) ----------
-  const registeredCards = useRecoilValue(registeredCardsAtom);
-  const userPaymentRaw = useRecoilValue(userPaymentsAtom);
-  const telcoInfo = useRecoilValue(userTelcoInfoAtom);
-
-  const toArray = (v) => Array.isArray(v) ? v : (typeof v === 'string' && v ? [v] : []);
-  const rawPays = toArray(userPaymentRaw).filter(v => v && v !== 'none');
-  const payParents = [...new Set(rawPays.map(p => (typeof p === 'string' ? p.split('_')[0] : p)))];
-
-  const PAYMENT_NAME = {
-    kakao: '카카오페이',
-    naver: '네이버페이',
-    toss:  '토스페이',
-    payco: '페이코',
-  };
-  const payIconMap = { kakao: kakaopayImg /* naver, toss, payco 아이콘 추가 가능 */ };
-  const telcoIconMap = { 'SKT': sktImg /* 'KT': ktImg, 'LG U+': lguplusImg */ };
-
-  const paymentItems = [
-    ...(registeredCards || []).map(card => ({
-      key: `card-${card.id}`,
-      name: card.name,
-      image: card.image,
-      onClick: () => navigate('/benefit/cards'),
-    })),
-    ...payParents.map(p => ({
-      key: `pay-${p}`,
-      name: PAYMENT_NAME[p] || p,
-      image: payIconMap[p],
-      onClick: () => navigate('/benefit/simplepay'),
-    })),
-    ...(telcoInfo?.telco ? [{
-      key: `telco-${telcoInfo.telco}`,
-      name: telcoInfo.telco,
-      image: telcoIconMap[telcoInfo.telco],
-      onClick: () => navigate('/benefit/telco'),
-    }] : []),
-  ];
 
   // ---------- 홈 섹션 표시 조건 ----------
   const hasLikedBrands = favBrands.length > 0; // 서버 기준
@@ -316,8 +340,8 @@ function HomePage() {
         <div className={styles.logoWrapper}>
           <img src={logoImage} alt="SavePay 로고" className={styles.logo} />
         </div>
-        <SearchBar 
-          placeholder="혜택을 원하는 브랜드를 검색해주세요" 
+        <SearchBar
+          placeholder="혜택을 원하는 브랜드를 검색해주세요"
           onSearch={handleSearch}
         />
       </div>
@@ -331,7 +355,7 @@ function HomePage() {
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h1 className={styles.title}>추천혜택</h1>
-                <button 
+                <button
                   className={styles.viewAllButton}
                   onClick={() => navigate('/benefit/recommended')}
                 >
@@ -395,7 +419,12 @@ function HomePage() {
                           navigate(`/benefit/${encodeURIComponent(item.brandName)}`)
                         }
                       >
-                        <img src={item.brandImage} alt={item.brandName} className={styles.brandIcon} />
+                        <img
+                          src={item.brandImage || ''}
+                          alt={item.brandName}
+                          className={styles.brandIcon}
+                          onError={(e) => (e.currentTarget.src = '')}
+                        />
                         <span className={styles.brandLabel}>{item.brandName}</span>
                       </div>
                     ))}
@@ -420,7 +449,7 @@ function HomePage() {
                 </>
               ) : (
                 <>
-                  {/* 결제수단 아이콘 (원래 로직 유지) */}
+                  {/* 결제수단 아이콘 */}
                   <div className={styles.brandList}>
                     {paymentItems.map((item) => (
                       <div
@@ -428,7 +457,12 @@ function HomePage() {
                         className={styles.brandItem}
                         onClick={item.onClick}
                       >
-                        <img src={item.image} alt={item.name} className={styles.brandIcon} />
+                        <img
+                          src={item.image || ''}
+                          alt={item.name}
+                          className={styles.brandIcon}
+                          onError={(e) => (e.currentTarget.src = '')}
+                        />
                         <span className={styles.brandLabel}>{item.name}</span>
                       </div>
                     ))}
