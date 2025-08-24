@@ -7,7 +7,7 @@ import BenefitListItem from '../components/Benefit/BenefitListItem';
 import recommendedBenefits from '../data/mockRecommendBenefits';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
 
-// ✅ API
+// API
 import { fetchRecommendedBenefits } from '../services/api/benefitApi';
 
 function RecommendedBenefitPage() {

@@ -15,7 +15,7 @@ const REGISTERED_TOP2_FALLBACK = '/api/discount/payment';
 
 // 카테고리 "전체 목록" (id 집합 만들 용도) — 스웨거 실제 경로로 확정
 const CARD_LIST_PATH  = '/api/discount/card';
-const PAY_LIST_PATH   = '/api/discount/pay';   // ✅ pay는 payment로 확정
+const PAY_LIST_PATH   = '/api/discount/pay';   // pay는 payment로 확정
 const TELCO_LIST_PATH = '/api/discount/telecom';
 
 async function fetchJson(url) {
@@ -72,7 +72,7 @@ function mapBenefit(item) {
 async function fetchRegisteredTop2FlatInternal() {
   const candidates = REGISTERED_TOP2_ENV
     ? [REGISTERED_TOP2_ENV, REGISTERED_TOP2_FALLBACK]
-    : [REGISTERED_TOP2_FALLBACK]; // ❌ 미설정이면 /registered/top2 호출 안 함
+    : [REGISTERED_TOP2_FALLBACK]; // 미설정이면 /registered/top2 호출 안 함
 
   for (const p of candidates) {
     try {

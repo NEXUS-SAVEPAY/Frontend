@@ -4,7 +4,6 @@ import styles from './BrandSection.module.css';
 import brandIcons from '../../data/brandIcons';
 
 function BrandSection({ brands = [], onAdd, onBrandClick }) {
-    // brands: ['스타벅스', '올리브영'] 또는 [{ name: '스타벅스', image: '/...' }, ...]
     const displayBrands = brands.map((b) => {
         if (typeof b === 'string') {
             return { name: b, image: brandIcons[b] };

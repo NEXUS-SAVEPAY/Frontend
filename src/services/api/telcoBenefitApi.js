@@ -3,7 +3,7 @@ import { getAccessToken } from './token';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const withBase = (path) =>
-  new URL(`${BASE_URL}${path}`, typeof window !== 'undefined' ? window.location.origin : undefined);
+    new URL(`${BASE_URL}${path}`, typeof window !== 'undefined' ? window.location.origin : undefined);
 
 // 공통 fetch
 async function fetchJson(url) {
@@ -32,13 +32,14 @@ async function fetchJson(url) {
 export async function fetchTelcoBenefits() {
     const url = withBase('/api/discount/telecom');
     const data = await fetchJson(url);
-
+    console.log('[통신사 혜택 응답]', data);
+    
     // 백엔드 응답 구조에서 result 배열만 꺼내기
     if (data?.result && Array.isArray(data.result)) {
         return data.result.map((item) => ({
             id: item.id,
             brand: item.brandName,
-            imageSrc: item.image,
+            imageSrc: item.brandImage,
             description: `${item.discountPercent}% ${item.discountType}`, // ex: "10% 할인"
             detail: item.details,
             infoLink: item.infoLink,

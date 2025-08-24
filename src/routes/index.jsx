@@ -2,8 +2,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// ✅ 경로 대소문자 혼용이 있다면, 실제 폴더/파일명과 일치하도록 맞추세요.
-// (아래는 사용자가 제공한 import를 그대로 유지)
 import AuthDonePage from '../Pages/Auth/AuthCallbackPage';
 import OnboardingPage from '../Pages/Onboarding/OnboardingPage';
 import CardRegisterPage from '../Pages/CardRegister/CardRegisterPage';
@@ -46,7 +44,7 @@ function AppRoutes() {
         <Route path="/benefit/simplepay" element={<SimplePayBenefitPage />} />
         <Route path="/benefit/telco" element={<TelcoBenefitPage />} />
 
-        {/* ✅ 상세 → 브랜드 순서 (더 구체적인 경로를 위에 둠) */}
+        {/* 상세 → 브랜드 순서 (더 구체적인 경로를 위에 둠) */}
         <Route path="/benefit/:brand/:discountId" element={<BenefitDetailPage />} />
         <Route path="/benefit/:brand" element={<BrandBenefitPage />} />
 
@@ -60,7 +58,7 @@ function AppRoutes() {
         <Route path="/manage-simplepay" element={<PayRegisterPage isManageMode={true} />} />
         <Route path="/manage-telco" element={<TelcoRegisterPage isManageMode={true} />} />
 
-        {/* (선택) 404 페이지가 있다면 마지막에 추가 */}
+        {/* 404 페이지가 있다면 마지막에 추가 */}
         {/* <Route path="*" element={<NotFoundPage />} /> */}
       </Routes>
     </BrowserRouter>

@@ -31,7 +31,7 @@ export default function BenefitDetailPage() {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  // ✅ /api/discount/card 목록 포함 여부
+  // /api/discount/card 목록 포함 여부
   const [hideCtaByCardApi, setHideCtaByCardApi] = useState(false);
 
   // -------- 없는 id를 Recoil 선택값으로 정규화 --------
@@ -69,7 +69,7 @@ export default function BenefitDetailPage() {
     return () => { cancelled = true; };
   }, [isIdValid, discountId, idParam, legacyIdParam, selected?.id]);
 
-  // ✅ 현재 discountId가 /api/discount/card 목록에 속하는지 확인
+  // 현재 discountId가 /api/discount/card 목록에 속하는지 확인
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -99,7 +99,7 @@ export default function BenefitDetailPage() {
     return !!(byState || byQuery || byPath || bySelected);
   }, [location?.state, location?.search, location?.pathname, selected]);
 
-  // 🔒 최종 CTA 숨김 여부
+  // 최종 CTA 숨김 여부
   const hideCTA = hideCtaByCardApi || isFromCardList;
 
   // -------- View 모델 --------
@@ -173,7 +173,7 @@ export default function BenefitDetailPage() {
 
           <div className={styles.subTextRow}>
             {view.description && <p className={styles.subText}>{view.description}</p>}
-            {/* ✅ /api/discount/card 포함이면 CTA 미노출 */}
+            {/* /api/discount/card 포함이면 CTA 미노출 */}
             {!hideCTA && (
               <div className={styles.owlButtonWrapper}>
                 <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
@@ -214,7 +214,7 @@ export default function BenefitDetailPage() {
           </div>
         </div>
 
-        {/* ✅ /api/discount/card 포함이면 CTA/모달 제거 */}
+        {/* /api/discount/card 포함이면 CTA/모달 제거 */}
         {!hideCTA && (
           <>
             <button onClick={() => setShowModal(true)} className={styles.bottomButton}>

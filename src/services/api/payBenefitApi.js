@@ -31,7 +31,7 @@ async function fetchJson(url) {
 
 // 간편결제(페이) 혜택 조회
 export async function fetchPayBenefits() {
-  // ✅ 스웨거 실제 경로 확인 후 필요하면 수정 (예: '/api/discount/simplepay')
+  // 스웨거 실제 경로 확인 후 필요하면 수정 (예: '/api/discount/simplepay')
   const url = withBase('/api/discount/pay');
   const data = await fetchJson(url);
 

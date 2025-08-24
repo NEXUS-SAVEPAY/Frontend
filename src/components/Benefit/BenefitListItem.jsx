@@ -9,23 +9,33 @@ function BenefitListItem({
   description,    // 예: '20% 할인'
   detail,         // 상세 문구
   imageSrc,       // 백엔드 brandImage
-  infoLink,       // ✅ 외부 정보 링크 (보존용; 여기서는 사용 X)
+  infoLink,       // 외부 정보 링크 (보존용; 여기서는 사용 X)
   onClickDetail,  // 부모 콜백 우선
   source,         // 'card' | 'brand' | 'telco' ... (선택; 카드 목록이면 'card')
 }) {
   const navigate = useNavigate();
 
+  // 렌더 직전에 안전 변환 (UI 동일)
+  const t = (v) =>
+    typeof v === 'string' || typeof v === 'number' ? String(v) : '';
+  const s = (v) => (typeof v === 'string' ? v : '');
+
+  const safeId = t(id);
+  const safeBrand = t(brand);
+  const safeDesc = t(description);
+  const safeDetail = t(detail);
+  const safeImg = s(imageSrc) || brandIcons[safeBrand] || '';
+
   const handleGoDetail = () => {
-    if (!brand || id == null) return; // 가드
-    const safeBrand = encodeURIComponent(String(brand).trim());
+    if (!safeBrand || !safeId) return; // 가드
+    const url = `/benefit/${encodeURIComponent(safeBrand.trim())}/${safeId}${
+      source === 'card' ? '?source=card' : ''
+    }`;
 
-    // 카드 목록에서 온 경우에만 표식 부착
-    const isCard = source === 'card';
-    const url = `/benefit/${safeBrand}/${String(id)}${isCard ? '?source=card' : ''}`;
-
-    navigate(url, {
-      state: isCard ? { source: 'card' } : undefined,
-    });
+    navigate(
+      url,
+      source === 'card' ? { state: { source: 'card' } } : undefined
+    );
   };
 
   const handleDetailClick = (e) => {
@@ -39,21 +49,19 @@ function BenefitListItem({
     handleGoDetail();
   };
 
-  const imgSrc = imageSrc || brandIcons[brand] || '';
-
   return (
     <div
       className={styles.selectedBrandBenefit}
-      data-id={id}
-      data-brand={brand}
+      data-id={safeId}
+      data-brand={safeBrand}
       onClick={handleDetailClick}
       role="button"
       tabIndex={0}
     >
       <div className={styles.benefitTextBlock}>
-        <h4 className={styles.brandTitle}>{brand}</h4>
-        <h3 className={styles.brandDescription}>{description}</h3>
-        <p className={styles.brandSubText}>{detail}</p>
+        <h4 className={styles.brandTitle}>{safeBrand}</h4>
+        <h3 className={styles.brandDescription}>{safeDesc}</h3>
+        <p className={styles.brandSubText}>{safeDetail}</p>
 
         <button
           className={styles.detailButton}
@@ -65,11 +73,11 @@ function BenefitListItem({
       </div>
 
       <img
-        src={imgSrc}
-        alt={brand}
+        src={safeImg}
+        alt={safeBrand}
         className={styles.brandImage}
         onError={(e) => {
-          const fallback = brandIcons?.[brand];
+          const fallback = brandIcons?.[safeBrand];
           if (fallback && e.currentTarget.src !== fallback) {
             e.currentTarget.src = fallback;
           }

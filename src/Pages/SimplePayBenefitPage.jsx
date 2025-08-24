@@ -23,7 +23,7 @@ function SimplePayBenefitPage() {
       }
     })();
   }, []);
-
+  
   return (
     <div className={styles.container}>
       {/* 고정 헤더 */}

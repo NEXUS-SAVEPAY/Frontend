@@ -8,13 +8,13 @@ function MembershipSelector({ telco, onComplete }) {
 
     const handleYes = () => {
         setHasMembership(true);
-        setGrade(''); // ✅ 이전 등급 초기화
-        onComplete(null); // ✅ 완료 버튼 비활성화를 위해 초기화 전달
+        setGrade(''); // 이전 등급 초기화
+        onComplete(null); // 완료 버튼 비활성화를 위해 초기화 전달
     };
 
     const handleNo = () => {
         setHasMembership(false);
-        setGrade(''); // ✅ 등급 초기화
+        setGrade(''); // 등급 초기화
         onComplete({ hasMembership: false, grade: '' });
     };
 

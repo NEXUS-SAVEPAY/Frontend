@@ -94,7 +94,7 @@ function PayRegisterPage({ isManageMode = false }) {
     if (!isManageMode) return;
 
     if (Array.isArray(savedPayment)) {
-      // ✅ 객체 배열일 경우 company만 추출
+      // 객체 배열일 경우 company만 추출
       if (typeof savedPayment[0] === 'object') {
         setSelected(savedPayment.map((p) => p.company));
       } else {
