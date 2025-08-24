@@ -15,6 +15,7 @@ import {
   addFavoriteBrandByName,
   removeFavoriteBrandById,
 } from '../services/api/interestbrandApi';
+import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ★ 카드 혜택 판정 추가
 
 // 문자열 정규화 (공백 제거 + 소문자 변환)
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
@@ -29,6 +30,9 @@ const FavoriteBenefitPage = () => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // ★ 카드 혜택 ID 집합
+  const [cardIdSet, setCardIdSet] = useState(null); // Set<string> | null
 
   // 서버 목록 동기화
   useEffect(() => {
@@ -69,6 +73,40 @@ const FavoriteBenefitPage = () => {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ★ 그룹이 준비되면 카드 혜택 판정해서 Set 구성
+  useEffect(() => {
+    (async () => {
+      if (!groups || groups.length === 0) {
+        setCardIdSet(new Set());
+        return;
+      }
+      const allIds = Array.from(
+        new Set(
+          groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id)))
+        )
+      );
+      if (allIds.length === 0) {
+        setCardIdSet(new Set());
+        return;
+      }
+      try {
+        const results = await Promise.all(
+          allIds.map(async (id) => {
+            try {
+              const ok = await isCardDiscountId(id);
+              return ok ? id : null;
+            } catch {
+              return null;
+            }
+          })
+        );
+        setCardIdSet(new Set(results.filter(Boolean).map(String)));
+      } catch {
+        setCardIdSet(new Set());
+      }
+    })();
+  }, [groups]);
 
   // 서버 관심 브랜드 이름 Set
   const serverNameSet = useMemo(() => {
@@ -145,19 +183,23 @@ const FavoriteBenefitPage = () => {
               </button>
             </div>
 
-            {g.benefits.map((b) => (
-              <BenefitListItem
-                key={`${g.brand}-${b.id}`}
-                id={b.id}
-                brand={g.brand}
-                description={b.description}
-                detail={b.detail}
-                imageSrc={b.imageSrc || g.brandImage}
-                infoLink={b.infoLink}
-                pointInfo={b.pointInfo}
-                createdAt={b.createdAt}
-              />
-            ))}
+            {g.benefits.map((b) => {
+              const isCard = cardIdSet?.has(String(b.id)); // ★ 카드 여부
+              return (
+                <BenefitListItem
+                  key={`${g.brand}-${b.id}`}
+                  id={b.id}
+                  brand={g.brand}
+                  description={b.description}
+                  detail={b.detail}
+                  imageSrc={b.imageSrc || g.brandImage}
+                  infoLink={b.infoLink}
+                  pointInfo={b.pointInfo}
+                  createdAt={b.createdAt}
+                  source={isCard ? 'card' : undefined} // ★ 카드면 정보 전달
+                />
+              );
+            })}
           </div>
         ))}
       </div>
