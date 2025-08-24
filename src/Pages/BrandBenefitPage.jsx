@@ -8,13 +8,9 @@ import BenefitListItem from '../components/Benefit/BenefitListItem';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
 import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
 
-// 새 API import (여기서 이미 0% 처리됨)
+// 새 API import
 import { fetchDiscountsByBrand } from '../services/api/discountApi';
-import {
-    addFavoriteBrandByName,
-    removeFavoriteBrandById,
-    getUserFavoriteBrands,
-} from '../services/api/interestbrandApi';
+import { addFavoriteBrandByName, removeFavoriteBrandById, getUserFavoriteBrands } from '../services/api/interestbrandApi';
 
 const norm = (s) => (s ?? '').toString().trim().toLowerCase();
 
@@ -24,7 +20,7 @@ const BrandBenefitPage = () => {
     const navigate = useNavigate();
 
     const [likedBrands, setLikedBrands] = useRecoilState(likedBrandsAtom);
-    const [favBrands, setFavBrands] = useState([]);
+    const [favBrands, setFavBrands] = useState([]); // 서버에서 가져온 관심 브랜드 목록
     const isLiked = useMemo(
         () => !!favBrands.find((b) => norm(b.name) === norm(decodedBrand)),
         [favBrands, decodedBrand]
@@ -33,7 +29,7 @@ const BrandBenefitPage = () => {
     const [benefits, setBenefits] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [busy, setBusy] = useState(false);
+    const [busy, setBusy] = useState(false); // 중복 클릭 방지
 
     // 관심 브랜드 동기화
     const syncFavorites = async () => {
@@ -53,16 +49,18 @@ const BrandBenefitPage = () => {
     const toggleLike = async () => {
         if (busy) return;
         setBusy(true);
-
         try {
             if (!isLiked) {
+                // 관심 브랜드 추가
                 await addFavoriteBrandByName(decodedBrand);
             } else {
+                // 관심 브랜드 삭제 → 서버 ID 찾아서 삭제
                 const target = favBrands.find((b) => norm(b.name) === norm(decodedBrand));
                 if (target?.id) {
                     await removeFavoriteBrandById(target.id);
                 }
             }
+            // 서버와 동기화
             await syncFavorites();
         } catch (e) {
             console.error('[BrandBenefitPage] toggleLike error', e);
@@ -72,6 +70,7 @@ const BrandBenefitPage = () => {
         }
     };
 
+    // 서버 호출 + 매핑
     // 서버 호출 (API에서 매핑까지 해줌)
     useEffect(() => {
         const fetchData = async () => {
@@ -79,14 +78,15 @@ const BrandBenefitPage = () => {
             setError('');
             try {
                 await syncFavorites();
-                const mapped = await fetchDiscountsByBrand(decodedBrand); // 이미 매핑된 데이터
+                // 🔹 API에서 이미 description 매핑 완료
+                const mapped = await fetchDiscountsByBrand(decodedBrand);
                 setBenefits(mapped);
             } catch (e) {
                 console.error('[BrandBenefitPage] API 에러:', e);
                 setError(e?.message || '혜택을 불러오지 못했습니다.');
 
-                // fallback: 로컬 목데이터
-                const local = favoriteBrandBenefits.find((item) => item.brand === decodedBrand);
+                // fallback: 로컬 목데이터 (기존 그대로)
+                const local = favoriteBrandBenefits.find(item => item.brand === decodedBrand);
                 const mappedLocal = (local?.benefits || []).map((it) => ({
                     id: it.id,
                     brand: decodedBrand,
@@ -103,6 +103,7 @@ const BrandBenefitPage = () => {
         fetchData();
     }, [decodedBrand]);
 
+
     // type별 분리
     const cardBenefits = benefits.filter((b) => b.type === 'card');
     const simplePayBenefits = benefits.filter((b) => b.type === 'pay');
@@ -115,11 +116,7 @@ const BrandBenefitPage = () => {
                     <span className={styles.backButton} onClick={() => navigate('/home')}>〈</span>
                     <div className={styles.brandTitleWrapper}>
                         <h2 className={styles.pageTitle}>{decodedBrand}</h2>
-                        <button
-                            className={styles.starButton}
-                            onClick={toggleLike}
-                            disabled={busy}
-                        >
+                        <button className={styles.starButton} onClick={toggleLike} disabled={busy}>
                             {isLiked ? '★' : '☆'}
                         </button>
                     </div>
