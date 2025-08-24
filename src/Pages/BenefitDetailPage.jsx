@@ -32,7 +32,7 @@ export default function BenefitDetailPage() {
   const [showModal, setShowModal] = useState(false);
 
   // /api/discount/card 목록 포함 여부
-  const [hideCtaByCardApi, setHideCtaByCardApi] = useState(false);
+  const [isCardListId, setIsCardListId] = useState(false);
 
   // -------- 없는 id를 Recoil 선택값으로 정규화 --------
   useEffect(() => {
@@ -74,11 +74,11 @@ export default function BenefitDetailPage() {
     let mounted = true;
     (async () => {
       if (!isIdValid) {
-        if (mounted) setHideCtaByCardApi(false);
+        if (mounted) setIsCardListId(false);
         return;
       }
       const ok = await isCardDiscountId(discountId);
-      if (mounted) setHideCtaByCardApi(!!ok);
+      if (mounted) setIsCardListId(!!ok);
     })();
     return () => { mounted = false; };
   }, [isIdValid, discountId]);
@@ -99,8 +99,8 @@ export default function BenefitDetailPage() {
     return !!(byState || byQuery || byPath || bySelected);
   }, [location?.state, location?.search, location?.pathname, selected]);
 
-  // 최종 CTA 숨김 여부
-  const hideCTA = hideCtaByCardApi || isFromCardList;
+  // 최종적으로 "카드 혜택 여부" 판단
+  const isCardBenefit = isCardListId || isFromCardList;
 
   // -------- View 모델 --------
   const view = useMemo(() => {
@@ -131,7 +131,7 @@ export default function BenefitDetailPage() {
 
     // 카드 혜택이면 외부 이동 비활성화
     const externalUrlRaw = src.externalUrl || src.infoLink || '';
-    const externalUrl = hideCTA ? '' : externalUrlRaw;
+    const externalUrl = isCardBenefit ? '' : externalUrlRaw;
 
     return {
       brand: src.brand || src.brandName || '',
@@ -143,7 +143,16 @@ export default function BenefitDetailPage() {
       steps,
       externalUrl,
     };
-  }, [src, hideCTA]);
+  }, [src, isCardBenefit]);
+
+  // CTA 라벨 및 동작
+  const ctaLabelTop = isCardBenefit ? '해당 카드로 결제해주세요' : '혜택 받기 >';
+  const ctaLabelBottom = isCardBenefit ? '해당 카드로 결제해주세요' : '혜택 받으러 이동하기';
+
+  const handleCtaClick = () => {
+    if (isCardBenefit) return; // 카드 혜택이면 동작 없음
+    setShowModal(true);        // 일반 혜택이면 모달 오픈
+  };
 
   const handleConfirm = () => {
     setShowModal(false);
@@ -173,15 +182,17 @@ export default function BenefitDetailPage() {
 
           <div className={styles.subTextRow}>
             {view.description && <p className={styles.subText}>{view.description}</p>}
-            {/* /api/discount/card 포함이면 CTA 미노출 */}
-            {!hideCTA && (
-              <div className={styles.owlButtonWrapper}>
-                <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
-                <button onClick={() => setShowModal(true)} className={styles.inlineButton}>
-                  혜택 받기 &gt;
-                </button>
-              </div>
-            )}
+            <div className={styles.owlButtonWrapper}>
+              <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
+              <button
+                onClick={handleCtaClick}
+                className={styles.inlineButton}
+                disabled={isCardBenefit}
+                aria-disabled={isCardBenefit}
+              >
+                {ctaLabelTop}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -214,19 +225,22 @@ export default function BenefitDetailPage() {
           </div>
         </div>
 
-        {/* /api/discount/card 포함이면 CTA/모달 제거 */}
-        {!hideCTA && (
-          <>
-            <button onClick={() => setShowModal(true)} className={styles.bottomButton}>
-              혜택 받으러 이동하기
-            </button>
-            <ExternalLinkModal
-              isOpen={showModal}
-              onClose={() => setShowModal(false)}
-              onConfirm={handleConfirm}
-            />
-          </>
-        )}
+        {/* 하단 CTA: 항상 보이되, 카드 혜택이면 비활성/문구 변경 */}
+        <button
+          onClick={handleCtaClick}
+          className={styles.bottomButton}
+          disabled={isCardBenefit}
+          aria-disabled={isCardBenefit}
+        >
+          {ctaLabelBottom}
+        </button>
+
+        {/* 일반 혜택일 때만 모달이 열림 */}
+        <ExternalLinkModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleConfirm}
+        />
       </div>
     </div>
   );
