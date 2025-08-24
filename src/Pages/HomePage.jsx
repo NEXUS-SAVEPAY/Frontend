@@ -193,24 +193,24 @@ function HomePage() {
         ...(registeredCards || []).map((card) => ({
             key: `card-${card.id}`,
             name: card.name,
-            image: card.image,
+            image: card.image,  // DB에서 받은 카드 이미지
             onClick: () => navigate('/benefit/cards'),
         })),
-        ...payParents.map((p) => ({
-            key: `pay-${p}`,
-            name: PAYMENT_NAME[p] || p,
-            image: payIconMap[p],
+        ...(Array.isArray(userPaymentRaw) ? userPaymentRaw : [userPaymentRaw]).map((pay, idx) => ({
+            key: `pay-${pay.provider || idx}`,
+            name: pay.provider || '간편결제',
+            image: pay.image || '',  // DB에서 내려준 간편결제 아이콘
             onClick: () => navigate('/benefit/simplepay'),
         })),
         ...(telcoInfo?.telco
             ? [{
                 key: `telco-${telcoInfo.telco}`,
                 name: telcoInfo.telco,
-                image: telcoIconMap[telcoInfo.telco],
+                image: telcoInfo.image || '',  // DB에 저장된 통신사 아이콘
                 onClick: () => navigate('/benefit/telco'),
             }]
             : []),
-    ];
+    ];    
 
     // 최초 진입
     useEffect(() => {
