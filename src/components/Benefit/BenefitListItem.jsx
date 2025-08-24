@@ -15,27 +15,17 @@ function BenefitListItem({
 }) {
   const navigate = useNavigate();
 
-  // 렌더 직전에 안전 변환 (UI 동일)
-  const t = (v) =>
-    typeof v === 'string' || typeof v === 'number' ? String(v) : '';
-  const s = (v) => (typeof v === 'string' ? v : '');
-
-  const safeId = t(id);
-  const safeBrand = t(brand);
-  const safeDesc = t(description);
-  const safeDetail = t(detail);
-  const safeImg = s(imageSrc) || brandIcons[safeBrand] || '';
-
   const handleGoDetail = () => {
-    if (!safeBrand || !safeId) return; // 가드
-    const url = `/benefit/${encodeURIComponent(safeBrand.trim())}/${safeId}${
-      source === 'card' ? '?source=card' : ''
-    }`;
+    if (!brand || id == null) return; // 가드
+    const safeBrand = encodeURIComponent(String(brand).trim());
 
-    navigate(
-      url,
-      source === 'card' ? { state: { source: 'card' } } : undefined
-    );
+    // 카드 목록에서 온 경우에만 표식 부착
+    const isCard = source === 'card';
+    const url = `/benefit/${safeBrand}/${String(id)}${isCard ? '?source=card' : ''}`;
+
+    navigate(url, {
+      state: isCard ? { source: 'card' } : undefined,
+    });
   };
 
   const handleDetailClick = (e) => {
@@ -49,19 +39,21 @@ function BenefitListItem({
     handleGoDetail();
   };
 
+  const imgSrc = imageSrc || brandIcons[brand] || '';
+
   return (
     <div
       className={styles.selectedBrandBenefit}
-      data-id={safeId}
-      data-brand={safeBrand}
+      data-id={id}
+      data-brand={brand}
       onClick={handleDetailClick}
       role="button"
       tabIndex={0}
     >
       <div className={styles.benefitTextBlock}>
-        <h4 className={styles.brandTitle}>{safeBrand}</h4>
-        <h3 className={styles.brandDescription}>{safeDesc}</h3>
-        <p className={styles.brandSubText}>{safeDetail}</p>
+        <h4 className={styles.brandTitle}>{brand}</h4>
+        <h3 className={styles.brandDescription}>{description}</h3>
+        <p className={styles.brandSubText}>{detail}</p>
 
         <button
           className={styles.detailButton}
@@ -73,11 +65,11 @@ function BenefitListItem({
       </div>
 
       <img
-        src={safeImg}
-        alt={safeBrand}
+        src={imgSrc}
+        alt={brand}
         className={styles.brandImage}
         onError={(e) => {
-          const fallback = brandIcons?.[safeBrand];
+          const fallback = brandIcons?.[brand];
           if (fallback && e.currentTarget.src !== fallback) {
             e.currentTarget.src = fallback;
           }
