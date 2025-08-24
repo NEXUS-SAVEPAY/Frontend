@@ -9,7 +9,6 @@ function BenefitListItem({
   description,    // 예: '20% 할인'
   detail,         // 상세 문구
   imageSrc,       // 백엔드 brandImage
-  infoLink,       // 외부 정보 링크 (보존용; 여기서는 사용 X)
   onClickDetail,  // 부모 콜백 우선
   source,         // 'card' | 'brand' | 'telco' ... (선택; 카드 목록이면 'card')
 }) {
@@ -33,7 +32,8 @@ function BenefitListItem({
     e.stopPropagation();
 
     if (typeof onClickDetail === 'function') {
-      onClickDetail();
+      // ★ 컨텍스트를 부모에 전달해서 부모가 navigate할 때도 source를 붙일 수 있게 함
+      onClickDetail({ id, brand, source });
       return;
     }
     handleGoDetail();

@@ -15,7 +15,6 @@ export default function BenefitDetailPage() {
   const { brand, discountId: idParam, id: legacyIdParam } = useParams();
   const selected = useRecoilValue(selectedBenefitAtom);
 
-  // -------- id 정규화 --------
   const discountId = String(
     idParam ?? legacyIdParam ?? selected?.id ?? selected?.discountId ?? ''
   ).trim();
@@ -25,16 +24,13 @@ export default function BenefitDetailPage() {
     discountId.toLowerCase() !== 'undefined' &&
     discountId.toLowerCase() !== 'null';
 
-  // -------- 상태 --------
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  // /api/discount/card 목록 포함 여부
-  const [hideCtaByCardApi, setHideCtaByCardApi] = useState(false);
+  const [isCardListId, setIsCardListId] = useState(false);
 
-  // -------- 없는 id를 Recoil 선택값으로 정규화 --------
   useEffect(() => {
     if (!isIdValid && selected?.id) {
       const brandForUrl = selected.brand ?? selected.brandName ?? 'brand';
@@ -42,7 +38,6 @@ export default function BenefitDetailPage() {
     }
   }, [isIdValid, selected?.id, selected?.brand, selected?.brandName, navigate]);
 
-  // -------- 상세 Fetch --------
   useEffect(() => {
     let cancelled = false;
 
@@ -69,16 +64,21 @@ export default function BenefitDetailPage() {
     return () => { cancelled = true; };
   }, [isIdValid, discountId, idParam, legacyIdParam, selected?.id]);
 
-  // 현재 discountId가 /api/discount/card 목록에 속하는지 확인
+  // /api/discount/card 포함 여부 (실패 시 false로 안전 처리)
   useEffect(() => {
     let mounted = true;
     (async () => {
       if (!isIdValid) {
-        if (mounted) setHideCtaByCardApi(false);
+        if (mounted) setIsCardListId(false);
         return;
       }
-      const ok = await isCardDiscountId(discountId);
-      if (mounted) setHideCtaByCardApi(!!ok);
+      try {
+        const maybeNum = /^\d+$/.test(String(discountId)) ? Number(discountId) : discountId;
+        const ok = await isCardDiscountId(maybeNum);
+        if (mounted) setIsCardListId(!!ok);
+      } catch {
+        if (mounted) setIsCardListId(false);
+      }
     })();
     return () => { mounted = false; };
   }, [isIdValid, discountId]);
@@ -86,7 +86,7 @@ export default function BenefitDetailPage() {
   // API 응답(우선) 또는 selected fallback
   const src = detail ?? (isIdValid ? null : selected);
 
-  // (보조) 진입 경로 기반 카드 리스트 판정 — API 실패 시 대비
+  // 진입 경로 기반 카드 판정
   const isFromCardList = useMemo(() => {
     const byState =
       location?.state?.source === 'card' ||
@@ -99,8 +99,15 @@ export default function BenefitDetailPage() {
     return !!(byState || byQuery || byPath || bySelected);
   }, [location?.state, location?.search, location?.pathname, selected]);
 
-  // 최종 CTA 숨김 여부
-  const hideCTA = hideCtaByCardApi || isFromCardList;
+  // 🔸 외부 링크가 없으면 카드 혜택 간주
+  const noExternalLink = useMemo(() => {
+    const link =
+      (src?.externalUrl ?? '') || (src?.infoLink ?? '');
+    return !String(link).trim();
+  }, [src]);
+
+  // 최종 카드 여부
+  const isCardBenefit = isCardListId || isFromCardList || noExternalLink;
 
   // -------- View 모델 --------
   const view = useMemo(() => {
@@ -131,7 +138,7 @@ export default function BenefitDetailPage() {
 
     // 카드 혜택이면 외부 이동 비활성화
     const externalUrlRaw = src.externalUrl || src.infoLink || '';
-    const externalUrl = hideCTA ? '' : externalUrlRaw;
+    const externalUrl = isCardBenefit ? '' : externalUrlRaw;
 
     return {
       brand: src.brand || src.brandName || '',
@@ -143,7 +150,16 @@ export default function BenefitDetailPage() {
       steps,
       externalUrl,
     };
-  }, [src, hideCTA]);
+  }, [src, isCardBenefit]);
+
+  // CTA 라벨 및 동작
+  const ctaLabelTop = isCardBenefit ? '해당 카드로 결제해주세요' : '혜택 받기 >';
+  const ctaLabelBottom = isCardBenefit ? '해당 카드로 결제해주세요' : '혜택 받으러 이동하기';
+
+  const handleCtaClick = () => {
+    if (isCardBenefit) return;
+    setShowModal(true);
+  };
 
   const handleConfirm = () => {
     setShowModal(false);
@@ -152,7 +168,6 @@ export default function BenefitDetailPage() {
     }
   };
 
-  // -------- Render --------
   if (loading) return null;
   if (error) return <div className={styles.pageWrapper}>🚨 {error}</div>;
   if (!view) return <div className={styles.pageWrapper}>혜택 정보가 없습니다.</div>;
@@ -173,15 +188,17 @@ export default function BenefitDetailPage() {
 
           <div className={styles.subTextRow}>
             {view.description && <p className={styles.subText}>{view.description}</p>}
-            {/* /api/discount/card 포함이면 CTA 미노출 */}
-            {!hideCTA && (
-              <div className={styles.owlButtonWrapper}>
-                <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
-                <button onClick={() => setShowModal(true)} className={styles.inlineButton}>
-                  혜택 받기 &gt;
-                </button>
-              </div>
-            )}
+            <div className={styles.owlButtonWrapper}>
+              <img src={owlImage} alt="혜택 부엉이" className={styles.owlIcon} />
+              <button
+                onClick={handleCtaClick}
+                className={styles.inlineButton}
+                disabled={isCardBenefit}
+                aria-disabled={isCardBenefit}
+              >
+                {ctaLabelTop}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -214,19 +231,20 @@ export default function BenefitDetailPage() {
           </div>
         </div>
 
-        {/* /api/discount/card 포함이면 CTA/모달 제거 */}
-        {!hideCTA && (
-          <>
-            <button onClick={() => setShowModal(true)} className={styles.bottomButton}>
-              혜택 받으러 이동하기
-            </button>
-            <ExternalLinkModal
-              isOpen={showModal}
-              onClose={() => setShowModal(false)}
-              onConfirm={handleConfirm}
-            />
-          </>
-        )}
+        <button
+          onClick={handleCtaClick}
+          className={styles.bottomButton}
+          disabled={isCardBenefit}
+          aria-disabled={isCardBenefit}
+        >
+          {ctaLabelBottom}
+        </button>
+
+        <ExternalLinkModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onConfirm={handleConfirm}
+        />
       </div>
     </div>
   );
