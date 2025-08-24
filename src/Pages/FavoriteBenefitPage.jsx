@@ -31,7 +31,7 @@ const FavoriteBenefitPage = () => {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
 
-  // ★ 카드 혜택 ID 집합
+  // ★ 카드 혜택 ID 집합(사전 최적화; 없어도 동작)
   const [cardIdSet, setCardIdSet] = useState(null); // Set<string> | null
 
   // 서버 목록 동기화
@@ -74,32 +74,28 @@ const FavoriteBenefitPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ★ 그룹이 준비되면 카드 혜택 판정해서 Set 구성
+  // ★ 그룹이 준비되면 카드 혜택 판정해서 Set 구성(있으면 사용, 없어도 아래 클릭시 재확인)
   useEffect(() => {
     (async () => {
       if (!groups || groups.length === 0) {
         setCardIdSet(new Set());
         return;
       }
-      const allIds = Array.from(
-        new Set(groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id))))
-      );
-      if (allIds.length === 0) {
+      const ids = Array.from(new Set(groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id)))));
+      if (ids.length === 0) {
         setCardIdSet(new Set());
         return;
       }
       try {
-        const results = await Promise.all(
-          allIds.map(async (id) => {
-            try {
-              const ok = await isCardDiscountId(id);
-              return ok ? id : null;
-            } catch {
-              return null;
-            }
-          })
-        );
-        setCardIdSet(new Set(results.filter(Boolean).map(String)));
+        const res = await Promise.all(ids.map(async (id) => {
+          try {
+            const ok = await isCardDiscountId(/^\d+$/.test(id) ? Number(id) : id);
+            return ok ? id : null;
+          } catch {
+            return null;
+          }
+        }));
+        setCardIdSet(new Set(res.filter(Boolean).map(String)));
       } catch {
         setCardIdSet(new Set());
       }
@@ -147,6 +143,34 @@ const FavoriteBenefitPage = () => {
     }
   };
 
+  // ★ 클릭 시 최종 확인하고 이동 (자식의 source 우선)
+  const openDetailWithCardCheck = async ({ id, brand, source }) => {
+    const safeBrand = encodeURIComponent(String(brand).trim());
+    let isCard = false;
+
+    // A) 자식이 이미 source='card'로 넘겼다면 최우선 존중
+    if (source === 'card') isCard = true;
+
+    // B) 사전 판정 Set
+    if (!isCard && cardIdSet && cardIdSet.size > 0) {
+      isCard = cardIdSet.has(String(id));
+    }
+
+    // C) 클릭 시점 최종 확인 (id 숫자형 변환 시도)
+    if (!isCard) {
+      const maybeNum = /^\d+$/.test(String(id)) ? Number(id) : id;
+      try {
+        isCard = !!(await isCardDiscountId(maybeNum));
+      } catch {
+        isCard = false;
+      }
+    }
+
+    navigate(`/benefit/${safeBrand}/${String(id)}${isCard ? '?source=card' : ''}`, {
+      state: isCard ? { source: 'card' } : undefined,
+    });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -177,7 +201,8 @@ const FavoriteBenefitPage = () => {
             </div>
 
             {g.benefits.map((b) => {
-              const isCard = cardIdSet?.has(String(b.id)); // ★ 카드 여부
+              // 사전 판정은 있으면 UI 힌트로만 사용 (navigate는 클릭 시 최종 확인)
+              const isCard = cardIdSet?.has(String(b.id));
               return (
                 <BenefitListItem
                   key={`${g.brand}-${b.id}`}
@@ -189,7 +214,8 @@ const FavoriteBenefitPage = () => {
                   infoLink={b.infoLink}
                   pointInfo={b.pointInfo}
                   createdAt={b.createdAt}
-                  source={isCard ? 'card' : undefined} // ★ 카드면 정보 전달
+                  source={isCard ? 'card' : undefined}
+                  onClickDetail={openDetailWithCardCheck}   // ★ 클릭 시점 최종 확인 & 이동
                 />
               );
             })}

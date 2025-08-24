@@ -69,7 +69,7 @@ export default function BenefitDetailPage() {
     return () => { cancelled = true; };
   }, [isIdValid, discountId, idParam, legacyIdParam, selected?.id]);
 
-  // 현재 discountId가 /api/discount/card 목록에 속하는지 확인
+  // 현재 discountId가 /api/discount/card 목록에 속하는지 확인 (실패 대비)
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -77,8 +77,13 @@ export default function BenefitDetailPage() {
         if (mounted) setIsCardListId(false);
         return;
       }
-      const ok = await isCardDiscountId(discountId);
-      if (mounted) setIsCardListId(!!ok);
+      try {
+        const maybeNum = /^\d+$/.test(String(discountId)) ? Number(discountId) : discountId;
+        const ok = await isCardDiscountId(maybeNum);
+        if (mounted) setIsCardListId(!!ok);
+      } catch (e) {
+        if (mounted) setIsCardListId(false);
+      }
     })();
     return () => { mounted = false; };
   }, [isIdValid, discountId]);
