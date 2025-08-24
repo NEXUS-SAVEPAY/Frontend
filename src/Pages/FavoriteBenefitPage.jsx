@@ -3,19 +3,19 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
-import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
-import BenefitListItem from '../components/Benefit/BenefitListItem';
-import OwlScrollTop from '../components/Common/OwlScrollTop';
+import { likedBrandsAtom } from '../../recoil/atoms/likedBrandsAtom';
+import BenefitListItem from '../../components/Benefit/BenefitListItem';
+import OwlScrollTop from '../../components/Common/OwlScrollTop';
 import styles from './FavoriteBenefitPage.module.css';
 
 // API
-import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
+import { fetchFavoriteBenefits } from '../../services/api/favoriteBenefitApi';
 import {
   getUserFavoriteBrands,
   addFavoriteBrandByName,
   removeFavoriteBrandById,
-} from '../services/api/interestbrandApi';
-import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ★ 카드 혜택 판정 추가
+} from '../../services/api/interestbrandApi';
+import { isCardDiscountId } from '../../services/api/cardBenefitApi'; // ★ 카드 혜택 판정
 
 // 문자열 정규화 (공백 제거 + 소문자 변환)
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
@@ -82,9 +82,7 @@ const FavoriteBenefitPage = () => {
         return;
       }
       const allIds = Array.from(
-        new Set(
-          groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id)))
-        )
+        new Set(groups.flatMap((g) => (g.benefits || []).map((b) => String(b.id))))
       );
       if (allIds.length === 0) {
         setCardIdSet(new Set());
@@ -131,9 +129,7 @@ const FavoriteBenefitPage = () => {
           await removeFavoriteBrandById(target.id);
 
           // UI에서도 해당 그룹 제거
-          setGroups((prev) =>
-            prev.filter((g) => norm(g.brand) !== norm(brandName))
-          );
+          setGroups((prev) => prev.filter((g) => norm(g.brand) !== norm(brandName)));
         }
       }
 
@@ -166,10 +162,7 @@ const FavoriteBenefitPage = () => {
             {/* 브랜드명 + (첫 번째만 뒤로가기 버튼) + 즐겨찾기 버튼 */}
             <div className={styles.brandTitleWrapper}>
               {index === 0 && (
-                <span
-                  className={styles.backButton}
-                  onClick={() => navigate(-1)}
-                >
+                <span className={styles.backButton} onClick={() => navigate(-1)}>
                   〈
                 </span>
               )}
