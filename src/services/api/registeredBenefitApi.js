@@ -36,12 +36,12 @@ function pickArray(data) {
   return [];
 }
 
-// ✅ 공통 description 포맷 (다른 API와 통일)
+// 공통 description 포맷 
 function mapBenefit(item) {
   const discountPercent = Number(item?.discountPercent ?? 0) || 0;
   const discountType = (item?.discountType ?? '').toString().trim();
 
-  // 📌 Telco/FavoriteBenefitPage와 같은 방식: 퍼센트 + 타입
+  // Telco/FavoriteBenefitPage와 같은 방식: 퍼센트 + 타입
   const discountLabel =
     discountPercent && discountType
       ? `${discountPercent}% ${discountType}`
@@ -53,7 +53,7 @@ function mapBenefit(item) {
     id: item?.id,
     brand: item?.brandName,
     imageSrc: item?.brandImage,
-    description,          // ✅ 다른 페이지와 동일한 형식
+    description,          // 다른 페이지와 동일한 형식
     detail: item?.details ?? '',
     infoLink: item?.infoLink ?? '',
     pointInfo: item?.pointInfo ?? '',
