@@ -35,16 +35,27 @@ export async function fetchPayBenefits() {
   const url = withBase('/api/discount/pay');
   const data = await fetchJson(url);
 
-  // 응답 result 배열 → 프론트에서 쓰기 좋은 형태로 매핑
   const list = Array.isArray(data?.result) ? data.result : [];
-  return list.map((item) => ({
-    id: item.id,
-    brand: item.brandName,
-    imageSrc: item.brandImage,
-    description: `${item.discountPercent}% ${item.discountType}`.trim(), // 예: "10% 할인"
-    detail: item.details,
-    infoLink: item.infoLink,
-    pointInfo: item.pointInfo,
-    createdAt: item.createdAt,
-  }));
+  return list.map((item) => {
+    const discountPercent = Number(item.discountPercent ?? 0) || 0;
+    const discountType = (item.discountType ?? '').toString().trim();
+
+    // 📌 0일 때는 퍼센트 빼고 타입만
+    const discountLabel =
+      discountPercent && discountType
+        ? `${discountPercent}% ${discountType}`
+        : discountType || '';
+
+    return {
+      id: item.id,
+      brand: item.brandName,
+      imageSrc: item.brandImage,
+      description: discountLabel || item.details || '',
+      detail: item.details,
+      infoLink: item.infoLink,
+      pointInfo: item.pointInfo,
+      createdAt: item.createdAt,
+    };
+  });
 }
+

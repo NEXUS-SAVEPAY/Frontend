@@ -156,29 +156,24 @@ export function mapCardBenefitToUI(it, idx) {
   if (!id) id = `tmp-${idx}`;
 
   const brand = norm(it?.brand ?? it?.brandName);
-  const discountPercentRaw = it?.discountPercent;
-
-  // percent 안전 처리 (10 -> 10%, '10' -> 10%, '10%' 유지)
-  const percentPart =
-    typeof discountPercentRaw === 'number'
-      ? `${discountPercentRaw}%`
-      : (norm(discountPercentRaw) || '').replace(/\s*%?$/, (m) =>
-          (m && m.includes('%')) ? m : '%'
-        );
-
+  const discountPercent = Number(it?.discountPercent ?? 0) || 0;
   const discountType = norm(it?.discountType);
+
+  // 0%일 때는 퍼센트 없이 타입만
+  const discountLabel =
+    discountPercent && discountType
+      ? `${discountPercent}% ${discountType}`
+      : discountType || '';
+
   const details = norm(it?.details);
   const pointInfo = norm(it?.pointInfo);
   const brandImage = norm(it?.brandImage);
   const infoLink = norm(it?.infoLink ?? it?.externalUrl ?? '');
 
-  // 항상 어느 정도 정보가 보이도록 보강
   const detail = joinParts(details, pointInfo) || '상세 내용을 확인해 주세요';
-  const description =
-    joinParts(discountType, percentPart) ||
-    details ||
-    pointInfo ||
-    '혜택 상세';
+
+  // description 로직만 변경
+  const description = discountLabel || details || pointInfo || '혜택 상세';
 
   return {
     id,

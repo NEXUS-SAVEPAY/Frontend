@@ -34,18 +34,29 @@ export async function fetchTelcoBenefits() {
     const data = await fetchJson(url);
     console.log('[통신사 혜택 응답]', data);
     
-    // 백엔드 응답 구조에서 result 배열만 꺼내기
     if (data?.result && Array.isArray(data.result)) {
-        return data.result.map((item) => ({
-            id: item.id,
-            brand: item.brandName,
-            imageSrc: item.brandImage,
-            description: `${item.discountPercent}% ${item.discountType}`, // ex: "10% 할인"
-            detail: item.details,
-            infoLink: item.infoLink,
-            pointInfo: item.pointInfo,
-            createdAt: item.createdAt,
-        }));
+        return data.result.map((item) => {
+            const discountPercent = Number(item.discountPercent ?? 0) || 0;
+            const discountType = (item.discountType ?? '').toString().trim();
+
+            // 📌 0일 때 퍼센트 빼고 타입만
+            const discountLabel =
+                discountPercent && discountType
+                    ? `${discountPercent}% ${discountType}`
+                    : discountType || '';
+
+            return {
+                id: item.id,
+                brand: item.brandName,
+                imageSrc: item.brandImage,
+                description: discountLabel || item.details || '',
+                detail: item.details,
+                infoLink: item.infoLink,
+                pointInfo: item.pointInfo,
+                createdAt: item.createdAt,
+            };
+        });
     }
     return [];
 }
+
