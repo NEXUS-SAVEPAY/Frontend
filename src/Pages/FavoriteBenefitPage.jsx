@@ -3,19 +3,19 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 
-import { likedBrandsAtom } from '../../recoil/atoms/likedBrandsAtom';
-import BenefitListItem from '../../components/Benefit/BenefitListItem';
-import OwlScrollTop from '../../components/Common/OwlScrollTop';
+import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
+import BenefitListItem from '../components/Benefit/BenefitListItem';
+import OwlScrollTop from '../components/Common/OwlScrollTop';
 import styles from './FavoriteBenefitPage.module.css';
 
 // API
-import { fetchFavoriteBenefits } from '../../services/api/favoriteBenefitApi';
+import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
 import {
   getUserFavoriteBrands,
   addFavoriteBrandByName,
   removeFavoriteBrandById,
-} from '../../services/api/interestbrandApi';
-import { isCardDiscountId } from '../../services/api/cardBenefitApi'; // 카드 혜택 판정
+} from '../services/api/interestbrandApi';
+import { isCardDiscountId } from '../services/api/cardBenefitApi'; // 카드 혜택 판정
 
 // 문자열 정규화 (공백 제거 + 소문자 변환)
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
