@@ -1,4 +1,3 @@
-// src/pages/FavoriteBenefitsPage.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FavoriteBenefitPage.module.css';
@@ -24,22 +23,19 @@ export default function FavoriteBenefitsPage() {
         setLoading(true);
         setErr('');
 
-        // 1) 서버가 이미 "관심사 기반"으로 돌려주므로
-        //    우선 전체를 받아온다.
+        // 1) 서버가 이미 "관심사 기반"으로 돌려주므로 우선 전체를 받아온다.
         const serverGroups = await fetchFavoriteBenefits();
 
         // 2) (선택) 관심 브랜드 목록이 정상 응답이면 이름이 완전히 다른 경우를 대비해 얇게 필터
-        //    - 서버가 이미 필터해주면 likeSet과 매칭되지 않아도 serverGroups를 그대로 사용
         let filtered = serverGroups;
-
         try {
           const brands = await getUserFavoriteBrands();
           setFavBrands(Array.isArray(brands) ? brands : []);
           const likeSet = new Set((brands || []).map(b => norm(b?.name)));
-          // 관심 브랜드 목록이 비어있지 않을 때만 추가 필터 (안 비면 교집합 느낌으로)
+
+          // 관심 브랜드 목록이 비어있지 않을 때만 추가 필터
           if (likeSet.size > 0) {
             filtered = serverGroups.filter(g => likeSet.has(norm(g.brand)));
-            // 만약 교집합이 비면 서버 응답을 그대로 사용 (서버가 이미 관심사 기준이라고 가정)
             if (filtered.length === 0) filtered = serverGroups;
           }
         } catch {
