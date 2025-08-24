@@ -1,10 +1,14 @@
-// src/pages/FavoriteBenefitsPage.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+// src/pages/FavoriteBenefit/FavoriteBenefitPage.jsx
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './FavoriteBenefitPage.module.css';
+import { useRecoilState } from 'recoil';
+
+import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
+import styles from './FavoriteBenefitPage.module.css';
 
+// API
 import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
 import { getUserFavoriteBrands } from '../services/api/interestbrandApi';
 import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ★ 카드 혜택 판정
