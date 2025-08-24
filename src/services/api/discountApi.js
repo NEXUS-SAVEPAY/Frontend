@@ -1,3 +1,4 @@
+// src/services/api/discountApi.js
 import { getAccessToken } from './token';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
@@ -21,30 +22,32 @@ async function fetchDiscountsByBrand(brandName) {
 
     const data = await res.json();
 
-    // result 배열을 안전하게 매핑
-    const list = Array.isArray(data?.result) ? data.result : [];
+    // 🔹 응답 매핑: 0%일 때는 퍼센트 빼고 discountType만 표시
+    if (Array.isArray(data?.result)) {
+        return data.result.map((it) => {
+            const discountPercent = Number(it.discountPercent ?? 0) || 0;
+            const discountType = (it.discountType ?? '').toString().trim();
 
-    return list.map((item) => {
-        const discountPercent = Number(item?.discountPercent ?? 0) || 0;
-        const discountType = (item?.discountType ?? '').toString().trim();
+            const discountLabel =
+                discountPercent && discountType
+                    ? `${discountPercent}% ${discountType}`
+                    : discountType || '';
 
-        // 0%일 때는 퍼센트 없이 discountType만
-        const discountLabel =
-            discountPercent && discountType
-                ? `${discountPercent}% ${discountType}`
-                : discountType || '';
+            return {
+                id: it.id,
+                brand: it.brandName,
+                description: discountLabel || it.details || '',
+                detail: it.details ?? '',
+                imageSrc: it.brandImage ?? '',
+                type: (it.source ?? '').toLowerCase(),
+                infoLink: it.infoLink ?? '',
+                pointInfo: it.pointInfo ?? '',
+                createdAt: it.createdAt ?? '',
+            };
+        });
+    }
 
-        return {
-            id: item.id,
-            brand: item.brandName,
-            imageSrc: item.brandImage,
-            description: discountLabel || item.details || '',
-            detail: item.details ?? '',
-            infoLink: item.infoLink ?? '',
-            pointInfo: item.pointInfo ?? '',
-            createdAt: item.createdAt ?? '',
-        };
-    });
+    return [];
 }
 
 export { fetchDiscountsByBrand };
