@@ -1,3 +1,4 @@
+// src/components/Benefit/BenefitCard.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BenefitCard.module.css';
@@ -6,22 +7,15 @@ import brandIcons from '../../data/brandIcons';
 function BenefitCard({ id, brand, description, imageSrc, source }) {
   const navigate = useNavigate();
 
-  const handleDetailClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!brand || id == null) return; // 가드
-
-    const safeBrand = encodeURIComponent(String(brand).trim());
-    const isCard = source === 'card';
-    const url = `/benefit/${safeBrand}/${String(id)}${isCard ? '?source=card' : ''}`;
-
-    navigate(url, {
-      state: isCard ? { source: 'card' } : undefined,
+  const handleDetailClick = () => {
+    navigate(`/benefit/${encodeURIComponent(brand)}/${id}`, {
+      // 카드 혜택 섹션에서만 source="card"를 내려주세요.
+      state: source ? { source } : undefined,
     });
   };
 
   return (
-    <div className={styles.card} onClick={handleDetailClick} role="button" tabIndex={0}>
+    <div className={styles.card}>
       <img
         src={imageSrc || brandIcons[brand] || ''}
         alt={brand}
@@ -36,8 +30,8 @@ function BenefitCard({ id, brand, description, imageSrc, source }) {
       <div className={styles.info}>
         <h4 className={styles.brand}>{brand}</h4>
         <h3 className={styles.description}>{description}</h3>
-        <button className={styles.detailButton} type="button" onClick={handleDetailClick}>
-          자세히 보기 &gt;
+        <button className={styles.detailButton} onClick={handleDetailClick}>
+          자세히 보기
         </button>
       </div>
     </div>
