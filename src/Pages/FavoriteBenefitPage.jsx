@@ -1,170 +1,143 @@
-// src/pages/FavoriteBenefit/FavoriteBenefitPage.jsx
-import React, { useEffect, useState, useMemo } from 'react';
+// src/pages/FavoriteBenefitsPage.jsx
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-
-import { likedBrandsAtom } from '../recoil/atoms/likedBrandsAtom';
+import styles from './FavoriteBenefitPage.module.css';
 import BenefitListItem from '../components/Benefit/BenefitListItem';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
-import styles from './FavoriteBenefitPage.module.css';
 
-// API
 import { fetchFavoriteBenefits } from '../services/api/favoriteBenefitApi';
-import {
-    getUserFavoriteBrands,
-    addFavoriteBrandByName,
-    removeFavoriteBrandById,
-} from '../services/api/interestbrandApi';
+import { getUserFavoriteBrands } from '../services/api/interestbrandApi';
+import { isCardDiscountId } from '../services/api/cardBenefitApi'; // ★ 카드 혜택 판정
 
-// 문자열 정규화 (공백 제거 + 소문자 변환)
 const norm = (s) => (s ?? '').toString().trim().replace(/\s+/g, ' ').toLowerCase();
 
-const FavoriteBenefitPage = () => {
-    const navigate = useNavigate();
-    const [likedBrands, setLikedBrands] = useRecoilState(likedBrandsAtom);
+export default function FavoriteBenefitsPage() {
+  const navigate = useNavigate();
 
-    // 서버 데이터
-    const [favBrands, setFavBrands] = useState([]); // 관심 브랜드 목록
-    const [groups, setGroups] = useState([]); // 혜택 그룹 [{ brand, benefits: [...] }]
-    const [loading, setLoading] = useState(true);
-    const [err, setErr] = useState('');
-    const [busy, setBusy] = useState(false);
+  const [favBrands, setFavBrands] = useState([]); // [{id, name, image}]
+  const [groups, setGroups] = useState([]);       // [{ brand, brandImage, benefits:[...] }]
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
 
-    // 서버 목록 동기화
-    useEffect(() => {
-        (async () => {
-            try {
-                setLoading(true);
-                setErr('');
+  // 카드 혜택 판정 결과를 담는 Set
+  const [cardIdSet, setCardIdSet] = useState(null); // Set<string>
 
-                const serverGroups = await fetchFavoriteBenefits();
-                let filtered = serverGroups;
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setErr('');
 
-                try {
-                    const brands = await getUserFavoriteBrands();
-                    setFavBrands(Array.isArray(brands) ? brands : []);
+        // 1) 서버 "관심사 기반" 혜택 전체
+        const serverGroups = await fetchFavoriteBenefits();
 
-                    // Recoil likedBrands 동기화
-                    const mirrored = {};
-                    for (const b of brands) mirrored[b.name] = true;
-                    setLikedBrands(mirrored);
-
-                    // 관심 브랜드만 필터링
-                    const likeSet = new Set((brands || []).map((b) => norm(b?.name)));
-                    if (likeSet.size > 0) {
-                        filtered = serverGroups.filter((g) => likeSet.has(norm(g.brand)));
-                        if (filtered.length === 0) filtered = serverGroups;
-                    }
-                } catch {
-                    setFavBrands([]);
-                }
-
-                setGroups(filtered);
-            } catch (e) {
-                setErr(e?.message || '관심 브랜드 혜택을 불러오지 못했습니다.');
-                setGroups([]);
-            } finally {
-                setLoading(false);
-            }
-        })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // 서버 관심 브랜드 이름 Set
-    const serverNameSet = useMemo(() => {
-        const s = new Set();
-        for (const b of favBrands) s.add(norm(b.name));
-        return s;
-    }, [favBrands]);
-
-    // 좋아요 토글 (API 반영)
-    const toggleLike = async (brandName) => {
-        if (busy) return;
-        setBusy(true);
-
+        // 2) (선택) 관심 브랜드 목록 기반의 얇은 필터
+        let filtered = serverGroups;
         try {
-            if (!serverNameSet.has(norm(brandName))) {
-                // 등록
-                await addFavoriteBrandByName(brandName);
-            } else {
-                // 해제
-                const target = favBrands.find((b) => norm(b.name) === norm(brandName));
-                if (target?.id) {
-                    await removeFavoriteBrandById(target.id);
-
-                    // UI에서도 해당 그룹 제거
-                    setGroups((prev) =>
-                        prev.filter((g) => norm(g.brand) !== norm(brandName))
-                    );
-                }
-            }
-
-            // 최신 관심 브랜드 동기화
-            const latestBrands = await getUserFavoriteBrands();
-            setFavBrands(latestBrands);
-            const mirrored = {};
-            for (const b of latestBrands) mirrored[b.name] = true;
-            setLikedBrands(mirrored);
-        } catch (e) {
-            console.error('toggleLike error', e);
-            alert(e?.message || '관심 브랜드 변경 실패');
-        } finally {
-            setBusy(false);
+          const brands = await getUserFavoriteBrands();
+          setFavBrands(Array.isArray(brands) ? brands : []);
+          const likeSet = new Set((brands || []).map(b => norm(b?.name)));
+          if (likeSet.size > 0) {
+            const inter = serverGroups.filter(g => likeSet.has(norm(g.brand)));
+            filtered = inter.length > 0 ? inter : serverGroups;
+          }
+        } catch {
+          setFavBrands([]);
         }
-    };
 
-    return (
-        <div className={styles.container}>
-            <div className={styles.content}>
-                {loading && null}
-                {err && !loading && <p className={styles.error}>{err}</p>}
+        setGroups(filtered);
 
-                {groups.length === 0 && !loading && !err && (
-                    <p className={styles.emptyMessage}>관심 브랜드가 없습니다.</p>
-                )}
+        // 3) 카드 혜택 판정: 각 benefit id에 대해 isCardDiscountId 호출
+        //    (중복 id 제거 + 병렬 호출)
+        const allIds = Array.from(
+          new Set(
+            filtered.flatMap(g => (g.benefits || []).map(b => String(b.id)))
+          )
+        );
 
-                {groups.map((g, index) => (
-                    <div key={g.brand} className={styles.benefitListColumn}>
-                        {/* 브랜드명 + (첫 번째만 뒤로가기 버튼) + 즐겨찾기 버튼 */}
-                        <div className={styles.brandTitleWrapper}>
-                            {index === 0 && (
-                                <span
-                                    className={styles.backButton}
-                                    onClick={() => navigate(-1)}
-                                >
-                                    〈
-                                </span>
-                            )}
-                            <span className={styles.brandTitle}>{g.brand}</span>
-                            <button
-                                className={styles.starButton}
-                                onClick={() => toggleLike(g.brand)}
-                                disabled={busy}
-                            >
-                                {likedBrands[g.brand] ? '★' : '☆'}
-                            </button>
-                        </div>
+        // 네트워크 폭주 방지용: 병렬 제한(선택). 간단히 Promise.all로 처리.
+        const results = await Promise.all(
+          allIds.map(async (id) => {
+            try {
+              const ok = await isCardDiscountId(id);
+              return ok ? id : null;
+            } catch {
+              return null;
+            }
+          })
+        );
 
-                        {g.benefits.map((b) => (
-                            <BenefitListItem
-                                key={`${g.brand}-${b.id}`}
-                                id={b.id}
-                                brand={g.brand}
-                                description={b.description}
-                                detail={b.detail}
-                                imageSrc={b.imageSrc || g.brandImage}
-                                infoLink={b.infoLink}
-                                pointInfo={b.pointInfo}
-                                createdAt={b.createdAt}
-                            />
-                        ))}
-                    </div>
-                ))}
-            </div>
+        const setOk = new Set(results.filter(Boolean).map(String));
+        setCardIdSet(setOk);
+      } catch (e) {
+        setErr(e?.message || '관심 브랜드 혜택을 불러오지 못했습니다.');
+        setGroups([]);
+        setCardIdSet(new Set());
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-            <OwlScrollTop />
-        </div>
+  const flat = useMemo(() => {
+    return groups.flatMap((g) =>
+      (g.benefits || []).map((b) => ({
+        ...b,
+        brand: g.brand,
+        brandImage: g.brandImage,
+      }))
     );
-};
+  }, [groups]);
 
-export default FavoriteBenefitPage;
+  return (
+    <div className={styles.container}>
+      {/* 고정 헤더 */}
+      <div className={styles.fixedHeader}>
+        <div className={styles.header}>
+          <span className={styles.backButton} onClick={() => navigate(-1)}>〈</span>
+          <h2 className={styles.title}>관심 브랜드 혜택</h2>
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        {loading && <p className={styles.dimText}>불러오는 중…</p>}
+        {err && !loading && <p className={styles.error}>{err}</p>}
+
+        {/* 브랜드별 섹션 */}
+        {groups.map((g) => (
+          <section key={g.brand} className={styles.brandSection}>
+            <h3 className={styles.brandHeader}>{g.brand}</h3>
+            <div className={styles.benefitListColumn}>
+              {g.benefits.map((b) => {
+                const isCard = cardIdSet?.has(String(b.id)); // ★ 카드 혜택 여부
+                return (
+                  <BenefitListItem
+                    key={`${g.brand}-${b.id}`}
+                    id={b.id}
+                    brand={g.brand}
+                    description={b.description}
+                    detail={b.detail}
+                    imageSrc={b.imageSrc || g.brandImage}
+                    infoLink={b.infoLink}
+                    pointInfo={b.pointInfo}
+                    createdAt={b.createdAt}
+                    source={isCard ? 'card' : undefined}  // ★ 카드 혜택이면 state: { source: 'card' }로 전달됨
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ))}
+
+        {/* 데이터 없을 때 */}
+        {!loading && !err && groups.length === 0 && (
+          <p className={styles.emptyText}>
+            등록된 관심 브랜드와 관련된 혜택이 없습니다.
+          </p>
+        )}
+      </div>
+
+      <OwlScrollTop />
+    </div>
+  );
+}
