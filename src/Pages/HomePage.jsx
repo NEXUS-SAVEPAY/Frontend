@@ -53,6 +53,7 @@ function HomePage() {
         brand: it.brandName,
         description: `${it.discountPercent}% ${it.discountType}`,
         imageSrc: it.brandImage || '',
+        // 추천 섹션은 source를 전달하지 않음
       }));
       setRecBenefits(mapped);
       return mapped;
@@ -102,7 +103,6 @@ function HomePage() {
     setBenefitError('');
     try {
       const groups = await fetchFavoriteBenefits(); // [{ brand, brandImage, benefits: [...] }]
-      // 내 관심 브랜드만 필터 (서버가 이미 필터했다면 교집합이 비더라도 원본 사용)
       const likeSet = new Set((favsFromServer || []).map(b => norm(b?.name)));
       let filtered = groups;
       if (likeSet.size > 0) {
@@ -127,22 +127,13 @@ function HomePage() {
   const refreshInterestOrPayment = async () => {
     try {
       const check = await checkUserHasFavoriteBrands();
-      console.log('[checkUserHasFavoriteBrands 응답]', check);
-
       const data = await fetchInterestOrPaymentBenefits();
-      console.log('[fetchInterestOrPaymentBenefits 응답]', data);
-
       const list = Array.isArray(data?.result) ? data.result : [];
       setInterestOrPaymentBenefits(list);
 
-      if (check?.result === true) {
-        setHasLikedBrandsByApi(true);
-      } else if (check?.result === false) {
-        setHasLikedBrandsByApi(false);
-      } else {
-        console.warn('[check.result가 애매함]', check);
-        setHasLikedBrandsByApi(false); // fallback
-      }
+      if (check?.result === true) setHasLikedBrandsByApi(true);
+      else if (check?.result === false) setHasLikedBrandsByApi(false);
+      else setHasLikedBrandsByApi(false);
     } catch (e) {
       console.error('[HomePage] interest-or-payment API error:', e);
       setInterestOrPaymentBenefits([]);
@@ -171,7 +162,6 @@ function HomePage() {
   const userPaymentRaw = useRecoilValue(userPaymentsAtom);
   const telcoInfo = useRecoilValue(userTelcoInfoAtom);
 
-  // ✅ 결제수단 원시 데이터 → 부모 프로바이더 문자열 배열로 정규화
   const normalizeSimplePays = (raw) => {
     const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
     const set = new Set();
@@ -180,21 +170,19 @@ function HomePage() {
       if (!it) continue;
 
       if (typeof it === 'string') {
-        // 예: 'kakao_membership' → 'kakao'
         const parent = it.split('_')[0];
         if (parent) set.add(parent.toLowerCase());
         continue;
       }
 
       if (typeof it === 'object') {
-        // 서버 객체형: { provider, company, image, isMembership }
         const prov = (it.provider ?? '').toString().trim().toLowerCase();
         if (prov) set.add(prov);
         continue;
       }
     }
 
-    return [...set]; // 중복 제거된 부모 프로바이더 목록
+    return [...set];
   };
 
   const payParents = useMemo(() => normalizeSimplePays(userPaymentRaw), [userPaymentRaw]);
@@ -205,8 +193,8 @@ function HomePage() {
     toss:  '토스페이',
     payco: '페이코',
   };
-  const payIconMap = { kakao: kakaopayImg /* naver, toss, payco 아이콘 추가 가능 */ };
-  const telcoIconMap = { 'SKT': sktImg /* 'KT': ktImg, 'LG U+': lguplusImg */ };
+  const payIconMap = { kakao: kakaopayImg };
+  const telcoIconMap = { 'SKT': sktImg };
 
   const paymentItems = [
     ...(registeredCards || []).map(card => ({
@@ -229,14 +217,6 @@ function HomePage() {
     }] : []),
   ];
 
-  // 결제수단별 그룹핑 (필요 시 사용)
-  const benefitsBySource = interestOrPaymentBenefits.reduce((acc, b) => {
-    const key = b.source; // "CARD", "PAY", "TELCO"
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(b);
-    return acc;
-  }, {});
-
   // 최초 진입 시: 관심 브랜드 → 관심 혜택 → 추천 혜택 순서 보장
   useEffect(() => {
     (async () => {
@@ -248,7 +228,7 @@ function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 로딩 상태 하나라도 true면 흰 화면 보여주기
+  // 로딩 상태 하나라도 true면 흰 화면
   const isLoadingAll = recLoading || favLoading || benefitLoading || interestOrPaymentBenefits.length === 0;
 
   // ---------- 검색 ----------
@@ -258,14 +238,10 @@ function HomePage() {
     if (!brandName) return;
 
     try {
-      // ✅ 서버에서 검색 (brandName이 DB에 존재하는지 확인)
       const data = await fetchDiscountsByBrand(brandName);
-
       if (Array.isArray(data?.result) && data.result.length > 0) {
-        // DB에 해당 브랜드 혜택이 존재 → 상세 페이지 이동
         navigate(`/benefit/${encodeURIComponent(brandName)}`);
       } else {
-        // DB에 없는 브랜드
         setShowNoResult(true);
         setTimeout(() => setShowNoResult(false), 2000);
       }
@@ -288,7 +264,6 @@ function HomePage() {
   });
 
   // ---------- 표시용: 관심 브랜드 혜택 프리뷰 ----------
-  // 서버 그룹을 평탄화 → 프리뷰 개수 제한(MAX_PREVIEW)
   const serverFlatBenefits = useMemo(() => {
     if (benefitGroups.length === 0) return [];
     const flat = benefitGroups.flatMap((g) =>
@@ -306,7 +281,6 @@ function HomePage() {
     return flat.slice(0, MAX_PREVIEW);
   }, [benefitGroups]);
 
-  // 서버 실패 시 로컬 목데이터에서 "내 관심 브랜드만" 추려서 표시(동일 개수 제한)
   const serverNameSet = useMemo(() => {
     const s = new Set();
     for (const b of favBrands) s.add(norm(b.name));
@@ -351,7 +325,7 @@ function HomePage() {
           null
         ) : (
           <>
-            {/* 추천 혜택 */}
+            {/* 추천 혜택 (source 전달 X) */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h1 className={styles.title}>추천혜택</h1>
@@ -363,7 +337,6 @@ function HomePage() {
                 </button>
               </div>
               <div className={styles.benefitList}>
-                {/* 에러가 있을 때만 목데이터 보여주기 */}
                 {recError ? (
                   recommendedBenefits.map((benefit) => (
                     <BenefitCard
@@ -372,6 +345,7 @@ function HomePage() {
                       brand={benefit.brand}
                       description={benefit.description}
                       imageSrc={benefit.imageSrc}
+                      // source 전달 안 함
                     />
                   ))
                 ) : (
@@ -382,6 +356,7 @@ function HomePage() {
                       brand={benefit.brand}
                       description={benefit.description}
                       imageSrc={benefit.imageSrc}
+                      // source 전달 안 함
                     />
                   ))
                 )}
@@ -430,7 +405,7 @@ function HomePage() {
                     ))}
                   </div>
 
-                  {/* 혜택 리스트는 혜택 단위 그대로 */}
+                  {/* 혜택 리스트 — 여기서만 CARD 항목에 state 전달 */}
                   <div className={styles.listColumn}>
                     {interestOrPaymentBenefits.map((b) => (
                       <BenefitListItem
@@ -443,6 +418,7 @@ function HomePage() {
                         infoLink={b.infoLink}
                         pointInfo={b.pointInfo}
                         createdAt={b.createdAt}
+                        source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
                       />
                     ))}
                   </div>
@@ -468,6 +444,7 @@ function HomePage() {
                     ))}
                   </div>
 
+                  {/* 결제수단별 혜택 — CARD만 state 전달 */}
                   <div className={styles.listColumn}>
                     {interestOrPaymentBenefits.map((b) => (
                       <BenefitListItem
@@ -477,6 +454,7 @@ function HomePage() {
                         description={`${b.brandName} ${b.discountPercent}% ${b.discountType}`}
                         detail={b.details}
                         imageSrc={b.brandImage}
+                        source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
                       />
                     ))}
                   </div>
