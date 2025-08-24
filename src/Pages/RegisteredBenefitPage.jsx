@@ -10,7 +10,6 @@ import { fetchRegisteredPaymentTop2 } from '../services/api/registeredBenefitApi
 
 function RegisteredBenefitPage() {
     const navigate = useNavigate();
-    console.log('[TOP2 응답]', { card, pay, telco });
 
     const [cardTop2, setCardTop2] = useState([]);
     const [payTop2, setPayTop2] = useState([]);
