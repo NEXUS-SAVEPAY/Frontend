@@ -64,7 +64,7 @@ function CardBenefitPage() {
       return;
     }
 
-    // ❗ 임시 id(tmp-*)인 경우: 서버 상세 페이지가 없을 수 있으니 infoLink가 있으면 외부 링크로 대체
+    // 임시 id(tmp-*)인 경우: 서버 상세 페이지가 없을 수 있으니 infoLink가 있으면 외부 링크로 대체
     if (String(discountId).startsWith('tmp-')) {
       if (benefit?.infoLink) {
         window.open(benefit.infoLink, '_blank', 'noopener,noreferrer');

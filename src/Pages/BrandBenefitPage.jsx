@@ -8,7 +8,7 @@ import BenefitListItem from '../components/Benefit/BenefitListItem';
 import OwlScrollTop from '../components/Common/OwlScrollTop';
 import favoriteBrandBenefits from '../data/favoriteBrandBenefits';
 
-// ✅ 새 API import
+// 새 API import
 import { fetchDiscountsByBrand } from '../services/api/discountApi';
 import { addFavoriteBrandByName, removeFavoriteBrandById, getUserFavoriteBrands } from '../services/api/interestbrandApi';
 
@@ -32,7 +32,7 @@ const BrandBenefitPage = () => {
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false); // 중복 클릭 방지
 
-    // ✅ 관심 브랜드 동기화
+    // 관심 브랜드 동기화
     const syncFavorites = async () => {
         try {
             const list = await getUserFavoriteBrands();
@@ -72,7 +72,7 @@ const BrandBenefitPage = () => {
         }
     };
 
-    // ✅ 서버 호출 + 매핑
+    // 서버 호출 + 매핑
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);

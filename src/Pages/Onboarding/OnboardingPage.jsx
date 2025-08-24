@@ -10,7 +10,7 @@ export default function OnboardingPage() {
 const navigate = useNavigate();
 
 const handleKakaoLogin = () => {
-    // ⛔️ fetch로 호출하면 CORS/302에 막힘
+    // fetch로 호출하면 CORS/302에 막힘
     window.location.href = 'http://3.35.204.188:8080/oauth2/authorization/kakao';
 };
 

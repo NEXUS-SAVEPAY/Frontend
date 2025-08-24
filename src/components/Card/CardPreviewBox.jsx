@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './CardPreviewBox.module.css';
 
 function CardPreviewBox({ card }) {
-    console.log('💡 전달된 카드 데이터:', card); // 👉 콘솔에서 확인
+    console.log('💡 전달된 카드 데이터:', card); // 콘솔에서 확인
 
     // card가 없거나 image가 없는 경우 경고 텍스트 렌더링
     if (!card || !card.image) {

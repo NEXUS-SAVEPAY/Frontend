@@ -116,7 +116,7 @@ export function invalidateCardBenefitIdCache() {
 }
 
 /**
- * ✅ 호환용 별칭
+ *  호환용 별칭
  *  - 인자로 문자열(브랜드명) 또는 객체 { brandName, signal } 모두 허용
  *  - 인자 없으면 전체 반환
  */
@@ -141,7 +141,7 @@ export async function fetchCardRelatedBrandBenefits(arg) {
 }
 
 /**
- * ✅ UI 매핑 함수 export (CardBenefitPage에서 사용)
+ * UI 매핑 함수 export (CardBenefitPage에서 사용)
  *  - id가 없으면 tmp-<index>로 fallback 생성하여 리스트에 반드시 노출
  *  - detail은 details + pointInfo를 결합해서 항상 표시
  *  - description도 (할인타입 + 퍼센트) → details → pointInfo 순으로 보강

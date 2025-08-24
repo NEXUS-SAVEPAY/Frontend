@@ -16,7 +16,7 @@ export async function authorizedFetch(path, options = {}) {
     return fetch(url, { ...options, headers });
 }
 
-// ✅ JSON 파싱 전용 함수
+// JSON 파싱 전용 함수
 export async function getJson(path, options = {}) {
     const res = await authorizedFetch(path, { method: 'GET', ...options });
     if (!res.ok) {

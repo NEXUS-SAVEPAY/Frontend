@@ -9,7 +9,7 @@ function BenefitListItem({
   description,    // 예: '20% 할인'
   detail,         // 상세 문구
   imageSrc,       // 백엔드 brandImage
-  infoLink,       // ✅ 외부 정보 링크 (보존용; 여기서는 사용 X)
+  infoLink,       // 외부 정보 링크 (보존용; 여기서는 사용 X)
   onClickDetail,  // 부모 콜백 우선
   source,         // 'card' | 'brand' | 'telco' ... (선택; 카드 목록이면 'card')
 }) {

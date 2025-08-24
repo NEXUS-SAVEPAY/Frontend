@@ -129,7 +129,7 @@ export async function fetchSimplePays() {
 
   const list = data?.result?.payResponseOneDtoList ?? [];
 
-  // ✅ 서버 데이터 그대로 normalize
+  // 서버 데이터 그대로 normalize
   return list.map((item) => ({
     provider: item.payProvider,   // "KAKAO", "TOSS", ...
     company: item.company,        // 소문자 "kakao", "toss", ...

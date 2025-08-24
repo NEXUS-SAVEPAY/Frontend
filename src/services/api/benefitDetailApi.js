@@ -34,7 +34,7 @@ async function getJson(url) {
 }
 
 export async function fetchBenefitDetail(discountIdRaw) {
-  // ✅ 문자열 'undefined' / 'null' / 공백 전부 차단
+  // 문자열 'undefined' / 'null' / 공백 전부 차단
   const discountId = String(discountIdRaw ?? '').trim();
   if (!discountId || discountId.toLowerCase() === 'undefined' || discountId.toLowerCase() === 'null') {
     throw new Error('유효하지 않은 discountId 입니다.');

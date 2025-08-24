@@ -65,7 +65,7 @@
     scroll-snap-type: x proximity;
 }
 
-/* (선택) 스크롤바 최소화 */
+/* 스크롤바 최소화 */
 .brandList::-webkit-scrollbar { height: 6px; }
 .brandList::-webkit-scrollbar-thumb { background: #e6e9ec; border-radius: 3px; }
 .brandList::-webkit-scrollbar-track { background: transparent; }

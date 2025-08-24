@@ -127,7 +127,7 @@
 .inputGroupWithStep {
     display: flex;
     gap: 12px;
-    align-items: flex-start; /* ✅ 이게 핵심 */
+    align-items: flex-start; /* 이게 핵심 */
     margin-bottom: 30px;
     width: 100%;
     padding-right: 8px;
@@ -137,7 +137,7 @@
     flex-shrink: 0;
     width: 36px; /* StepCircle 공간 확보용 */
     display: flex;
-    align-items: center; /* ✅ 수직 정중앙 */
+    align-items: center; /* 수직 정중앙 */
     justify-content: center;
     margin-top: 11px;
     padding-right: 8px;

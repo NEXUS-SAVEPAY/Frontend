@@ -46,18 +46,6 @@ async function fetchJson(url) {
   return res.json();
 }
 
-/**
- * ✅ 추천 혜택 조회
- * 스웨거 응답 예:
- * {
- *   isSuccess: true,
- *   result: [{ id, brandName, brandImage, discountPercent, discountType, infoLink, details, pointInfo, createdAt }],
- *   success: true
- * }
- *
- * 백엔드 경로가 다르면 아래 경로만 바꿔주세요.
- */
 export async function fetchRecommendedBenefits() {
-  // 예시 엔드포인트: /api/discount/recommend
   return fetchJson(withBase('/api/discount/recommend'));
 }
