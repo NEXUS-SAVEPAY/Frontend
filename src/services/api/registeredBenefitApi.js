@@ -1,21 +1,14 @@
-// src/services/api/registeredBenefitApi.js
 import { getAccessToken } from './token';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const withBase = (path) =>
   new URL(`${BASE_URL}${path}`, typeof window !== 'undefined' ? window.location.origin : undefined);
 
-/**
- * 통합 TOP(평면) 엔드포인트:
- * - 환경변수(VITE_API_REGISTERED_TOP2_PATH)가 설정된 경우에만 사용
- * - 미설정이면 '/api/discount/payment'만 시도 (404 없애기)
- */
 const REGISTERED_TOP2_ENV = import.meta.env.VITE_API_REGISTERED_TOP2_PATH;
 const REGISTERED_TOP2_FALLBACK = '/api/discount/payment';
 
-// 카테고리 "전체 목록" (id 집합 만들 용도) — 스웨거 실제 경로로 확정
 const CARD_LIST_PATH  = '/api/discount/card';
-const PAY_LIST_PATH   = '/api/discount/pay';   // pay는 payment로 확정
+const PAY_LIST_PATH   = '/api/discount/pay';
 const TELCO_LIST_PATH = '/api/discount/telecom';
 
 async function fetchJson(url) {
@@ -43,24 +36,24 @@ function pickArray(data) {
   return [];
 }
 
-const TYPE_LABELS = {
-  DISCOUNT: '할인',
-  POINT: '포인트',
-  COUPON: '쿠폰',
-  CASHBACK: '캐시백',
-};
-
+// ✅ 공통 description 포맷 (다른 API와 통일)
 function mapBenefit(item) {
-  const n = Number(item?.discountPercent);
-  const pct = Number.isFinite(n) && n > 0 ? `${n}%` : '';
-  const rawType = (item?.discountType ?? '').toString().trim();
-  const typeText = TYPE_LABELS[rawType?.toUpperCase?.()] || rawType;
-  const description = [pct, typeText].filter(Boolean).join(' ').trim() || (item?.details ?? '');
+  const discountPercent = Number(item?.discountPercent ?? 0) || 0;
+  const discountType = (item?.discountType ?? '').toString().trim();
+
+  // 📌 Telco/FavoriteBenefitPage와 같은 방식: 퍼센트 + 타입
+  const discountLabel =
+    discountPercent && discountType
+      ? `${discountPercent}% ${discountType}`
+      : discountType || '';
+
+  const description = discountLabel || item?.details || '';
+
   return {
     id: item?.id,
     brand: item?.brandName,
     imageSrc: item?.brandImage,
-    description,
+    description,          // ✅ 다른 페이지와 동일한 형식
     detail: item?.details ?? '',
     infoLink: item?.infoLink ?? '',
     pointInfo: item?.pointInfo ?? '',
@@ -72,7 +65,7 @@ function mapBenefit(item) {
 async function fetchRegisteredTop2FlatInternal() {
   const candidates = REGISTERED_TOP2_ENV
     ? [REGISTERED_TOP2_ENV, REGISTERED_TOP2_FALLBACK]
-    : [REGISTERED_TOP2_FALLBACK]; // 미설정이면 /registered/top2 호출 안 함
+    : [REGISTERED_TOP2_FALLBACK];
 
   for (const p of candidates) {
     try {
@@ -86,22 +79,14 @@ async function fetchRegisteredTop2FlatInternal() {
   return [];
 }
 
-// ---- 카테고리 전체 목록 ----
 async function fetchCardList()  { return pickArray(await fetchJson(withBase(CARD_LIST_PATH))); }
 async function fetchPayList()   { return pickArray(await fetchJson(withBase(PAY_LIST_PATH))); }
 async function fetchTelcoList() { return pickArray(await fetchJson(withBase(TELCO_LIST_PATH))); }
 
-/**
- * 통합 TOP(flat)을 받아오고, 카테고리 전체 목록의 ID 집합으로 교차검증하여
- * { card:[..2], pay:[..2], telco:[..2], unknown:[...] }로 확정 분류
- * - 섞임 없음, 순서는 flat 응답의 우선순위를 그대로 따름
- */
 export async function fetchRegisteredPaymentTop2() {
-  // 1) 통합 TOP(평면)
   const flat = await fetchRegisteredTop2FlatInternal();
   if (flat.length === 0) return { card: [], pay: [], telco: [], unknown: [] };
 
-  // 2) 카테고리 전체 목록 → id 집합
   const [cardAll, payAll, telcoAll] = await Promise.allSettled([
     fetchCardList(),
     fetchPayList(),
@@ -113,7 +98,6 @@ export async function fetchRegisteredPaymentTop2() {
   const payIds   = toSet(payAll);
   const telcoIds = toSet(telcoAll);
 
-  // 3) 교차검증 분류 (동일 id가 다수 집합에 있으면 card > pay > telco 우선)
   const buckets = { card: [], pay: [], telco: [], unknown: [] };
   for (const raw of flat) {
     const id = raw?.id;
@@ -125,11 +109,10 @@ export async function fetchRegisteredPaymentTop2() {
     buckets.unknown.push(raw);
   }
 
-  // 4) UI 맵핑
   return {
     card:   buckets.card.slice(0, 2).map(mapBenefit),
     pay:    buckets.pay.slice(0, 2).map(mapBenefit),
     telco:  buckets.telco.slice(0, 2).map(mapBenefit),
-    unknown: buckets.unknown.map(mapBenefit), // 필요 없으면 페이지에서 무시
+    unknown: buckets.unknown.map(mapBenefit),
   };
 }

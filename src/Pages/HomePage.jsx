@@ -384,82 +384,103 @@ function HomePage() {
 
               {hasLikedBrandsByApi ? (
                 <>
-                  {/* 🔹 관심 브랜드 아이콘 (중복 제거) */}
-                  <div className={styles.brandList}>
+                    {/* 🔹 관심 브랜드 아이콘 (중복 제거) */}
+                    <div className={styles.brandList}>
                     {uniqueBrandIcons.map((item) => (
-                      <div
+                        <div
                         key={item.brandName}
                         className={styles.brandItem}
                         onClick={() =>
-                          navigate(`/benefit/${encodeURIComponent(item.brandName)}`)
+                            navigate(`/benefit/${encodeURIComponent(item.brandName)}`)
                         }
-                      >
+                        >
                         <img
-                          src={item.brandImage || ''}
-                          alt={item.brandName}
-                          className={styles.brandIcon}
-                          onError={(e) => (e.currentTarget.src = '')}
+                            src={item.brandImage || ''}
+                            alt={item.brandName}
+                            className={styles.brandIcon}
+                            onError={(e) => (e.currentTarget.src = '')}
                         />
                         <span className={styles.brandLabel}>{item.brandName}</span>
-                      </div>
+                        </div>
                     ))}
-                  </div>
+                    </div>
 
-                  {/* 혜택 리스트 — 여기서만 CARD 항목에 state 전달 */}
-                  <div className={styles.listColumn}>
-                    {interestOrPaymentBenefits.map((b) => (
-                      <BenefitListItem
-                        key={b.id}
-                        id={b.id}
-                        brand={b.brandName}
-                        description={`${b.discountPercent}% ${b.discountType}`}
-                        detail={b.details}
-                        imageSrc={b.brandImage}
-                        infoLink={b.infoLink}
-                        pointInfo={b.pointInfo}
-                        createdAt={b.createdAt}
-                        source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
-                      />
-                    ))}
-                  </div>
+                    {/* 혜택 리스트 — 여기서만 CARD 항목에 state 전달 */}
+                    <div className={styles.listColumn}>
+                    {interestOrPaymentBenefits.map((b) => {
+                        const discountPercent = Number(b.discountPercent ?? 0) || 0;
+                        const discountType = (b.discountType ?? '').toString().trim();
+
+                        const discountLabel =
+                        discountPercent && discountType
+                            ? `${discountPercent}% ${discountType}`
+                            : discountType || '';
+
+                        return (
+                        <BenefitListItem
+                            key={b.id}
+                            id={b.id}
+                            brand={b.brandName}
+                            description={discountLabel || b.details || ''}
+                            detail={b.details}
+                            imageSrc={b.brandImage}
+                            infoLink={b.infoLink}
+                            pointInfo={b.pointInfo}
+                            createdAt={b.createdAt}
+                            source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
+                        />
+                        );
+                    })}
+                    </div>
                 </>
-              ) : (
+                ) : (
                 <>
-                  {/* 결제수단 아이콘 */}
-                  <div className={styles.brandList}>
+                    {/* 결제수단 아이콘 */}
+                    <div className={styles.brandList}>
                     {paymentItems.map((item) => (
-                      <div
+                        <div
                         key={item.key}
                         className={styles.brandItem}
                         onClick={item.onClick}
-                      >
+                        >
                         <img
-                          src={item.image || ''}
-                          alt={item.name}
-                          className={styles.brandIcon}
-                          onError={(e) => (e.currentTarget.src = '')}
+                            src={item.image || ''}
+                            alt={item.name}
+                            className={styles.brandIcon}
+                            onError={(e) => (e.currentTarget.src = '')}
                         />
                         <span className={styles.brandLabel}>{item.name}</span>
-                      </div>
+                        </div>
                     ))}
-                  </div>
+                    </div>
 
-                  {/* 결제수단별 혜택 — CARD만 state 전달 */}
-                  <div className={styles.listColumn}>
-                    {interestOrPaymentBenefits.map((b) => (
-                      <BenefitListItem
-                        key={b.id}
-                        id={b.id}
-                        brand={b.source}  // PAY / CARD / TELCO 등
-                        description={`${b.brandName} ${b.discountPercent}% ${b.discountType}`}
-                        detail={b.details}
-                        imageSrc={b.brandImage}
-                        source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
-                      />
-                    ))}
-                  </div>
+                    {/* 결제수단별 혜택 — CARD만 state 전달 */}
+                    <div className={styles.listColumn}>
+                    {interestOrPaymentBenefits.map((b) => {
+                        const discountPercent = Number(b.discountPercent ?? 0) || 0;
+                        const discountType = (b.discountType ?? '').toString().trim();
+
+                        const discountLabel =
+                        discountPercent && discountType
+                            ? `${discountPercent}% ${discountType}`
+                            : discountType || '';
+
+                        return (
+                        <BenefitListItem
+                            key={b.id}
+                            id={b.id}
+                            brand={b.source}  // PAY / CARD / TELCO 등
+                            description={`${b.brandName} ${discountLabel || b.details || ''}`}
+                            detail={b.details}
+                            imageSrc={b.brandImage}
+                            source={b.source === 'CARD' ? 'card' : undefined}  // ★ 핵심
+                        />
+                        );
+                    })}
+                    </div>
                 </>
-              )}
+                )}
+
             </section>
           </>
         )}
